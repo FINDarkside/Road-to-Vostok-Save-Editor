@@ -29,6 +29,8 @@ export function useInventoryGrid() {
         condition: item.condition,
         showCondition: item.showCondition,
         amount: item.amount,
+        showAmount: item.showAmount,
+        chamber: item.chamber,
         col: Math.round(item.gridPosition.x / GAME_CELL_SIZE),
         row: Math.round(item.gridPosition.y / GAME_CELL_SIZE),
         w,

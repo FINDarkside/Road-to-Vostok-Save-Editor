@@ -70,6 +70,19 @@ const { dragState } = useDragDrop()
       >
         {{ placement.itemName }}
       </div>
+      <!-- Ammo count -->
+      <span
+        v-if="!ghost && placement.category === 'Weapons'"
+        class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+      >
+        {{ placement.amount }} + {{ placement.chamber ? 1 : 0 }}
+      </span>
+      <span
+        v-else-if="!ghost && placement.showAmount"
+        class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+      >
+        {{ placement.amount }}
+      </span>
       <!-- Item name label -->
       <span
         v-if="!ghost"

@@ -169,8 +169,36 @@ const gridHeight = ROWS * CELL_SIZE
           :h="slot.h"
           :cell-size="CELL_SIZE"
         />
+        <!-- Condition percentage -->
         <span
-          class="absolute bottom-0 left-0 text-[8px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
+          v-if="equipmentBySlot.get(slot.name)!.showCondition"
+          class="absolute top-0 right-0 text-[9px] leading-none font-medium px-[3px] pt-[2px] z-10"
+          :class="
+            equipmentBySlot.get(slot.name)!.condition > 50
+              ? 'text-green-500'
+              : equipmentBySlot.get(slot.name)!.condition > 25
+                ? 'text-yellow-300'
+                : 'text-red-400'
+          "
+        >
+          {{ Math.round(equipmentBySlot.get(slot.name)!.condition) }}%
+        </span>
+        <!-- Ammo count -->
+        <span
+          v-if="equipmentBySlot.get(slot.name)!.category === 'Weapons'"
+          class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+        >
+          {{ equipmentBySlot.get(slot.name)!.amount }} + {{ equipmentBySlot.get(slot.name)!.chamber ? 1 : 0 }}
+        </span>
+        <span
+          v-else-if="equipmentBySlot.get(slot.name)!.showAmount"
+          class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+        >
+          {{ equipmentBySlot.get(slot.name)!.amount }}
+        </span>
+        <!-- Item name label -->
+        <span
+          class="absolute bottom-0 left-0 text-[9px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
           style="text-overflow: '.'"
         >
           {{ equipmentBySlot.get(slot.name)!.nameEquipment }}

@@ -84,6 +84,10 @@ export interface SlotItem {
   /** Whether condition is meaningful for this item type */
   showCondition: boolean
   amount: number
+  /** Whether amount is meaningful for this item type */
+  showAmount: boolean
+  /** Whether a round is chambered (weapons only) */
+  chamber: boolean
   gridPosition: { x: number; y: number }
   gridRotated: boolean
   /** Equipment slot ("Primary", "Head", etc.) or "" for inventory items */
@@ -104,6 +108,8 @@ export interface GridItemPlacement {
   condition: number
   showCondition: boolean
   amount: number
+  showAmount: boolean
+  chamber: boolean
   col: number
   row: number
   w: number

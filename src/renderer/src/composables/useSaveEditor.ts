@@ -74,6 +74,8 @@ function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
     condition: getNumberProp(sub.properties, 'condition'),
     showCondition: ITEMS_META.get(itemPath)?.showCondition ?? false,
     amount: getNumberProp(sub.properties, 'amount'),
+    showAmount: ITEMS_META.get(itemPath)?.showAmount ?? false,
+    chamber: getBoolProp(sub.properties, 'chamber'),
     gridPosition: {
       x: getVector2Prop(sub.properties, 'gridPosition')?.x ?? 0,
       y: getVector2Prop(sub.properties, 'gridPosition')?.y ?? 0

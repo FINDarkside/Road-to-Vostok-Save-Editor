@@ -35,6 +35,8 @@ function buildPlacementFromSlotItem(item: SlotItem): GridItemPlacement {
     condition: item.condition,
     showCondition: item.showCondition,
     amount: item.amount,
+    showAmount: item.showAmount,
+    chamber: item.chamber,
     col: 0,
     row: 0,
     w: baseSize.w,
