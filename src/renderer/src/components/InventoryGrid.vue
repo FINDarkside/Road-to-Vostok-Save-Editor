@@ -4,6 +4,7 @@ import { useInventoryGrid, GRID_COLS, GRID_ROWS } from '../composables/useInvent
 import { useDragDrop } from '../composables/useDragDrop'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import InventoryGridItem from './InventoryGridItem.vue'
+import ItemContextMenu from './ItemContextMenu.vue'
 import type { GridItemPlacement } from '../lib/types'
 
 const CELL_SIZE = 48
@@ -19,7 +20,36 @@ const {
   onKeyDown,
   cancelDrag
 } = useDragDrop()
-const { updateItemGridPosition } = useSaveEditor()
+const { updateItemGridPosition, removeItem, addItem, items: allItems } = useSaveEditor()
+
+const contextMenu = ref<{ placement: GridItemPlacement; x: number; y: number } | null>(null)
+
+function onItemContextMenu(placement: GridItemPlacement, event: MouseEvent) {
+  contextMenu.value = { placement, x: event.clientX, y: event.clientY }
+}
+
+function handleDuplicate() {
+  if (!contextMenu.value) return
+  const p = contextMenu.value.placement
+  const original = allItems.value.find((i) => i.subResourceId === p.subResourceId)
+  if (!original) return
+  const slot = findFreeSlot(p.w, p.h, p.subResourceId)
+  if (!slot) return
+  addItem(original.itemPath, {
+    condition: original.condition,
+    amount: original.amount,
+    gridCol: slot.col,
+    gridRow: slot.row,
+    gridRotated: slot.rotated
+  })
+  contextMenu.value = null
+}
+
+function handleDelete() {
+  if (!contextMenu.value) return
+  removeItem(contextMenu.value.placement.subResourceId)
+  contextMenu.value = null
+}
 
 const conflicts = computed(() => getConflicts())
 const conflictIds = computed(() => new Set(conflicts.value.map((c) => c.subResourceId)))
@@ -155,7 +185,17 @@ defineExpose({ findFreeSlot })
         :dimmed="dragState?.source.item.subResourceId === p.subResourceId"
         :class="{ 'ring-1 ring-amber-500/60': conflictIds.has(p.subResourceId) }"
         @dragstart="onItemDragStart"
+        @contextmenu="onItemContextMenu"
       />
     </div>
+
+    <ItemContextMenu
+      v-if="contextMenu"
+      :x="contextMenu.x"
+      :y="contextMenu.y"
+      @duplicate="handleDuplicate"
+      @delete="handleDelete"
+      @close="contextMenu = null"
+    />
   </div>
 </template>

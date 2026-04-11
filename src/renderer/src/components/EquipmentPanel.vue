@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
+import { useInventoryGrid } from '../composables/useInventoryGrid'
 import { ITEMS_BY_PATH } from '../data/items'
 import CompositeIcon from './CompositeIcon.vue'
+import ItemContextMenu from './ItemContextMenu.vue'
 import type { SlotItem } from '../lib/types'
 
 const CELL_SIZE = 48
@@ -42,8 +44,42 @@ const slots: SlotDef[] = [
   { name: 'Player', col: 5, row: 7, w: 1, h: 1 }
 ]
 
-const { equipment } = useSaveEditor()
+const { equipment, removeItem, addItem } = useSaveEditor()
 const { dragState, startDragFromEquipment, enterEquipmentSlot, leaveEquipmentSlot } = useDragDrop()
+const { findFreeSlot } = useInventoryGrid()
+
+const contextMenu = ref<{ item: SlotItem; x: number; y: number } | null>(null)
+
+function onSlotContextMenu(slot: SlotDef, event: MouseEvent) {
+  const item = equipmentBySlot.value.get(slot.name)
+  if (!item) return
+  event.preventDefault()
+  contextMenu.value = { item, x: event.clientX, y: event.clientY }
+}
+
+function handleDuplicate() {
+  if (!contextMenu.value) return
+  const item = contextMenu.value.item
+  const catalogItem = ITEMS_BY_PATH.get(item.itemPath)
+  const w = catalogItem?.sizeW ?? 1
+  const h = catalogItem?.sizeH ?? 1
+  const slot = findFreeSlot(w, h)
+  if (!slot) return
+  addItem(item.itemPath, {
+    condition: item.condition,
+    amount: item.amount,
+    gridCol: slot.col,
+    gridRow: slot.row,
+    gridRotated: slot.rotated
+  })
+  contextMenu.value = null
+}
+
+function handleDelete() {
+  if (!contextMenu.value) return
+  removeItem(contextMenu.value.item.subResourceId)
+  contextMenu.value = null
+}
 
 const equipmentBySlot = computed(() => {
   const map = new Map<string, SlotItem>()
@@ -58,6 +94,7 @@ function getIconFile(item: SlotItem): string {
 }
 
 function onSlotPointerDown(slot: SlotDef, event: PointerEvent) {
+  if (event.button !== 0) return
   const item = equipmentBySlot.value.get(slot.name)
   if (!item) return
   startDragFromEquipment(item, slot.name, event)
@@ -121,6 +158,7 @@ const gridHeight = ROWS * CELL_SIZE
       @pointerdown="onSlotPointerDown(slot, $event)"
       @pointerenter="onSlotPointerEnter(slot)"
       @pointerleave="onSlotPointerLeave(slot)"
+      @contextmenu="onSlotContextMenu(slot, $event)"
     >
       <div v-if="equipmentBySlot.get(slot.name)" class="relative w-full h-full">
         <CompositeIcon
@@ -140,5 +178,14 @@ const gridHeight = ROWS * CELL_SIZE
       </div>
       <span v-else class="text-[9px] text-muted-foreground/60 uppercase flex items-center justify-center w-full h-full">{{ slot.label ?? slot.name }}</span>
     </div>
+
+    <ItemContextMenu
+      v-if="contextMenu"
+      :x="contextMenu.x"
+      :y="contextMenu.y"
+      @duplicate="handleDuplicate"
+      @delete="handleDelete"
+      @close="contextMenu = null"
+    />
   </div>
 </template>

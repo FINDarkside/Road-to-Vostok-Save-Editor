@@ -12,6 +12,7 @@ const props = defineProps<{
 
 defineEmits<{
   dragstart: [placement: GridItemPlacement, event: PointerEvent]
+  contextmenu: [placement: GridItemPlacement, event: MouseEvent]
 }>()
 
 const { dragState } = useDragDrop()
@@ -32,7 +33,8 @@ const { dragState } = useDragDrop()
       height: `${placement.h * cellSize}px`
     }"
     :title="`${placement.itemName}${placement.condition ? ` (${Math.round(placement.condition)}%)` : ''}`"
-    @pointerdown.prevent="!ghost && $emit('dragstart', placement, $event)"
+    @pointerdown.prevent="!ghost && $event.button === 0 && $emit('dragstart', placement, $event)"
+    @contextmenu.prevent="!ghost && $emit('contextmenu', placement, $event)"
   >
     <div
       class="w-full h-full relative"

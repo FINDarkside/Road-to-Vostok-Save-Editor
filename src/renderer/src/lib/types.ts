@@ -140,6 +140,8 @@ export interface DragDropState {
   gridSnap: GridSnapState | null
   /** Equipment slot hover — set when pointer is over an equipment slot */
   equipmentHover: EquipmentHoverState | null
+  /** Whether the pointer is over the delete zone */
+  deleteHover: boolean
   /** Current ghost dimensions (updated by grid snap / rotation) */
   ghostW: number
   ghostH: number

@@ -1,5 +1,11 @@
 import { ref } from 'vue'
-import type { GridItemPlacement, GridSnapState, DragDropState, DragSource, SlotItem } from '../lib/types'
+import type {
+  GridItemPlacement,
+  GridSnapState,
+  DragDropState,
+  DragSource,
+  SlotItem
+} from '../lib/types'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { GRID_COLS, GRID_ROWS, useInventoryGrid } from './useInventoryGrid'
 import { useSaveEditor } from './useSaveEditor'
@@ -51,10 +57,7 @@ function snapToGrid(ds: DragDropState) {
   snap.row = Math.max(0, Math.min(GRID_ROWS - snap.h, row))
 }
 
-function findSwapTarget(
-  snap: GridSnapState,
-  source: DragSource
-): GridItemPlacement | null {
+function findSwapTarget(snap: GridSnapState, source: DragSource): GridItemPlacement | null {
   const { occupancyMap, gridPlacements } = useInventoryGrid()
   const excludeId = source.origin === 'grid' ? source.item.subResourceId : undefined
 
@@ -113,13 +116,19 @@ function onDocumentPointerUp() {
   if (!dragState.value) return
 
   const ds = dragState.value
-  const { updateItemGridPosition, moveToInventory, moveToEquipment, equipment } = useSaveEditor()
+  const { updateItemGridPosition, moveToInventory, moveToEquipment, equipment, removeItem } =
+    useSaveEditor()
+
+  if (ds.deleteHover) {
+    removeItem(ds.source.item.subResourceId)
+    cleanup()
+    return
+  }
 
   if (ds.gridSnap?.isValid) {
     const snap = ds.gridSnap
     const { canPlace } = useInventoryGrid()
-    const excludeId =
-      ds.source.origin === 'grid' ? ds.source.item.subResourceId : undefined
+    const excludeId = ds.source.origin === 'grid' ? ds.source.item.subResourceId : undefined
 
     if (canPlace(snap.col, snap.row, snap.w, snap.h, excludeId)) {
       // Direct placement on empty cells
@@ -241,6 +250,7 @@ export function useDragDrop() {
       clientY: event.clientY,
       gridSnap: null,
       equipmentHover: null,
+      deleteHover: false,
       ghostW: placement.w,
       ghostH: placement.h,
       ghostRotated: placement.rotated,
@@ -263,6 +273,7 @@ export function useDragDrop() {
       clientY: event.clientY,
       gridSnap: null,
       equipmentHover: null,
+      deleteHover: false,
       ghostW: placement.w,
       ghostH: placement.h,
       ghostRotated: placement.rotated,
@@ -365,6 +376,16 @@ export function useDragDrop() {
     updateGridValidity()
   }
 
+  function enterDeleteZone() {
+    if (!dragState.value) return
+    dragState.value.deleteHover = true
+  }
+
+  function leaveDeleteZone() {
+    if (!dragState.value) return
+    dragState.value.deleteHover = false
+  }
+
   function cancelDrag() {
     cleanup()
   }
@@ -378,6 +399,8 @@ export function useDragDrop() {
     leaveGrid,
     enterEquipmentSlot,
     leaveEquipmentSlot,
+    enterDeleteZone,
+    leaveDeleteZone,
     onKeyDown,
     cancelDrag
   }

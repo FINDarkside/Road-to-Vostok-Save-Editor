@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
 import { Button } from '../components/ui/button'
+import { Trash2 } from 'lucide-vue-next'
 import EquipmentPanel from './EquipmentPanel.vue'
 import InventoryGrid from './InventoryGrid.vue'
 import InventoryGridItem from './InventoryGridItem.vue'
@@ -10,7 +11,7 @@ import InventoryGridItem from './InventoryGridItem.vue'
 const CELL_SIZE = 48
 
 const { items } = useSaveEditor()
-const { dragState } = useDragDrop()
+const { dragState, enterDeleteZone, leaveDeleteZone } = useDragDrop()
 
 const ghostPlacement = computed(() => {
   if (!dragState.value) return null
@@ -52,6 +53,21 @@ defineEmits<{
     <div class="flex gap-4 flex-1 min-h-0 overflow-auto">
       <EquipmentPanel />
       <InventoryGrid ref="gridRef" />
+
+      <!-- Delete zone: visible during drag, fills remaining space -->
+      <div
+        v-if="dragState"
+        class="flex items-center justify-center flex-1 mr-2 rounded border-2 border-dashed transition-colors"
+        :class="
+          dragState.deleteHover
+            ? 'border-red-500 bg-red-500/15 text-red-400'
+            : 'border-muted-foreground/30 text-muted-foreground/40'
+        "
+        @pointerenter="enterDeleteZone"
+        @pointerleave="leaveDeleteZone"
+      >
+        <Trash2 class="h-5 w-5" />
+      </div>
     </div>
 
     <!-- Drag ghost (teleported to body, follows cursor) -->
@@ -62,6 +78,11 @@ defineEmits<{
         :style="ghostStyle"
       >
         <InventoryGridItem :placement="ghostPlacement" :cell-size="CELL_SIZE" ghost />
+        <!-- Red tint overlay when over delete zone -->
+        <div
+          v-if="dragState.deleteHover"
+          class="absolute inset-0 rounded-sm bg-red-500/30 pointer-events-none"
+        />
       </div>
     </Teleport>
   </div>
