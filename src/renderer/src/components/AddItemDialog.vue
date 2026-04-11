@@ -174,7 +174,7 @@ function reset(): void {
       }
     "
   >
-    <DialogContent class="max-w-lg max-h-[80vh] flex flex-col">
+    <DialogContent class="max-w-lg h-[80vh] flex flex-col">
       <DialogHeader>
         <DialogTitle>Add Item</DialogTitle>
       </DialogHeader>
@@ -218,7 +218,7 @@ function reset(): void {
               class="h-5 w-16 shrink-0 object-contain"
             />
             <div v-else class="h-5 w-16 shrink-0" />
-            <Badge variant="secondary" class="text-xs shrink-0">{{ item.category }}</Badge>
+            <Badge variant="secondary" class="text-xs shrink-0 w-24 justify-center">{{ item.category }}</Badge>
           </button>
         </div>
 

@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: io.github.findarkside.road-to-vostok-save-editor
 productName: road-to-vostok-save-editor
 directories:
   buildResources: build
