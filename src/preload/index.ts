@@ -6,6 +6,8 @@ const api = {
   loadSave: (fileName: string): Promise<string> => ipcRenderer.invoke('saves:load', fileName),
   saveSave: (fileName: string, content: string): Promise<void> =>
     ipcRenderer.invoke('saves:save', fileName, content),
+  getSaveDir: (): Promise<string> => ipcRenderer.invoke('saves:get-dir'),
+  openSaveDir: (): Promise<void> => ipcRenderer.invoke('saves:open-dir'),
 
   // Icons
   getIconStatus: (): Promise<IconStatus> => ipcRenderer.invoke('icons:get-status'),

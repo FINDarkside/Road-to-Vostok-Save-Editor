@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, shell } from 'electron'
 import { readdir, readFile, copyFile, writeFile } from 'fs/promises'
 import { join, basename, extname } from 'path'
 
@@ -28,6 +28,12 @@ export function registerSaveHandlers(): void {
     validateFileName(fileName)
     const filePath = join(getSaveDir(), fileName)
     return readFile(filePath, 'utf-8')
+  })
+
+  ipcMain.handle('saves:get-dir', () => getSaveDir())
+
+  ipcMain.handle('saves:open-dir', async () => {
+    await shell.openPath(getSaveDir())
   })
 
   ipcMain.handle('saves:save', async (_event, fileName: string, content: string) => {

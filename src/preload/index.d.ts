@@ -11,6 +11,8 @@ interface SaveApi {
   listSaves(): Promise<{ fileName: string }[]>
   loadSave(fileName: string): Promise<string>
   saveSave(fileName: string, content: string): Promise<void>
+  getSaveDir(): Promise<string>
+  openSaveDir(): Promise<void>
 
   // Icons
   getIconStatus(): Promise<IconStatus>
