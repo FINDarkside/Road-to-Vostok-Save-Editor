@@ -16,7 +16,10 @@ const { status, progress, total, error, reload } = useItemIcons()
         <div class="flex items-center gap-2">
           <span class="text-sm text-muted-foreground">Status:</span>
           <span v-if="status === 'done'" class="text-sm text-green-400">Loaded</span>
-          <span v-else-if="status === 'extracting'" class="text-sm text-yellow-400 flex items-center gap-1.5">
+          <span
+            v-else-if="status === 'extracting'"
+            class="text-sm text-yellow-400 flex items-center gap-1.5"
+          >
             <LoaderCircle class="h-3.5 w-3.5 animate-spin" />
             Extracting{{ total > 0 ? ` (${progress}/${total})` : '...' }}
           </span>
@@ -52,7 +55,7 @@ const { status, progress, total, error, reload } = useItemIcons()
           :disabled="status === 'extracting'"
           @click="reload"
         >
-Reload Icons
+          Reload Icons
         </Button>
       </div>
     </div>

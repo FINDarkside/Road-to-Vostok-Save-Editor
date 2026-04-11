@@ -12,7 +12,10 @@ const api = {
   extractIcons: (force?: boolean): Promise<void> => ipcRenderer.invoke('icons:extract-all', force),
   getIcon: (itemId: string): Promise<string | null> => ipcRenderer.invoke('icons:get', itemId),
   onIconProgress: (cb: (data: { current: number; total: number }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { current: number; total: number }): void => cb(data)
+    const handler = (
+      _event: Electron.IpcRendererEvent,
+      data: { current: number; total: number }
+    ): void => cb(data)
     ipcRenderer.on('icons:progress', handler)
     return () => ipcRenderer.removeListener('icons:progress', handler)
   }

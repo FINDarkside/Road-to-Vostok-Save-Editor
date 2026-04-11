@@ -20,6 +20,7 @@ A desktop save file editor for the game "Road to Vostok", built with Electron.
 ## Rules
 
 - Do NOT start the dev server (`npm run dev`). The user will run it themselves.
+- Prefer implicit typing when reasonable — let TypeScript infer return types, variable types, etc. Only add explicit type annotations when they improve clarity or are required.
 
 ## Commands
 

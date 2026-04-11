@@ -32,10 +32,7 @@ interface PckEntry {
 // PCK directory parsing
 // ---------------------------------------------------------------------------
 
-async function readPckDirectory(
-  fh: FileHandle,
-  fileBase: number
-): Promise<PckEntry[]> {
+async function readPckDirectory(fh: FileHandle, fileBase: number): Promise<PckEntry[]> {
   const headerBuf = Buffer.alloc(40)
   await fh.read(headerBuf, 0, 40, 0)
 
@@ -126,12 +123,12 @@ function decodeDxt5(data: Buffer, width: number, height: number): Uint8Array {
       const c0 = data[bo + 8] | (data[bo + 9] << 8)
       const c1 = data[bo + 10] | (data[bo + 11] << 8)
 
-      cr[0] = (((c0 >> 11) & 0x1f) * 255 / 31 + 0.5) | 0
-      cg[0] = (((c0 >> 5) & 0x3f) * 255 / 63 + 0.5) | 0
-      cb[0] = ((c0 & 0x1f) * 255 / 31 + 0.5) | 0
-      cr[1] = (((c1 >> 11) & 0x1f) * 255 / 31 + 0.5) | 0
-      cg[1] = (((c1 >> 5) & 0x3f) * 255 / 63 + 0.5) | 0
-      cb[1] = ((c1 & 0x1f) * 255 / 31 + 0.5) | 0
+      cr[0] = ((((c0 >> 11) & 0x1f) * 255) / 31 + 0.5) | 0
+      cg[0] = ((((c0 >> 5) & 0x3f) * 255) / 63 + 0.5) | 0
+      cb[0] = (((c0 & 0x1f) * 255) / 31 + 0.5) | 0
+      cr[1] = ((((c1 >> 11) & 0x1f) * 255) / 31 + 0.5) | 0
+      cg[1] = ((((c1 >> 5) & 0x3f) * 255) / 63 + 0.5) | 0
+      cb[1] = (((c1 & 0x1f) * 255) / 31 + 0.5) | 0
 
       cr[2] = ((2 * cr[0] + cr[1] + 1) / 3) | 0
       cg[2] = ((2 * cg[0] + cg[1] + 1) / 3) | 0
@@ -264,7 +261,8 @@ function decodeCtex(data: Buffer): { width: number; height: number; rgba: Uint8A
   const height = data.readUInt32LE(12)
   const format = data.readUInt32LE(48)
 
-  if (format !== FORMAT_DXT5) throw new Error(`Unsupported texture format: ${format} (expected DXT5=${FORMAT_DXT5})`)
+  if (format !== FORMAT_DXT5)
+    throw new Error(`Unsupported texture format: ${format} (expected DXT5=${FORMAT_DXT5})`)
 
   const pixelData = data.subarray(GST2_HEADER_SIZE)
   const rgba = decodeDxt5(pixelData, width, height)

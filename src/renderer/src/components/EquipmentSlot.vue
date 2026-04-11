@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const meta = computed(() => (props.item ? ITEMS_META.get(props.item.itemPath) : undefined))
 const itemId = computed(() =>
-  props.item ? ITEMS_BY_PATH.get(props.item.itemPath)?.id ?? '' : ''
+  props.item ? (ITEMS_BY_PATH.get(props.item.itemPath)?.id ?? '') : ''
 )
 
 function conditionColor(value: number): string {

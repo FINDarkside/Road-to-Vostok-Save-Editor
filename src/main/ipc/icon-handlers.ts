@@ -1,11 +1,6 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import { findGamePckPath } from '../game-path'
-import {
-  extractAllIcons,
-  getIconStatus,
-  getIconBase64,
-  type IconStatus
-} from '../icon-extractor'
+import { extractAllIcons, getIconStatus, getIconBase64, type IconStatus } from '../icon-extractor'
 
 let cachedPckPath: string | null | undefined = undefined
 

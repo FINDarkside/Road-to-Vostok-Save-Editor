@@ -72,6 +72,36 @@ export interface SlotItem {
   nested: string[]
 }
 
+export interface GridItemPlacement {
+  subResourceId: string
+  itemPath: string
+  itemId: string
+  itemName: string
+  category: string
+  condition: number
+  amount: number
+  col: number
+  row: number
+  w: number
+  h: number
+  rotated: boolean
+}
+
+export interface DragState {
+  item: GridItemPlacement
+  col: number
+  row: number
+  rotated: boolean
+  w: number
+  h: number
+  isValid: boolean
+  offsetX: number
+  offsetY: number
+  /** Last known pointer position relative to grid container */
+  pointerX: number
+  pointerY: number
+}
+
 export interface CharacterStats {
   health: number
   energy: number

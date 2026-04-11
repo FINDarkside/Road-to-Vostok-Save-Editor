@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
+import { useInventoryGrid } from '../composables/useInventoryGrid'
 import { ITEMS, resolveItemMeta } from '../data/items'
+import { getItemSize } from '../data/itemSizes'
 import {
   Dialog,
   DialogContent,
@@ -23,12 +25,14 @@ const emit = defineEmits<{
 }>()
 
 const { addItem } = useSaveEditor()
+const { findFreeSlot } = useInventoryGrid()
 
 const search = ref('')
 const selectedIndex = ref(0)
 const condition = ref(100)
 const amount = ref(1)
 const listRef = ref<HTMLElement | null>(null)
+const addError = ref<string | null>(null)
 
 const filteredItems = computed(() => {
   if (!search.value) return ITEMS
@@ -48,6 +52,7 @@ watch(
   () => search.value,
   () => {
     selectedIndex.value = 0
+    addError.value = null
   }
 )
 
@@ -56,6 +61,7 @@ watch(selectedItem, (item) => {
   const meta = resolveItemMeta(item)
   condition.value = meta.defaultCondition
   amount.value = meta.defaultAmount
+  addError.value = null
 })
 
 function scrollToSelected(): void {
@@ -85,10 +91,31 @@ function onKeydown(e: KeyboardEvent): void {
 
 function confirm(): void {
   if (!selectedItem.value || !selectedMeta.value) return
-  const opts: { condition?: number; amount?: number } = {}
+
+  const size = getItemSize(selectedItem.value.id)
+  const slot = findFreeSlot(size.w, size.h)
+
+  if (!slot) {
+    addError.value = 'No space available in inventory grid'
+    return
+  }
+
+  const opts: {
+    condition?: number
+    amount?: number
+    gridCol?: number
+    gridRow?: number
+    gridRotated?: boolean
+  } = {
+    gridCol: slot.col,
+    gridRow: slot.row,
+    gridRotated: slot.rotated
+  }
+
   if (selectedMeta.value.showCondition) opts.condition = condition.value
   if (selectedMeta.value.showAmount) opts.amount = amount.value
   addItem(selectedItem.value.resourcePath, opts)
+  addError.value = null
   reset()
   emit('update:open', false)
 }
@@ -98,6 +125,7 @@ function reset(): void {
   selectedIndex.value = 0
   condition.value = 100
   amount.value = 1
+  addError.value = null
 }
 </script>
 
@@ -124,7 +152,10 @@ function reset(): void {
           @keydown="onKeydown"
         />
 
-        <div ref="listRef" class="flex-1 border border-border rounded-md min-h-0 overflow-y-auto p-1">
+        <div
+          ref="listRef"
+          class="flex-1 border border-border rounded-md min-h-0 overflow-y-auto p-1"
+        >
           <button
             v-for="(item, i) in filteredItems"
             :key="item.id"
@@ -159,6 +190,13 @@ function reset(): void {
               class="h-7 w-20 text-xs"
             />
           </div>
+        </div>
+
+        <div
+          v-if="addError"
+          class="text-xs text-red-500 bg-red-500/10 border border-red-500/30 rounded px-2 py-1.5"
+        >
+          {{ addError }}
         </div>
       </div>
 

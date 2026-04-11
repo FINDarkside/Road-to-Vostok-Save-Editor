@@ -189,7 +189,16 @@ export function useSaveEditor() {
     tresFile.value = { ...tres }
   }
 
-  function addItem(resourcePath: string, opts: { condition?: number; amount?: number } = {}): void {
+  function addItem(
+    resourcePath: string,
+    opts: {
+      condition?: number
+      amount?: number
+      gridCol?: number
+      gridRow?: number
+      gridRotated?: boolean
+    } = {}
+  ): void {
     if (!tresFile.value) return
     const tres = tresFile.value
 
@@ -221,8 +230,8 @@ export function useSaveEditor() {
     } while (tres.subResources.some((s) => s.id === subId))
 
     const meta = ITEMS_META.get(resourcePath)
-    const condition = opts.condition ?? (meta?.defaultCondition ?? 0)
-    const amount = opts.amount ?? (meta?.defaultAmount ?? 0)
+    const condition = opts.condition ?? meta?.defaultCondition ?? 0
+    const amount = opts.amount ?? meta?.defaultAmount ?? 0
 
     const newSub: SubResource = {
       id: subId,
@@ -246,8 +255,16 @@ export function useSaveEditor() {
         { key: 'chamber', value: { kind: 'bool', value: false } },
         { key: 'casing', value: { kind: 'bool', value: false } },
         { key: 'state', value: { kind: 'string', value: '' } },
-        { key: 'gridPosition', value: { kind: 'vector2', x: 0, y: 0, raw: 'Vector2(0, 0)' } },
-        { key: 'gridRotated', value: { kind: 'bool', value: false } },
+        {
+          key: 'gridPosition',
+          value: {
+            kind: 'vector2',
+            x: (opts.gridCol ?? 0) * 64,
+            y: (opts.gridRow ?? 0) * 64,
+            raw: `Vector2(${(opts.gridCol ?? 0) * 64}, ${(opts.gridRow ?? 0) * 64})`
+          }
+        },
+        { key: 'gridRotated', value: { kind: 'bool', value: opts.gridRotated ?? false } },
         { key: 'slot', value: { kind: 'string', value: '' } }
       ]
     }
@@ -305,6 +322,39 @@ export function useSaveEditor() {
     tresFile.value = { ...tresFile.value }
   }
 
+  function updateItemGridPosition(
+    subResourceId: string,
+    col: number,
+    row: number,
+    gridRotated: boolean
+  ): void {
+    if (!tresFile.value) return
+    const tres = tresFile.value
+    const sub = tres.subResources.find((s) => s.id === subResourceId)
+    if (!sub) return
+
+    const pixelX = col * 64
+    const pixelY = row * 64
+
+    const posProp = sub.properties.find((p) => p.key === 'gridPosition')
+    if (posProp) {
+      posProp.value = {
+        kind: 'vector2',
+        x: pixelX,
+        y: pixelY,
+        raw: `Vector2(${pixelX}, ${pixelY})`
+      }
+    }
+
+    const rotProp = sub.properties.find((p) => p.key === 'gridRotated')
+    if (rotProp) {
+      rotProp.value = { kind: 'bool', value: gridRotated }
+    }
+
+    isDirty.value = true
+    tresFile.value = { ...tres }
+  }
+
   function updateItem(
     subResourceId: string,
     updates: { condition?: number; amount?: number }
@@ -356,7 +406,8 @@ export function useSaveEditor() {
     updateStat,
     maxAllStats,
     updateStatusEffect,
-    updateItem
+    updateItem,
+    updateItemGridPosition
   }
 }
 
