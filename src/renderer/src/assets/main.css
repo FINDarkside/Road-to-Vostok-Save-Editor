@@ -76,6 +76,11 @@
   border-color: var(--border);
 }
 
+*:focus-visible {
+  outline: 1px solid white;
+  outline-offset: 0px;
+}
+
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;

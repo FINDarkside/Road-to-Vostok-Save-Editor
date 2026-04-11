@@ -53,6 +53,8 @@ export interface GameItem {
   maxAmount?: number
   /** Item can be repaired to full condition. Default: false */
   repairs?: boolean
+  /** Equipment slots this item can be placed in (e.g. ["Primary", "Secondary"]) */
+  slots?: string[]
 }
 
 export interface ResolvedItemMeta {
@@ -184,4 +186,11 @@ export interface CatStatus {
   cat: number
   catFound: boolean
   catDead: boolean
+}
+
+export interface WorldState {
+  difficulty: number
+  season: number
+  day: number
+  weather: string
 }

@@ -613,7 +613,8 @@ export const ITEMS = [
     nameInventory: 'R. Duffel',
     sizeW: 4,
     sizeH: 2,
-    iconFile: 'Icon_Duffel_Retro.png-7d1f678b7467b606256347135f8ff090.s3tc.ctex'
+    iconFile: 'Icon_Duffel_Retro.png-7d1f678b7467b606256347135f8ff090.s3tc.ctex',
+    slots: ['Backpack']
   },
   {
     category: 'Backpacks',
@@ -623,7 +624,8 @@ export const ITEMS = [
     nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
-    iconFile: 'Icon_Backpack_Jaeger_Black.png-ce085bb0390c9b41d54097c5256198f9.s3tc.ctex'
+    iconFile: 'Icon_Backpack_Jaeger_Black.png-ce085bb0390c9b41d54097c5256198f9.s3tc.ctex',
+    slots: ['Backpack']
   },
   {
     category: 'Backpacks',
@@ -633,7 +635,8 @@ export const ITEMS = [
     nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
-    iconFile: 'Icon_Backpack_Jaeger_Brown.png-197fb8f940ccbd77f7e00a2aa79f3adb.s3tc.ctex'
+    iconFile: 'Icon_Backpack_Jaeger_Brown.png-197fb8f940ccbd77f7e00a2aa79f3adb.s3tc.ctex',
+    slots: ['Backpack']
   },
   {
     category: 'Backpacks',
@@ -643,7 +646,8 @@ export const ITEMS = [
     nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
-    iconFile: 'Icon_Backpack_Jaeger_Green.png-c71ed79765f984fed33d6e903c3f1438.s3tc.ctex'
+    iconFile: 'Icon_Backpack_Jaeger_Green.png-c71ed79765f984fed33d6e903c3f1438.s3tc.ctex',
+    slots: ['Backpack']
   },
   {
     category: 'Backpacks',
@@ -653,7 +657,8 @@ export const ITEMS = [
     nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
-    iconFile: 'Icon_Backpack_Jaeger_M05.png-6abb65f9c57178d1e79331fc0b546c3a.s3tc.ctex'
+    iconFile: 'Icon_Backpack_Jaeger_M05.png-6abb65f9c57178d1e79331fc0b546c3a.s3tc.ctex',
+    slots: ['Backpack']
   },
   {
     category: 'Backpacks',
@@ -663,7 +668,8 @@ export const ITEMS = [
     nameInventory: 'Nomad BP.',
     sizeW: 3,
     sizeH: 4,
-    iconFile: 'Icon_Backpack_Nomad.png-cf9aef898118f3d36540dd41c8688dac.s3tc.ctex'
+    iconFile: 'Icon_Backpack_Nomad.png-cf9aef898118f3d36540dd41c8688dac.s3tc.ctex',
+    slots: ['Backpack']
   },
   {
     category: 'Backpacks',
@@ -673,7 +679,8 @@ export const ITEMS = [
     nameInventory: 'Patrol BP.',
     sizeW: 3,
     sizeH: 4,
-    iconFile: 'Icon_Backpack_Patrol.png-1940b7cd1e8e1883e0af45e3a3fac197.s3tc.ctex'
+    iconFile: 'Icon_Backpack_Patrol.png-1940b7cd1e8e1883e0af45e3a3fac197.s3tc.ctex',
+    slots: ['Backpack']
   },
   {
     category: 'Belts',
@@ -683,7 +690,8 @@ export const ITEMS = [
     nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Kukkaro_Black.png-7cad12797daea9c1f2dc1f2cb35124e7.s3tc.ctex'
+    iconFile: 'Icon_Kukkaro_Black.png-7cad12797daea9c1f2dc1f2cb35124e7.s3tc.ctex',
+    slots: ['Belt']
   },
   {
     category: 'Belts',
@@ -693,7 +701,8 @@ export const ITEMS = [
     nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Kukkaro_Brown.png-452a20e5eff60c009b591b5fc38150d9.s3tc.ctex'
+    iconFile: 'Icon_Kukkaro_Brown.png-452a20e5eff60c009b591b5fc38150d9.s3tc.ctex',
+    slots: ['Belt']
   },
   {
     category: 'Belts',
@@ -703,7 +712,8 @@ export const ITEMS = [
     nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Kukkaro_Green.png-3a75f4448b6f66fbc751cf7a77602247.s3tc.ctex'
+    iconFile: 'Icon_Kukkaro_Green.png-3a75f4448b6f66fbc751cf7a77602247.s3tc.ctex',
+    slots: ['Belt']
   },
   {
     category: 'Belts',
@@ -713,7 +723,8 @@ export const ITEMS = [
     nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Kukkaro_M05.png-d80913b04636bc8ec8c4f6936173a122.s3tc.ctex'
+    iconFile: 'Icon_Kukkaro_M05.png-d80913b04636bc8ec8c4f6936173a122.s3tc.ctex',
+    slots: ['Belt']
   },
   {
     category: 'Books',
@@ -763,7 +774,8 @@ export const ITEMS = [
     nameEquipment: 'C. Boots',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Boots_Combat.png-9f7b38179b35a93d2a3930322673b9d9.s3tc.ctex'
+    iconFile: 'Icon_Boots_Combat.png-9f7b38179b35a93d2a3930322673b9d9.s3tc.ctex',
+    slots: ['Feet']
   },
   {
     category: 'Clothing',
@@ -773,7 +785,8 @@ export const ITEMS = [
     nameEquipment: 'F. Beanie',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Beanie_Flame.png-3a780dc85a8e5a0e547505f43465de5b.s3tc.ctex'
+    iconFile: 'Icon_Beanie_Flame.png-3a780dc85a8e5a0e547505f43465de5b.s3tc.ctex',
+    slots: ['Head']
   },
   {
     category: 'Clothing',
@@ -783,7 +796,8 @@ export const ITEMS = [
     nameInventory: 'Hiking P.',
     sizeW: 1,
     sizeH: 2,
-    iconFile: 'Icon_Pants_Hiking.png-de55054d477684832b11b5fe8d64fb54.s3tc.ctex'
+    iconFile: 'Icon_Pants_Hiking.png-de55054d477684832b11b5fe8d64fb54.s3tc.ctex',
+    slots: ['Legs']
   },
   {
     category: 'Clothing',
@@ -794,7 +808,8 @@ export const ITEMS = [
     nameEquipment: 'Hoodie B.',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Hoodie_Border_Zone.png-505a7f7052e1cef45ef0b59ea0dab006.s3tc.ctex'
+    iconFile: 'Icon_Hoodie_Border_Zone.png-505a7f7052e1cef45ef0b59ea0dab006.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -804,7 +819,8 @@ export const ITEMS = [
     nameInventory: 'Hoodie',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Hoodie_Gray.png-292f489136a7f576b09ea5ea7989d29d.s3tc.ctex'
+    iconFile: 'Icon_Hoodie_Gray.png-292f489136a7f576b09ea5ea7989d29d.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -814,7 +830,8 @@ export const ITEMS = [
     nameInventory: 'Jeans',
     sizeW: 1,
     sizeH: 2,
-    iconFile: 'Icon_Jeans_Black.png-b5f5efcf98ebe800391c3154e54e5abe.s3tc.ctex'
+    iconFile: 'Icon_Jeans_Black.png-b5f5efcf98ebe800391c3154e54e5abe.s3tc.ctex',
+    slots: ['Legs']
   },
   {
     category: 'Clothing',
@@ -822,7 +839,8 @@ export const ITEMS = [
     displayName: 'Leather Gloves',
     resourcePath: 'res://Items/Clothing/Gloves_Leather/Gloves_Leather.tres',
     nameInventory: 'L. Gloves',
-    iconFile: 'Icon_Gloves_Leather.png-08420816813a1b1e1b5d3c810c8935d3.s3tc.ctex'
+    iconFile: 'Icon_Gloves_Leather.png-08420816813a1b1e1b5d3c810c8935d3.s3tc.ctex',
+    slots: ['Hands']
   },
   {
     category: 'Clothing',
@@ -831,7 +849,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Clothing/Cap_M62/Cap_M62.tres',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Cap_M62.png-d96aec9f188af3e9f9987c1be9e7f065.s3tc.ctex'
+    iconFile: 'Icon_Cap_M62.png-d96aec9f188af3e9f9987c1be9e7f065.s3tc.ctex',
+    slots: ['Head']
   },
   {
     category: 'Clothing',
@@ -841,7 +860,8 @@ export const ITEMS = [
     nameEquipment: 'M62 J.',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Jacket_M62.png-8f445de9a7e63911b096e4bfd58a87ea.s3tc.ctex'
+    iconFile: 'Icon_Jacket_M62.png-8f445de9a7e63911b096e4bfd58a87ea.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -851,7 +871,8 @@ export const ITEMS = [
     nameEquipment: 'M. Hat',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Hat_Mosquito.png-b1cfac481001781188406fc18201365b.s3tc.ctex'
+    iconFile: 'Icon_Hat_Mosquito.png-b1cfac481001781188406fc18201365b.s3tc.ctex',
+    slots: ['Head']
   },
   {
     category: 'Clothing',
@@ -861,7 +882,8 @@ export const ITEMS = [
     nameEquipment: 'Santa J.',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Jacket_Santa.png-7e7668c74fbd72d21727d4074647f5b2.s3tc.ctex'
+    iconFile: 'Icon_Jacket_Santa.png-7e7668c74fbd72d21727d4074647f5b2.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -871,7 +893,8 @@ export const ITEMS = [
     nameEquipment: 'S. Hat',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Hat_Sauna.png-5e03f27a73044008bbacd0cae9700441.s3tc.ctex'
+    iconFile: 'Icon_Hat_Sauna.png-5e03f27a73044008bbacd0cae9700441.s3tc.ctex',
+    slots: ['Head']
   },
   {
     category: 'Clothing',
@@ -881,7 +904,8 @@ export const ITEMS = [
     nameInventory: 'T. Fleece',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Fleece_Tactical_Brown.png-c4c638ec96400d11725e310eef2e4cd1.s3tc.ctex'
+    iconFile: 'Icon_Fleece_Tactical_Brown.png-c4c638ec96400d11725e310eef2e4cd1.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -891,7 +915,8 @@ export const ITEMS = [
     nameInventory: 'T. Fleece',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Fleece_Tactical_Green.png-32f57f33c3e06506c191ae362b32bbc0.s3tc.ctex'
+    iconFile: 'Icon_Fleece_Tactical_Green.png-32f57f33c3e06506c191ae362b32bbc0.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -902,7 +927,8 @@ export const ITEMS = [
     nameEquipment: 'Windbr.',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Windbreaker_Black.png-61f28c52d2e084682c7bb9de6a33ae4c.s3tc.ctex'
+    iconFile: 'Icon_Windbreaker_Black.png-61f28c52d2e084682c7bb9de6a33ae4c.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -913,7 +939,8 @@ export const ITEMS = [
     nameEquipment: 'Windbr.',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Windbreaker_Green.png-43a6a44d3c92b86ba078946d9c4a8f80.s3tc.ctex'
+    iconFile: 'Icon_Windbreaker_Green.png-43a6a44d3c92b86ba078946d9c4a8f80.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -924,7 +951,8 @@ export const ITEMS = [
     nameEquipment: 'Winter J.',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Jacket_Winter_Blue.png-7712a27fbdaea589c3dffa5c28f8bd4b.s3tc.ctex'
+    iconFile: 'Icon_Jacket_Winter_Blue.png-7712a27fbdaea589c3dffa5c28f8bd4b.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -935,7 +963,8 @@ export const ITEMS = [
     nameEquipment: 'Winter J.',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Jacket_Winter_Red.png-04506ce616b3a0a80e7c7f3439df2149.s3tc.ctex'
+    iconFile: 'Icon_Jacket_Winter_Red.png-04506ce616b3a0a80e7c7f3439df2149.s3tc.ctex',
+    slots: ['Torso']
   },
   {
     category: 'Clothing',
@@ -943,7 +972,8 @@ export const ITEMS = [
     displayName: 'Work Gloves',
     resourcePath: 'res://Items/Clothing/Gloves_Work/Gloves_Work.tres',
     nameInventory: 'W. Gloves',
-    iconFile: 'Icon_Gloves_Work.png-0a4e05c6bdda8c8ce883e4eaa3592446.s3tc.ctex'
+    iconFile: 'Icon_Gloves_Work.png-0a4e05c6bdda8c8ce883e4eaa3592446.s3tc.ctex',
+    slots: ['Hands']
   },
   {
     category: 'Consumables',
@@ -1278,7 +1308,8 @@ export const ITEMS = [
     displayName: 'Alarm Clock',
     resourcePath: 'res://Items/Electronics/Alarm_Clock/Alarm_Clock.tres',
     nameInventory: 'A. Clock',
-    iconFile: 'Icon_Alarm_Clock.png-efdaf46146cc6d1bdb0c79cd8d942d56.s3tc.ctex'
+    iconFile: 'Icon_Alarm_Clock.png-efdaf46146cc6d1bdb0c79cd8d942d56.s3tc.ctex',
+    slots: ['Time']
   },
   {
     category: 'Electronics',
@@ -1351,7 +1382,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Electronics/Casette_Player/Casette_Player.tres',
     nameInventory: 'C. Player',
     iconFile: 'Icon_Casette_Player.png-c3e6f03e451e324bdaae9d8cd08f612c.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    slots: ['Player']
   },
   {
     category: 'Electronics',
@@ -1395,7 +1427,8 @@ export const ITEMS = [
     displayName: 'Narva',
     resourcePath: 'res://Items/Electronics/Narva/Narva.tres',
     iconFile: 'Icon_Narva.png-0217ce0e5d98c97f42e44fa028d10d89.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    slots: ['Light']
   },
   {
     category: 'Electronics',
@@ -1403,7 +1436,8 @@ export const ITEMS = [
     displayName: 'Polaris',
     resourcePath: 'res://Items/Electronics/Polaris/Polaris.tres',
     iconFile: 'Icon_Polaris.png-aeef0acef687114b2dbdb100dd45ed54.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    slots: ['Light']
   },
   {
     category: 'Electronics',
@@ -1413,7 +1447,8 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_PV7.png-cdedefa2a266b1bc039c7918d4fbea9f.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    slots: ['NVG']
   },
   {
     category: 'Fishing',
@@ -1432,7 +1467,8 @@ export const ITEMS = [
     nameRotated: 'F. Rod',
     sizeW: 6,
     sizeH: 1,
-    iconFile: 'Icon_Fishing_Rod.png-a7592b83f789592a4337777613da3bcf.s3tc.ctex'
+    iconFile: 'Icon_Fishing_Rod.png-a7592b83f789592a4337777613da3bcf.s3tc.ctex',
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Fishing',
@@ -1464,28 +1500,32 @@ export const ITEMS = [
     id: 'F1',
     displayName: 'F1',
     resourcePath: 'res://Items/Grenades/F1/F1.tres',
-    iconFile: 'Icon_F1.png-3d438aa5ca39605448e4dbf3555ea37b.s3tc.ctex'
+    iconFile: 'Icon_F1.png-3d438aa5ca39605448e4dbf3555ea37b.s3tc.ctex',
+    slots: ['Grenade_1', 'Grenade_2']
   },
   {
     category: 'Grenades',
     id: 'M43',
     displayName: 'M43',
     resourcePath: 'res://Items/Grenades/M43/M43.tres',
-    iconFile: 'Icon_M43.png-195237f16d6e816afb4f869d0eb83984.s3tc.ctex'
+    iconFile: 'Icon_M43.png-195237f16d6e816afb4f869d0eb83984.s3tc.ctex',
+    slots: ['Grenade_1', 'Grenade_2']
   },
   {
     category: 'Grenades',
     id: 'M50',
     displayName: 'M50',
     resourcePath: 'res://Items/Grenades/M50/M50.tres',
-    iconFile: 'Icon_M50.png-e861673c32d96839faa6f9c344b58612.s3tc.ctex'
+    iconFile: 'Icon_M50.png-e861673c32d96839faa6f9c344b58612.s3tc.ctex',
+    slots: ['Grenade_1', 'Grenade_2']
   },
   {
     category: 'Grenades',
     id: 'RGD-5',
     displayName: 'RGD-5',
     resourcePath: 'res://Items/Grenades/RGD-5/RGD-5.tres',
-    iconFile: 'Icon_RGD-5.png-6cedf186cfa7d4bb945adbb2888d1726.s3tc.ctex'
+    iconFile: 'Icon_RGD-5.png-6cedf186cfa7d4bb945adbb2888d1726.s3tc.ctex',
+    slots: ['Grenade_1', 'Grenade_2']
   },
   {
     category: 'Helmets',
@@ -1497,7 +1537,8 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Helmet_Police.png-08476abc1799bee433c7696350d70eea.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    slots: ['Helmet']
   },
   {
     category: 'Helmets',
@@ -1508,7 +1549,8 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_SSh-39.png-1116cea93367083ece65f5d9352675e0.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    slots: ['Helmet']
   },
   {
     category: 'Instruments',
@@ -1517,7 +1559,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Instruments/Guitar/Guitar.tres',
     sizeW: 5,
     sizeH: 2,
-    iconFile: 'Icon_Guitar.png-40e99485b0afc380ccbf955525867016.s3tc.ctex'
+    iconFile: 'Icon_Guitar.png-40e99485b0afc380ccbf955525867016.s3tc.ctex',
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Instruments',
@@ -1527,7 +1570,8 @@ export const ITEMS = [
     nameRotated: 'Harmo.',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Harmonica.png-54943cc1c10a9bf3002fa2665ab7d4f6.s3tc.ctex'
+    iconFile: 'Icon_Harmonica.png-54943cc1c10a9bf3002fa2665ab7d4f6.s3tc.ctex',
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Keys',
@@ -1585,7 +1629,8 @@ export const ITEMS = [
     nameRotated: 'Jaeger',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Jaeger_140.png-f62536d78a4ca0ef40607dbac56abc41.s3tc.ctex'
+    iconFile: 'Icon_Jaeger_140.png-f62536d78a4ca0ef40607dbac56abc41.s3tc.ctex',
+    slots: ['Knife']
   },
   {
     category: 'Knives',
@@ -1595,7 +1640,8 @@ export const ITEMS = [
     nameRotated: 'Skrama',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Skrama_200.png-680f47696df834a45dfbca7143bfb465.s3tc.ctex'
+    iconFile: 'Icon_Skrama_200.png-680f47696df834a45dfbca7143bfb465.s3tc.ctex',
+    slots: ['Knife']
   },
   {
     category: 'Knives',
@@ -1605,7 +1651,8 @@ export const ITEMS = [
     nameRotated: 'Skrama',
     sizeW: 3,
     sizeH: 1,
-    iconFile: 'Icon_Skrama_240.png-307387c167f5bb645fd2818a45da4854.s3tc.ctex'
+    iconFile: 'Icon_Skrama_240.png-307387c167f5bb645fd2818a45da4854.s3tc.ctex',
+    slots: ['Knife']
   },
   {
     category: 'Lore',
@@ -1893,7 +1940,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Misc/Map/Map.tres',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Map.png-e521a23785e0dd89d7446b72a89e6cf2.s3tc.ctex'
+    iconFile: 'Icon_Map.png-e521a23785e0dd89d7446b72a89e6cf2.s3tc.ctex',
+    slots: ['Map']
   },
   {
     category: 'Misc',
@@ -1903,7 +1951,8 @@ export const ITEMS = [
     nameInventory: 'T. Map',
     sizeW: 2,
     sizeH: 1,
-    iconFile: 'Icon_Map_Tactical.png-391af5b9c79d43586ba1e7fd175e97ca.s3tc.ctex'
+    iconFile: 'Icon_Map_Tactical.png-391af5b9c79d43586ba1e7fd175e97ca.s3tc.ctex',
+    slots: ['Map']
   },
   {
     category: 'Misc',
@@ -1915,7 +1964,8 @@ export const ITEMS = [
     stackable: true,
     showAmount: true,
     defaultAmount: 20,
-    maxAmount: 300
+    maxAmount: 300,
+    slots: ['Matches']
   },
   {
     category: 'Misc',
@@ -2042,7 +2092,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Rigs/Vest_Fishing/Vest_Fishing.tres',
     sizeW: 3,
     sizeH: 4,
-    iconFile: 'Icon_Vest_Fishing.png-2ef066baf4704610812bb2fd8c00c49e.s3tc.ctex'
+    iconFile: 'Icon_Vest_Fishing.png-2ef066baf4704610812bb2fd8c00c49e.s3tc.ctex',
+    slots: ['Rig']
   },
   {
     category: 'Rigs',
@@ -2051,7 +2102,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Rigs/K19/K19.tres',
     sizeW: 3,
     sizeH: 3,
-    iconFile: 'Icon_K19.png-1b3ef164b2bb5e574270863cac9387da.s3tc.ctex'
+    iconFile: 'Icon_K19.png-1b3ef164b2bb5e574270863cac9387da.s3tc.ctex',
+    slots: ['Rig']
   },
   {
     category: 'Rigs',
@@ -2061,7 +2113,8 @@ export const ITEMS = [
     nameInventory: 'LVPC',
     sizeW: 3,
     sizeH: 3,
-    iconFile: 'Icon_LVPC_Green.png-66ac4a5a9f4f8ba78ec884e9ddc9e60e.s3tc.ctex'
+    iconFile: 'Icon_LVPC_Green.png-66ac4a5a9f4f8ba78ec884e9ddc9e60e.s3tc.ctex',
+    slots: ['Rig']
   },
   {
     category: 'Rigs',
@@ -2071,7 +2124,8 @@ export const ITEMS = [
     nameInventory: 'LVPC',
     sizeW: 3,
     sizeH: 3,
-    iconFile: 'Icon_LVPC_M05.png-dd28b4ec476a3f4d2e694a81420f108b.s3tc.ctex'
+    iconFile: 'Icon_LVPC_M05.png-dd28b4ec476a3f4d2e694a81420f108b.s3tc.ctex',
+    slots: ['Rig']
   },
   {
     category: 'Rigs',
@@ -2081,7 +2135,8 @@ export const ITEMS = [
     nameInventory: 'LVPC',
     sizeW: 3,
     sizeH: 3,
-    iconFile: 'Icon_LVPC_Winter.png-1bd29dba8d05bb46b9266bbe2f57607c.s3tc.ctex'
+    iconFile: 'Icon_LVPC_Winter.png-1bd29dba8d05bb46b9266bbe2f57607c.s3tc.ctex',
+    slots: ['Rig']
   },
   {
     category: 'Weapons',
@@ -2092,7 +2147,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_Colt_1911.png-d04198a346b1bf2e2406bfe0766c0f56.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2103,7 +2159,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_Glock_17.png-56de74b8c1ae3841be73c1a7256538d4.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2114,7 +2171,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_HK416.png-4af939f2e96952d3b967f5948e8f0212.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2125,7 +2183,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_AK-12.png-2d442005495c142c784901b2332a26ca.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2136,7 +2195,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_AKM.png-a5e5b075e6186ca91a04f3db4ba2b70e.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2147,7 +2207,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_KAR-21_223.png-3a8cb87927e2206be77557170961a9d0.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2158,7 +2219,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_KAR-21_308.png-3b47b9accf38892a3cd333650ebde20b.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2169,7 +2231,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_Makarov.png-405c8d50cb922dd9b3e89fd44a12eeba.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2180,7 +2243,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_AKS-74U.png-90e5a268906203cd2c1313134363c019.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2191,7 +2255,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_MK18.png-b08c5d7af5d1eab4a25b1c10f680d02f.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2202,7 +2267,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_KP-31.png-630bf263af6357252671f11a1df403d5.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2213,7 +2279,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_M4A1.png-0db8c30d05ccbfd4c639d3eabc130058.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2224,7 +2291,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_M78.png-b211a43aabebb5a8a022b3bdc2fee3eb.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2236,7 +2304,8 @@ export const ITEMS = [
     iconFile: 'Icon_Mosin.png-e9e70076d2cba0e1505989ceca545e2e.s3tc.ctex',
     showCondition: true,
     maxAmount: 5,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2247,7 +2316,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_P320.png-07e594e8dd9a1cfc0f80508308122330.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2258,7 +2328,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_MP5.png-d3158bee1a1245fc7a9b517243d74b11.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2269,7 +2340,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_MP5K.png-e7939db88fbc8f75040b86db66b4983f.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2280,7 +2352,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_MP5SD.png-202ed76f0ea183a93e58ef567ec5773c.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2291,7 +2364,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_MP7.png-89d2304a0e229ba6720f93cba344672f.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary', 'Secondary']
   },
   {
     category: 'Weapons',
@@ -2302,7 +2376,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_RK-62.png-0d920b8f46caa1934d34d8e564158c96.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2313,7 +2388,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_RK-62M.png-b33fff579595a2a9c8699146c59dd89c.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2324,7 +2400,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_RK-95.png-784355bf7d5444962ad93ebbf54e0bba.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2336,7 +2413,8 @@ export const ITEMS = [
     iconFile: 'Icon_Remington_870.png-6652b0a2ca21b5cbb79e436f0453d033.s3tc.ctex',
     showCondition: true,
     maxAmount: 8,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2347,7 +2425,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_VSS.png-012df67ff9fa46d22b9bd4d563786396.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   },
   {
     category: 'Weapons',
@@ -2358,7 +2437,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_SVD.png-8f99dac97356038d43aa0e3bad7f7087.s3tc.ctex',
     showCondition: true,
-    repairs: true
+    repairs: true,
+    slots: ['Primary']
   }
 ] satisfies GameItem[]
 

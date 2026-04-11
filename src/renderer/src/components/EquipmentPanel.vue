@@ -4,10 +4,15 @@ import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useInventoryGrid, CELL_SIZE } from '../composables/useInventoryGrid'
 import { ITEMS_BY_PATH } from '../data/items'
+import { ITEMS_BY_SLOT } from '../data/equipment-slots'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
 import CompositeIcon from './CompositeIcon.vue'
 import ItemContextMenu from './ItemContextMenu.vue'
-import type { SlotItem } from '../lib/types'
+import { Popover } from '../components/ui/popover'
+import { PopoverAnchor } from 'reka-ui'
+import PopoverContent from '../components/ui/popover/PopoverContent.vue'
+import { ChevronDown } from 'lucide-vue-next'
+import type { SlotItem, GameItem } from '../lib/types'
 
 const COLS = 6
 const ROWS = 8
@@ -44,12 +49,16 @@ const slots: SlotDef[] = [
   { name: 'Player', col: 5, row: 7, w: 1, h: 1 }
 ]
 
-const { equipment, removeItem, addItem } = useSaveEditor()
+const { equipment, removeItem, addItem, addEquipmentItem } = useSaveEditor()
 const { dragState, startDragFromEquipment, enterEquipmentSlot, leaveEquipmentSlot } = useDragDrop()
 const { findFreeSlot } = useInventoryGrid()
 const openWorkbench = inject<(weapon: SlotItem) => void>('openWorkbench')
 
 const contextMenu = ref<{ item: SlotItem; x: number; y: number } | null>(null)
+const openPopover = ref<string | null>(null)
+let popoverClosedSlot = null as { name: string; at: number } | null
+
+const DRAG_THRESHOLD = 5
 
 const showEditLoadout = computed(() => {
   if (!contextMenu.value) return false
@@ -106,11 +115,78 @@ function getIconFile(item: SlotItem): string {
   return ITEMS_BY_PATH.get(item.itemPath)?.iconFile ?? ''
 }
 
+function onPopoverUpdate(slotName: string, open: boolean) {
+  if (open) {
+    openPopover.value = slotName
+  } else {
+    openPopover.value = null
+    popoverClosedSlot = { name: slotName, at: Date.now() }
+  }
+}
+
+function togglePopover(slotName: string) {
+  if (openPopover.value === slotName) {
+    openPopover.value = null
+  } else if (
+    !popoverClosedSlot ||
+    popoverClosedSlot.name !== slotName ||
+    Date.now() - popoverClosedSlot.at > 200
+  ) {
+    openPopover.value = slotName
+  }
+}
+
+function onSlotClick(slot: SlotDef) {
+  // For empty slots, toggle the picker on click (occupied slots use the drag-threshold handler)
+  if (!equipmentBySlot.value.get(slot.name) && ITEMS_BY_SLOT.has(slot.name)) {
+    togglePopover(slot.name)
+  }
+}
+
 function onSlotPointerDown(slot: SlotDef, event: PointerEvent) {
   if (event.button !== 0) return
-  const item = equipmentBySlot.value.get(slot.name)
-  if (!item) return
-  startDragFromEquipment(item, slot.name, event)
+  const maybeItem = equipmentBySlot.value.get(slot.name)
+  if (!maybeItem) return
+  const item = maybeItem
+
+  // Use drag threshold to distinguish click (open picker) from drag (move item)
+  event.preventDefault()
+  const startX = event.clientX
+  const startY = event.clientY
+
+  function onMove(e: PointerEvent) {
+    if (Math.abs(e.clientX - startX) + Math.abs(e.clientY - startY) > DRAG_THRESHOLD) {
+      teardown()
+      startDragFromEquipment(item, slot.name, event)
+    }
+  }
+
+  function onUp() {
+    teardown()
+    togglePopover(slot.name)
+  }
+
+  function teardown() {
+    document.removeEventListener('pointermove', onMove)
+    document.removeEventListener('pointerup', onUp)
+  }
+
+  document.addEventListener('pointermove', onMove)
+  document.addEventListener('pointerup', onUp)
+}
+
+// --- Equipment item picker ---
+
+function getPickerIconUrl(iconFile: string | undefined) {
+  if (!iconFile) return null
+  return `app-icon:///${encodeURIComponent(iconFile + '.png')}`
+}
+
+function selectEquipmentItem(slotName: string, item: GameItem | null) {
+  const existing = equipmentBySlot.value.get(slotName)
+  if (existing) removeItem(existing.subResourceId)
+  if (item) addEquipmentItem(item.resourcePath, slotName)
+  openPopover.value = null
 }
 
 function onSlotPointerEnter(slot: SlotDef) {
@@ -147,78 +223,149 @@ const gridHeight = ROWS * CELL_SIZE
     :style="{ width: `${gridWidth}px`, height: `${gridHeight}px` }"
   >
     <!-- Equipment slots -->
-    <div
+    <Popover
       v-for="slot in slots"
       :key="slot.name"
-      class="absolute z-10 border rounded-sm overflow-hidden transition-colors select-none"
-      :class="[
-        isSlotHovered(slot)
-          ? dragState?.equipmentHover?.isValid
-            ? 'border-green-500 bg-green-500/10'
-            : 'border-red-500 bg-red-500/10'
-          : equipmentBySlot.get(slot.name)
-            ? 'border-border/60 bg-muted/40'
-            : 'border-border/60 bg-background',
-        isSlotDragging(slot) ? 'opacity-30' : '',
-        equipmentBySlot.get(slot.name) ? 'cursor-grab' : ''
-      ]"
-      :style="{
-        left: `${slot.col * CELL_SIZE}px`,
-        top: `${slot.row * CELL_SIZE}px`,
-        width: `${slot.w * CELL_SIZE}px`,
-        height: `${slot.h * CELL_SIZE}px`
-      }"
-      @pointerdown="onSlotPointerDown(slot, $event)"
-      @pointerenter="onSlotPointerEnter(slot)"
-      @pointerleave="onSlotPointerLeave(slot)"
-      @contextmenu="onSlotContextMenu(slot, $event)"
+      :open="openPopover === slot.name"
+      @update:open="onPopoverUpdate(slot.name, $event)"
     >
-      <div v-if="equipmentBySlot.get(slot.name)" class="relative w-full h-full">
-        <CompositeIcon
-          :icon-file="getIconFile(equipmentBySlot.get(slot.name)!)"
-          :item-path="equipmentBySlot.get(slot.name)!.itemPath"
-          :nested="equipmentBySlot.get(slot.name)!.nested"
-          :w="slot.w"
-          :h="slot.h"
-          :cell-size="CELL_SIZE"
-        />
-        <!-- Condition percentage -->
-        <span
-          v-if="equipmentBySlot.get(slot.name)!.showCondition"
-          class="absolute top-0 right-0 text-[10px] leading-none font-medium px-[3px] pt-[2px] z-10"
-          :class="
-            equipmentBySlot.get(slot.name)!.condition > 50
-              ? 'text-green-500'
-              : equipmentBySlot.get(slot.name)!.condition > 25
-                ? 'text-yellow-300'
-                : 'text-red-400'
-          "
+      <PopoverAnchor as-child>
+        <div
+          class="group absolute border rounded-sm overflow-hidden transition-colors select-none"
+          :class="[
+            openPopover === slot.name ? 'z-20' : 'z-10',
+            isSlotHovered(slot)
+              ? dragState?.equipmentHover?.isValid
+                ? 'border-green-500 bg-green-500/10'
+                : 'border-red-500 bg-red-500/10'
+              : openPopover === slot.name
+                ? 'border-primary ring-1 ring-primary'
+                : equipmentBySlot.get(slot.name)
+                  ? 'border-border/60 bg-muted/40'
+                  : 'border-border/60 bg-background',
+            isSlotDragging(slot) ? 'opacity-30' : '',
+            equipmentBySlot.get(slot.name)
+              ? 'cursor-grab'
+              : ITEMS_BY_SLOT.has(slot.name)
+                ? 'cursor-pointer'
+                : ''
+          ]"
+          :style="{
+            left: `${slot.col * CELL_SIZE}px`,
+            top: `${slot.row * CELL_SIZE}px`,
+            width: `${slot.w * CELL_SIZE}px`,
+            height: `${slot.h * CELL_SIZE}px`
+          }"
+          @pointerdown="onSlotPointerDown(slot, $event)"
+          @pointerenter="onSlotPointerEnter(slot)"
+          @pointerleave="onSlotPointerLeave(slot)"
+          @contextmenu="onSlotContextMenu(slot, $event)"
+          @click="onSlotClick(slot)"
         >
-          {{ Math.round(equipmentBySlot.get(slot.name)!.condition) }}%
-        </span>
-        <!-- Ammo count -->
-        <span
-          v-if="equipmentBySlot.get(slot.name)!.category === 'Weapons'"
-          class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
-        >
-          {{ equipmentBySlot.get(slot.name)!.amount }} + {{ equipmentBySlot.get(slot.name)!.chamber ? 1 : 0 }}
-        </span>
-        <span
-          v-else-if="equipmentBySlot.get(slot.name)!.showAmount"
-          class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
-        >
-          {{ equipmentBySlot.get(slot.name)!.amount }}
-        </span>
-        <!-- Item name label -->
-        <span
-          class="absolute bottom-0 left-0 text-[10px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
-          style="text-overflow: '.'"
-        >
-          {{ equipmentBySlot.get(slot.name)!.nameEquipment }}
-        </span>
-      </div>
-      <span v-else class="text-[10px] text-muted-foreground/60 uppercase flex items-center justify-center w-full h-full">{{ slot.label ?? slot.name }}</span>
-    </div>
+          <div v-if="equipmentBySlot.get(slot.name)" class="relative w-full h-full">
+            <CompositeIcon
+              :icon-file="getIconFile(equipmentBySlot.get(slot.name)!)"
+              :item-path="equipmentBySlot.get(slot.name)!.itemPath"
+              :nested="equipmentBySlot.get(slot.name)!.nested"
+              :w="slot.w"
+              :h="slot.h"
+              :cell-size="CELL_SIZE"
+            />
+            <!-- Condition percentage -->
+            <span
+              v-if="equipmentBySlot.get(slot.name)!.showCondition"
+              class="absolute top-0 right-0 text-[10px] leading-none font-medium px-[3px] pt-[2px] z-10"
+              :class="
+                equipmentBySlot.get(slot.name)!.condition > 50
+                  ? 'text-green-500'
+                  : equipmentBySlot.get(slot.name)!.condition > 25
+                    ? 'text-yellow-300'
+                    : 'text-red-400'
+              "
+            >
+              {{ Math.round(equipmentBySlot.get(slot.name)!.condition) }}%
+            </span>
+            <!-- Ammo count -->
+            <span
+              v-if="equipmentBySlot.get(slot.name)!.category === 'Weapons'"
+              class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+            >
+              {{ equipmentBySlot.get(slot.name)!.amount }} +
+              {{ equipmentBySlot.get(slot.name)!.chamber ? 1 : 0 }}
+            </span>
+            <span
+              v-else-if="equipmentBySlot.get(slot.name)!.showAmount"
+              class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+            >
+              {{ equipmentBySlot.get(slot.name)!.amount }}
+            </span>
+            <!-- Item name label -->
+            <span
+              class="absolute bottom-0 left-0 text-[10px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
+              style="text-overflow: '.'"
+            >
+              {{ equipmentBySlot.get(slot.name)!.nameEquipment }}
+            </span>
+          </div>
+          <span
+            v-else
+            class="text-[10px] text-muted-foreground/60 uppercase flex items-center justify-center w-full h-full"
+            >{{ slot.label ?? slot.name }}</span
+          >
+          <!-- Picker button (visible on slot hover) -->
+          <button
+            v-if="ITEMS_BY_SLOT.has(slot.name)"
+            class="absolute top-0 right-0 z-20 flex items-center justify-center w-5 h-5 rounded-bl-sm bg-muted/80 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
+            @pointerdown.stop
+            @click.stop="togglePopover(slot.name)"
+          >
+            <ChevronDown class="w-3 h-3" />
+          </button>
+        </div>
+      </PopoverAnchor>
+      <PopoverContent
+        v-if="ITEMS_BY_SLOT.has(slot.name)"
+        :collision-padding="12"
+        class="max-h-[400px] overflow-y-auto"
+      >
+        <div class="flex flex-wrap gap-2 w-[344px]">
+          <!-- None / remove option (only when slot is occupied) -->
+          <button
+            v-if="equipmentBySlot.get(slot.name)"
+            class="relative flex items-center justify-center w-20 h-20 rounded-md border transition-colors"
+            :class="'border-border hover:bg-accent'"
+            @click="selectEquipmentItem(slot.name, null)"
+          >
+            <span class="text-xs text-muted-foreground">None</span>
+          </button>
+          <!-- Item options -->
+          <button
+            v-for="item in ITEMS_BY_SLOT.get(slot.name)"
+            :key="item.resourcePath"
+            class="relative w-20 h-20 rounded-md border transition-colors overflow-hidden"
+            :class="
+              equipmentBySlot.get(slot.name)?.itemPath === item.resourcePath
+                ? 'border-primary ring-1 ring-primary bg-accent'
+                : 'border-border hover:bg-accent'
+            "
+            @click="selectEquipmentItem(slot.name, item)"
+          >
+            <img
+              v-if="getPickerIconUrl(item.iconFile)"
+              :src="getPickerIconUrl(item.iconFile)!"
+              class="w-full h-full object-contain p-1.5"
+              draggable="false"
+            />
+            <div v-else class="w-full h-full bg-muted" />
+            <span
+              class="absolute bottom-0 left-0 right-0 text-[10px] leading-none text-foreground/80 text-center pb-[3px] truncate px-[3px]"
+            >
+              {{ item.displayName }}
+            </span>
+          </button>
+        </div>
+      </PopoverContent>
+    </Popover>
 
     <ItemContextMenu
       v-if="contextMenu"

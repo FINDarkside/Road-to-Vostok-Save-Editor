@@ -218,7 +218,9 @@ function reset(): void {
               class="h-5 w-16 shrink-0 object-contain"
             />
             <div v-else class="h-5 w-16 shrink-0" />
-            <Badge variant="secondary" class="text-xs shrink-0 w-24 justify-center">{{ item.category }}</Badge>
+            <Badge variant="secondary" class="text-xs shrink-0 w-24 justify-center">{{
+              item.category
+            }}</Badge>
           </button>
         </div>
 

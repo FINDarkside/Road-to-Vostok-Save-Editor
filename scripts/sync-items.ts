@@ -174,6 +174,18 @@ function parseBool(raw: string | undefined): boolean {
   return raw === 'true'
 }
 
+function parseStringArray(raw: string | undefined): string[] {
+  if (!raw) return []
+  const m = raw.match(/\["([^"]*)"(?:\s*,\s*"([^"]*)")*\]/)
+  if (!m) return []
+  // Extract all quoted strings from the array literal
+  const result: string[] = []
+  for (const match of raw.matchAll(/"([^"]+)"/g)) {
+    result.push(match[1])
+  }
+  return result
+}
+
 function parseNumber(raw: string | undefined): number {
   if (!raw) return 0
   const n = Number(raw)
@@ -261,9 +273,7 @@ function parseTscnAttachments(content: string): AttachmentOverlayEntry[] {
         continue
       }
 
-      const scaleMatch = propLine.match(
-        /^scale\s*=\s*Vector2\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\)/
-      )
+      const scaleMatch = propLine.match(/^scale\s*=\s*Vector2\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\)/)
       if (scaleMatch) {
         scale = parseFloat(scaleMatch[1])
         continue
@@ -365,6 +375,7 @@ interface ItemEntry {
   defaultAmount: number
   maxAmount: number
   repairs: boolean
+  slots: string[]
 }
 
 async function main() {
@@ -417,7 +428,8 @@ async function main() {
       showAmount: parseBool(fields.showAmount),
       defaultAmount: parseNumber(fields.defaultAmount),
       maxAmount: parseNumber(fields.maxAmount),
-      repairs: parseBool(fields.repairs)
+      repairs: parseBool(fields.repairs),
+      slots: parseStringArray(fields.slots)
     })
   }
 
@@ -478,6 +490,9 @@ async function main() {
     if (item.defaultAmount) props.push(`    defaultAmount: ${item.defaultAmount}`)
     if (item.maxAmount) props.push(`    maxAmount: ${item.maxAmount}`)
     if (item.repairs) props.push('    repairs: true')
+    if (item.slots.length > 0) {
+      props.push(`    slots: [${item.slots.map((s) => `'${s}'`).join(', ')}]`)
+    }
     itemLines.push(`  {\n${props.join(',\n')}\n  }`)
   }
 

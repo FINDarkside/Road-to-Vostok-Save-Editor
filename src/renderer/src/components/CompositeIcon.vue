@@ -90,28 +90,47 @@ const wrapperStyle = computed(() => {
   }
 })
 
+// Scale factor matching what object-contain does to the weapon image.
+// When the display area (w×h) differs from the weapon's actual size,
+// attachment positions must be scaled to match the visual weapon size.
+const imgScale = computed(() => {
+  const item = ITEMS_BY_PATH.get(props.itemPath)
+  if (!item) return 1
+  const actual = getItemSize(item)
+  const actualW = actual.w * props.cellSize
+  const actualH = actual.h * props.cellSize
+  const dispW = (props.rotated ? props.h : props.w) * props.cellSize - 4
+  const dispH = (props.rotated ? props.w : props.h) * props.cellSize - 4
+  return Math.min(dispW / actualW, dispH / actualH, 1)
+})
+
 // Compute auto-fit scale when attachments overflow the weapon area
 const fitTransform = computed(() => {
   if (props.noFit) return undefined
   const atts = resolvedAttachments.value
-  if (atts.length === 0) return undefined
+  const s = imgScale.value
 
-  const factor = props.cellSize / 64
   // When rotated, the wrapper is h×w (pre-rotation dimensions)
   const wrapW = (props.rotated ? props.h : props.w) * props.cellSize - 4
   const wrapH = (props.rotated ? props.w : props.h) * props.cellSize - 4
 
-  // Bounding box starts with the base weapon (fills the wrapper)
-  let minX = 0
-  let maxX = wrapW
-  let minY = 0
-  let maxY = wrapH
+  const item = ITEMS_BY_PATH.get(props.itemPath)
+  const actual = item ? getItemSize(item) : { w: props.w, h: props.h }
+  const imgW = actual.w * props.cellSize * s
+  const imgH = actual.h * props.cellSize * s
 
+  // Bounding box starts with the weapon image visual bounds (centered by object-contain)
+  let minX = (wrapW - imgW) / 2
+  let maxX = (wrapW + imgW) / 2
+  let minY = (wrapH - imgH) / 2
+  let maxY = (wrapH + imgH) / 2
+
+  const factor = props.cellSize / 64
   for (const att of atts) {
-    const cx = wrapW / 2 + 0.5 * att.position[0] * factor
-    const cy = wrapH / 2 + 0.5 * att.position[1] * factor
-    const aw = att.attW * props.cellSize * att.scale
-    const ah = att.attH * props.cellSize * att.scale
+    const cx = wrapW / 2 + 0.5 * att.position[0] * factor * s
+    const cy = wrapH / 2 + 0.5 * att.position[1] * factor * s
+    const aw = att.attW * props.cellSize * att.scale * s
+    const ah = att.attH * props.cellSize * att.scale * s
     minX = Math.min(minX, cx - aw / 2)
     maxX = Math.max(maxX, cx + aw / 2)
     minY = Math.min(minY, cy - ah / 2)
@@ -123,28 +142,30 @@ const fitTransform = computed(() => {
 
   const scaleX = wrapW / bboxW
   const scaleY = wrapH / bboxH
-  const s = Math.min(scaleX, scaleY, 1)
-  if (s >= 0.99) return undefined
+  const fit = Math.min(scaleX, scaleY, 1)
+  if (atts.length === 0 && fit >= 0.99) return undefined
+  if (fit >= 0.99) return undefined
 
   // Offset so the bounding box center maps to the wrapper center
   const bboxCx = (minX + maxX) / 2
   const bboxCy = (minY + maxY) / 2
-  const tx = wrapW / 2 - bboxCx * s
-  const ty = wrapH / 2 - bboxCy * s
+  const tx = wrapW / 2 - bboxCx * fit
+  const ty = wrapH / 2 - bboxCy * fit
 
   return {
-    transform: `translate(${tx}px, ${ty}px) scale(${s})`,
+    transform: `translate(${tx}px, ${ty}px) scale(${fit})`,
     transformOrigin: '0 0'
   }
 })
 
 function attStyle(att: ResolvedAttachment) {
   const factor = props.cellSize / 64
+  const s = imgScale.value
   return {
-    left: `calc(50% + ${0.5 * att.position[0] * factor}px)`,
-    top: `calc(50% + ${0.5 * att.position[1] * factor}px)`,
-    width: `${att.attW * props.cellSize * att.scale}px`,
-    height: `${att.attH * props.cellSize * att.scale}px`,
+    left: `calc(50% + ${0.5 * att.position[0] * factor * s}px)`,
+    top: `calc(50% + ${0.5 * att.position[1] * factor * s}px)`,
+    width: `${att.attW * props.cellSize * att.scale * s}px`,
+    height: `${att.attH * props.cellSize * att.scale * s}px`,
     transform: `translate(-50%, -50%)${att.rotation ? ` rotate(${att.rotation}rad)` : ''}`,
     zIndex: att.behind ? 0 : 2
   }

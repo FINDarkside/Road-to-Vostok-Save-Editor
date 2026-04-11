@@ -9,7 +9,6 @@ import InventoryGridItem from './InventoryGridItem.vue'
 import ItemContextMenu from './ItemContextMenu.vue'
 import type { GridItemPlacement, SlotItem } from '../lib/types'
 
-
 const containerRef = ref<HTMLElement | null>(null)
 const { gridPlacements, canPlace, findFreeSlot, getConflicts } = useInventoryGrid()
 const {
@@ -34,7 +33,9 @@ const showEditLoadout = computed(() => {
 
 function handleEditLoadout() {
   if (!contextMenu.value) return
-  const item = allItems.value.find((i) => i.subResourceId === contextMenu.value!.placement.subResourceId)
+  const item = allItems.value.find(
+    (i) => i.subResourceId === contextMenu.value!.placement.subResourceId
+  )
   if (item) openWorkbench?.(item)
   contextMenu.value = null
 }

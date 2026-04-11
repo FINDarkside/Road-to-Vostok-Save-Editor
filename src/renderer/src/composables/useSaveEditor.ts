@@ -1,6 +1,13 @@
 import { ref, computed } from 'vue'
 import type { TresFile, ExtResource, SubResource, Property } from '../lib/tres/types'
-import type { SlotItem, CharacterStats, StatusEffects, CatStatus, SaveFileInfo } from '../lib/types'
+import type {
+  SlotItem,
+  CharacterStats,
+  StatusEffects,
+  CatStatus,
+  WorldState,
+  SaveFileInfo
+} from '../lib/types'
 import { parseTresFile } from '../lib/tres/parser'
 import { serializeTresFile } from '../lib/tres/serializer'
 import { ITEMS_BY_PATH, ITEMS_META } from '../data/items'
@@ -8,9 +15,11 @@ import { ATTACHMENT_SUBTYPE } from '../data/attachment-subtypes'
 
 const currentFile = ref<SaveFileInfo | null>(null)
 const tresFile = ref<TresFile | null>(null)
+const worldFile = ref<TresFile | null>(null)
 const isLoading = ref(false)
 const isDirty = ref(false)
 const loadError = ref<string | null>(null)
+const worldLoadError = ref<string | null>(null)
 
 function getStringProp(props: Property[], key: string): string {
   const prop = props.find((p) => p.key === key)
@@ -170,10 +179,22 @@ const catStatus = computed<CatStatus>(() => {
   }
 })
 
+const worldState = computed<WorldState>(() => {
+  if (!worldFile.value) return { difficulty: 1, season: 1, day: 1, weather: 'Neutral' }
+  const res = worldFile.value.resource
+  return {
+    difficulty: getNumberProp(res, 'difficulty'),
+    season: getNumberProp(res, 'season'),
+    day: getNumberProp(res, 'day'),
+    weather: getStringProp(res, 'weather')
+  }
+})
+
 export function useSaveEditor() {
   async function init(): Promise<void> {
     isLoading.value = true
     loadError.value = null
+    worldLoadError.value = null
     try {
       const content = await window.api.loadSave('Character.tres')
       tresFile.value = parseTresFile(content)
@@ -181,15 +202,24 @@ export function useSaveEditor() {
       isDirty.value = false
     } catch (e) {
       loadError.value = e instanceof Error ? e.message : 'Failed to load Character.tres'
-    } finally {
-      isLoading.value = false
     }
+    try {
+      const worldContent = await window.api.loadSave('World.tres')
+      worldFile.value = parseTresFile(worldContent)
+    } catch (e) {
+      worldLoadError.value = e instanceof Error ? e.message : 'Failed to load World.tres'
+    }
+    isLoading.value = false
   }
 
   async function saveFile(): Promise<void> {
     if (!tresFile.value || !currentFile.value) return
     const content = serializeTresFile(tresFile.value)
     await window.api.saveSave(currentFile.value.fileName, content)
+    if (worldFile.value) {
+      const worldContent = serializeTresFile(worldFile.value)
+      await window.api.saveSave('World.tres', worldContent)
+    }
     isDirty.value = false
   }
 
@@ -201,6 +231,14 @@ export function useSaveEditor() {
     const invProp = tres.resource.find((p) => p.key === 'inventory')
     if (invProp && invProp.value.kind === 'typed_array') {
       invProp.value.elements = invProp.value.elements.filter(
+        (el) => !(el.kind === 'sub_resource' && el.id === subResourceId)
+      )
+    }
+
+    // Remove from equipment array
+    const eqProp = tres.resource.find((p) => p.key === 'equipment')
+    if (eqProp && eqProp.value.kind === 'typed_array') {
+      eqProp.value.elements = eqProp.value.elements.filter(
         (el) => !(el.kind === 'sub_resource' && el.id === subResourceId)
       )
     }
@@ -310,6 +348,86 @@ export function useSaveEditor() {
     tresFile.value = { ...tres }
   }
 
+  function addEquipmentItem(
+    resourcePath: string,
+    slotName: string,
+    opts: { condition?: number; amount?: number } = {}
+  ): void {
+    if (!tresFile.value) return
+    const tres = tresFile.value
+
+    // Find or create ext_resource for this item path
+    let extId = tres.extResources.find((e) => e.path === resourcePath)?.id
+    if (!extId) {
+      extId = String(Math.max(0, ...tres.extResources.map((e) => parseInt(e.id, 10))) + 1)
+      const newExt: ExtResource = {
+        id: extId,
+        type: 'Resource',
+        path: resourcePath,
+        raw: `[ext_resource type="Resource" path="${resourcePath}" id="${extId}"]`
+      }
+      tres.extResources.push(newExt)
+    }
+
+    const slotDataExt = tres.extResources.find((e) => e.path.endsWith('SlotData.gd'))
+    const slotDataId = slotDataExt?.id ?? '1'
+    const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
+    const itemDataId = itemDataExt?.id ?? '3'
+
+    let subId: string
+    do {
+      subId = 'Resource_' + randomAlphanumeric(5)
+    } while (tres.subResources.some((s) => s.id === subId))
+
+    const meta = ITEMS_META.get(resourcePath)
+    const condition = opts.condition ?? meta?.defaultCondition ?? 0
+    const amount = opts.amount ?? meta?.defaultAmount ?? 0
+
+    const newSub: SubResource = {
+      id: subId,
+      type: 'Resource',
+      properties: [
+        { key: 'script', value: { kind: 'ext_resource', id: slotDataId } },
+        { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
+        {
+          key: 'nested',
+          value: { kind: 'typed_array', elementType: `ExtResource("${itemDataId}")`, elements: [] }
+        },
+        {
+          key: 'storage',
+          value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
+        },
+        { key: 'condition', value: { kind: 'int', value: condition, raw: String(condition) } },
+        { key: 'amount', value: { kind: 'int', value: amount, raw: String(amount) } },
+        { key: 'position', value: { kind: 'int', value: 0, raw: '0' } },
+        { key: 'mode', value: { kind: 'int', value: 1, raw: '1' } },
+        { key: 'zoom', value: { kind: 'int', value: 1, raw: '1' } },
+        { key: 'chamber', value: { kind: 'bool', value: false } },
+        { key: 'casing', value: { kind: 'bool', value: false } },
+        { key: 'state', value: { kind: 'string', value: '' } },
+        {
+          key: 'gridPosition',
+          value: { kind: 'vector2', x: 0, y: 0, raw: 'Vector2(0, 0)' }
+        },
+        { key: 'gridRotated', value: { kind: 'bool', value: false } },
+        { key: 'slot', value: { kind: 'string', value: slotName } }
+      ]
+    }
+
+    tres.subResources.push(newSub)
+
+    // Add to equipment array
+    const eqProp = tres.resource.find((p) => p.key === 'equipment')
+    if (eqProp && eqProp.value.kind === 'typed_array') {
+      eqProp.value.elements.push({ kind: 'sub_resource', id: subId })
+    }
+
+    updateLoadSteps(tres)
+
+    isDirty.value = true
+    tresFile.value = { ...tres }
+  }
+
   function setWeaponNested(subResourceId: string, nestedPaths: string[]): void {
     if (!tresFile.value) return
     const tres = tresFile.value
@@ -410,6 +528,19 @@ export function useSaveEditor() {
     }
     isDirty.value = true
     tresFile.value = { ...tresFile.value }
+  }
+
+  function updateWorldProp(key: keyof WorldState, value: number | string): void {
+    if (!worldFile.value) return
+    const prop = worldFile.value.resource.find((p) => p.key === key)
+    if (!prop) return
+    if (typeof value === 'string') {
+      prop.value = { kind: 'string', value }
+    } else {
+      prop.value = { kind: 'int', value, raw: String(value) }
+    }
+    isDirty.value = true
+    worldFile.value = { ...worldFile.value }
   }
 
   function maxAllStats(): void {
@@ -597,6 +728,9 @@ export function useSaveEditor() {
     stats,
     statusEffects,
     catStatus,
+    worldState,
+    worldFile,
+    worldLoadError,
     isLoading,
     isDirty,
     loadError,
@@ -604,6 +738,7 @@ export function useSaveEditor() {
     init,
     saveFile,
     addItem,
+    addEquipmentItem,
     removeItem,
     setWeaponNested,
     updateStat,
@@ -612,6 +747,7 @@ export function useSaveEditor() {
     updateCatHealth,
     reviveCat,
     killCat,
+    updateWorldProp,
     updateItem,
     updateItemGridPosition,
     moveToInventory,

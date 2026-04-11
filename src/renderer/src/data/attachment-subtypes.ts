@@ -57,7 +57,10 @@ export const ATTACHMENT_SUBTYPE = new Map<string, AttachmentSubtype>([
  * These weapons use a shared magazine (STANAG) but have weapon-specific visual scenes.
  */
 const MAGAZINE_VISUAL_ALIASES = new Map<string, string>([
-  ['res://Items/Weapons/HK416/HK416_Magazine.tres', 'res://Items/Weapons/M4A1/STANAG_Magazine.tres'],
+  [
+    'res://Items/Weapons/HK416/HK416_Magazine.tres',
+    'res://Items/Weapons/M4A1/STANAG_Magazine.tres'
+  ],
   ['res://Items/Weapons/MK18/MK18_Magazine.tres', 'res://Items/Weapons/M4A1/STANAG_Magazine.tres'],
   ['res://Items/Weapons/M4A1/M4A1_Magazine.tres', 'res://Items/Weapons/M4A1/STANAG_Magazine.tres']
 ])
@@ -68,10 +71,7 @@ export function resolveItemPath(layoutPath: string): string {
 }
 
 /** Resolves an item path back to the visual layout path for a specific weapon */
-export function resolveLayoutPath(
-  itemPath: string,
-  weaponPath: string
-): string | undefined {
+export function resolveLayoutPath(itemPath: string, weaponPath: string): string | undefined {
   const layouts = WEAPON_ATTACHMENT_LAYOUTS.get(weaponPath)
   if (!layouts) return undefined
   // Direct match
@@ -97,9 +97,7 @@ const SUBTYPE_ORDER: AttachmentSubtype[] = ['Magazine', 'Optic', 'Muzzle', 'Lase
  * Returns compatible attachments for a weapon, grouped by subtype.
  * Entries are ordered: Magazine, Optic, Muzzle, Laser.
  */
-export function getWeaponSlots(
-  weaponPath: string
-): Map<AttachmentSubtype, AttachmentOption[]> {
+export function getWeaponSlots(weaponPath: string): Map<AttachmentSubtype, AttachmentOption[]> {
   const layouts = WEAPON_ATTACHMENT_LAYOUTS.get(weaponPath)
   if (!layouts) return new Map()
 

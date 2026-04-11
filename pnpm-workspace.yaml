@@ -1,0 +1,7 @@
+ignoredBuiltDependencies:
+  - electron-winstaller
+  - vue-demi
+
+onlyBuiltDependencies:
+  - electron
+  - esbuild
