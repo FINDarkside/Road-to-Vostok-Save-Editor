@@ -7,7 +7,7 @@ const progress = ref(0)
 const total = ref(0)
 const error = ref<string | null>(null)
 
-// Cache of item ID → base64 data URL (loaded lazily)
+// Cache of item ID → file:// URL (loaded lazily)
 const iconCache = new Map<string, string | null>()
 // Track pending loads to avoid duplicate requests
 const pendingLoads = new Map<string, Promise<string | null>>()
@@ -63,7 +63,7 @@ async function startExtraction(force = false): Promise<void> {
   }
 }
 
-/** Retry after an error (respects cache) */
+/** Retry after an error */
 async function retry(): Promise<void> {
   initialized = false
   iconCache.clear()
@@ -79,29 +79,31 @@ async function reload(): Promise<void> {
 }
 
 /**
- * Get a cached icon data URL for an item ID.
+ * Get a cached icon data URL for an icon file.
  * Returns null if not loaded yet — call loadIcon to trigger async load.
  */
-function getCachedIcon(itemId: string): string | null {
-  return iconCache.get(itemId) ?? null
+function getCachedIcon(iconFile: string): string | null {
+  return iconCache.get(iconFile) ?? null
 }
 
 /**
- * Load an icon for an item ID. Returns a data URL or null.
+ * Load an icon by its ctex filename (e.g. "Icon_Coffee.png-03e4...s3tc.ctex").
+ * The ctex filename is used as the cache key on both the extractor and lookup sides,
+ * ensuring we always get the correct icon even when multiple files share a name.
  * Results are cached — subsequent calls return immediately.
  */
-async function loadIcon(itemId: string): Promise<string | null> {
-  if (iconCache.has(itemId)) return iconCache.get(itemId)!
+async function loadIcon(iconFile: string): Promise<string | null> {
+  if (iconCache.has(iconFile)) return iconCache.get(iconFile)!
 
   // Deduplicate concurrent requests
-  let pending = pendingLoads.get(itemId)
+  let pending = pendingLoads.get(iconFile)
   if (!pending) {
-    pending = window.api.getIcon(itemId).then((result) => {
-      iconCache.set(itemId, result)
-      pendingLoads.delete(itemId)
+    pending = window.api.getIcon(iconFile).then((result) => {
+      iconCache.set(iconFile, result)
+      pendingLoads.delete(iconFile)
       return result
     })
-    pendingLoads.set(itemId, pending)
+    pendingLoads.set(iconFile, pending)
   }
 
   return pending

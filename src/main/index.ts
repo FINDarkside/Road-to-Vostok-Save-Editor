@@ -1,15 +1,22 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, net, protocol } from 'electron'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { registerSaveHandlers } from './ipc/save-handlers'
 import { registerIconHandlers } from './ipc/icon-handlers'
 
+const ICON_CACHE_DIR = join(app.getPath('userData'), 'icon-cache')
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app-icon', privileges: { bypassCSP: true, supportFetchAPI: true } }
+])
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
-    height: 670,
+    height: 850,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -49,6 +56,12 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
+  })
+
+  protocol.handle('app-icon', (request) => {
+    const fileName = decodeURIComponent(new URL(request.url).pathname.replace(/^\//, ''))
+    const filePath = join(ICON_CACHE_DIR, fileName)
+    return net.fetch(pathToFileURL(filePath).toString())
   })
 
   registerSaveHandlers()

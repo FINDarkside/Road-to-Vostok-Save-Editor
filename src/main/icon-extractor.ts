@@ -164,6 +164,32 @@ function decodeDxt5(data: Buffer, width: number, height: number): Uint8Array {
 }
 
 // ---------------------------------------------------------------------------
+// Box-filter 2x downscale
+// ---------------------------------------------------------------------------
+
+function downscaleHalf(rgba: Uint8Array, w: number, h: number): Uint8Array {
+  const hw = w >> 1
+  const hh = h >> 1
+  const out = new Uint8Array(hw * hh * 4)
+
+  for (let y = 0; y < hh; y++) {
+    for (let x = 0; x < hw; x++) {
+      const sx = x * 2
+      const sy = y * 2
+      for (let c = 0; c < 4; c++) {
+        const tl = rgba[(sy * w + sx) * 4 + c]
+        const tr = rgba[(sy * w + sx + 1) * 4 + c]
+        const bl = rgba[((sy + 1) * w + sx) * 4 + c]
+        const br = rgba[((sy + 1) * w + sx + 1) * 4 + c]
+        out[(y * hw + x) * 4 + c] = (tl + tr + bl + br + 2) >> 2
+      }
+    }
+  }
+
+  return out
+}
+
+// ---------------------------------------------------------------------------
 // Minimal PNG encoder (uses Node's built-in zlib)
 // ---------------------------------------------------------------------------
 
@@ -273,12 +299,11 @@ function decodeCtex(data: Buffer): { width: number; height: number; rgba: Uint8A
 // Icon name extraction from PCK paths
 // ---------------------------------------------------------------------------
 
-/** Extract item ID from PCK icon path like ".godot/imported/Icon_AK-12.png-hash.s3tc.ctex" */
-function extractItemId(pckPath: string): string | null {
+/** Extract cache key from PCK icon path like ".godot/imported/Icon_AK-12.png-hash.s3tc.ctex" */
+function extractCacheKey(pckPath: string): string | null {
   const filename = basename(pckPath)
-  // Match: Icon_{name}.png-{hash}.s3tc.ctex
-  const match = filename.match(/^Icon_(.+)\.png-[a-f0-9]+\.s3tc\.ctex$/)
-  return match ? match[1] : null
+  if (filename.startsWith('Icon_') && filename.endsWith('.s3tc.ctex')) return filename
+  return null
 }
 
 // ---------------------------------------------------------------------------
@@ -293,10 +318,14 @@ function getVersionPath(): string {
   return join(getCacheDir(), 'version.json')
 }
 
+/** Bump this when the cache key scheme changes to force re-extraction */
+const CACHE_VERSION = 3
+
 async function isCacheValid(pckPath: string): Promise<boolean> {
   try {
     const versionJson = await readFile(getVersionPath(), 'utf-8')
-    const cached = JSON.parse(versionJson) as { pckMtime: number }
+    const cached = JSON.parse(versionJson) as { pckMtime: number; version?: number }
+    if ((cached.version ?? 1) !== CACHE_VERSION) return false
     const pckStat = await stat(pckPath)
     return cached.pckMtime === pckStat.mtimeMs
   } catch {
@@ -306,7 +335,10 @@ async function isCacheValid(pckPath: string): Promise<boolean> {
 
 async function writeCacheVersion(pckPath: string): Promise<void> {
   const pckStat = await stat(pckPath)
-  await writeFile(getVersionPath(), JSON.stringify({ pckMtime: pckStat.mtimeMs }))
+  await writeFile(
+    getVersionPath(),
+    JSON.stringify({ pckMtime: pckStat.mtimeMs, version: CACHE_VERSION })
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -319,19 +351,16 @@ export function getIconStatus(): IconStatus {
   return currentStatus
 }
 
-export function getIconCachePath(itemId: string): string {
-  return join(getCacheDir(), `${itemId}.png`)
+export function getIconCachePath(cacheKey: string): string {
+  return join(getCacheDir(), `${cacheKey}.png`)
 }
 
-/** Read a cached icon as a base64 data URL, or null if not cached */
-export async function getIconBase64(itemId: string): Promise<string | null> {
-  const cachePath = getIconCachePath(itemId)
-  try {
-    const buf = await readFile(cachePath)
-    return `data:image/png;base64,${buf.toString('base64')}`
-  } catch {
-    return null
-  }
+/** Return the app-icon:// URL for a cached icon, or null if not cached */
+export function getIconUrl(cacheKey: string): string | null {
+  const fileName = `${cacheKey}.png`
+  const cachePath = join(getCacheDir(), fileName)
+  if (!existsSync(cachePath)) return null
+  return `app-icon:///${encodeURIComponent(fileName)}`
 }
 
 /**
@@ -380,18 +409,21 @@ export async function extractAllIcons(
     // Extract each icon
     for (let i = 0; i < iconEntries.length; i++) {
       const entry = iconEntries[i]
-      const itemId = extractItemId(entry.path)
-      if (!itemId) continue
+      const cacheKey = extractCacheKey(entry.path)
+      if (!cacheKey) continue
 
-      const outPath = join(cacheDir, `${itemId}.png`)
+      const outPath = join(cacheDir, `${cacheKey}.png`)
 
       // Read CTEX data from PCK
       const ctexBuf = Buffer.alloc(entry.size)
       await fh.read(ctexBuf, 0, entry.size, entry.offset)
 
-      // Decode and save as PNG
-      const { width, height, rgba } = decodeCtex(ctexBuf)
-      const png = encodePng(rgba, width, height)
+      // Decode, downscale 2x, and save as PNG
+      const decoded = decodeCtex(ctexBuf)
+      const hw = decoded.width >> 1
+      const hh = decoded.height >> 1
+      const rgba = downscaleHalf(decoded.rgba, decoded.width, decoded.height)
+      const png = encodePng(rgba, hw, hh)
       await writeFile(outPath, png)
 
       currentStatus = { status: 'extracting', progress: i + 1, total }

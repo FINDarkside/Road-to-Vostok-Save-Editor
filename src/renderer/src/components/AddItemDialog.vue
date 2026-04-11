@@ -2,8 +2,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { useInventoryGrid } from '../composables/useInventoryGrid'
-import { ITEMS, resolveItemMeta } from '../data/items'
-import { getItemSize } from '../data/itemSizes'
+import { ITEMS, resolveItemMeta, getItemSize } from '../data/items'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +13,7 @@ import {
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-import ItemIcon from './ItemIcon.vue'
+import { useItemIcons } from '../composables/useItemIcons'
 
 const props = defineProps<{
   open: boolean
@@ -26,21 +25,59 @@ const emit = defineEmits<{
 
 const { addItem } = useSaveEditor()
 const { findFreeSlot } = useInventoryGrid()
+const { getCachedIcon, loadIcon } = useItemIcons()
+
+const iconTick = ref(0)
+
+function getIcon(iconFile: string) {
+  iconTick.value // reactive dependency
+  return getCachedIcon(iconFile)
+}
+
+watch(
+  () => props.open,
+  async (open) => {
+    if (!open) return
+    const toLoad = ITEMS.filter((i) => i.iconFile && !getCachedIcon(i.iconFile))
+    if (!toLoad.length) return
+    await Promise.all(toLoad.map((i) => loadIcon(i.iconFile!)))
+    iconTick.value++
+  }
+)
 
 const search = ref('')
+const selectedCategory = ref<string | null>(null)
 const selectedIndex = ref(0)
 const condition = ref(100)
 const amount = ref(1)
 const listRef = ref<HTMLElement | null>(null)
 const addError = ref<string | null>(null)
 
-const filteredItems = computed(() => {
-  if (!search.value) return ITEMS
-  const q = search.value.toLowerCase()
-  return ITEMS.filter(
-    (i) => i.displayName.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)
-  )
+const categories = computed(() => {
+  const cats = new Set<string>()
+  for (const item of ITEMS) cats.add(item.category)
+  return [...cats].sort()
 })
+
+const filteredItems = computed(() => {
+  let result = ITEMS as typeof ITEMS
+  if (selectedCategory.value) {
+    result = result.filter((i) => i.category === selectedCategory.value)
+  }
+  if (search.value) {
+    const q = search.value.toLowerCase()
+    result = result.filter(
+      (i) => i.displayName.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)
+    )
+  }
+  return result
+})
+
+function toggleCategory(cat: string): void {
+  selectedCategory.value = selectedCategory.value === cat ? null : cat
+  selectedIndex.value = 0
+  addError.value = null
+}
 
 const selectedItem = computed(() => filteredItems.value[selectedIndex.value] ?? null)
 
@@ -48,13 +85,10 @@ const selectedMeta = computed(() =>
   selectedItem.value ? resolveItemMeta(selectedItem.value) : null
 )
 
-watch(
-  () => search.value,
-  () => {
-    selectedIndex.value = 0
-    addError.value = null
-  }
-)
+watch(search, () => {
+  selectedIndex.value = 0
+  addError.value = null
+})
 
 watch(selectedItem, (item) => {
   if (!item) return
@@ -92,7 +126,7 @@ function onKeydown(e: KeyboardEvent): void {
 function confirm(): void {
   if (!selectedItem.value || !selectedMeta.value) return
 
-  const size = getItemSize(selectedItem.value.id)
+  const size = getItemSize(selectedItem.value)
   const slot = findFreeSlot(size.w, size.h)
 
   if (!slot) {
@@ -122,6 +156,7 @@ function confirm(): void {
 
 function reset(): void {
   search.value = ''
+  selectedCategory.value = null
   selectedIndex.value = 0
   condition.value = 100
   amount.value = 1
@@ -152,6 +187,18 @@ function reset(): void {
           @keydown="onKeydown"
         />
 
+        <div class="flex flex-wrap gap-1">
+          <Badge
+            v-for="cat in categories"
+            :key="cat"
+            :variant="selectedCategory === cat ? 'default' : 'secondary'"
+            class="text-xs cursor-pointer select-none"
+            @click="toggleCategory(cat)"
+          >
+            {{ cat }}
+          </Badge>
+        </div>
+
         <div
           ref="listRef"
           class="flex-1 border border-border rounded-md min-h-0 overflow-y-auto p-1"
@@ -163,9 +210,15 @@ function reset(): void {
             :class="{ 'bg-accent': i === selectedIndex }"
             @click="selectedIndex = i"
           >
-            <ItemIcon :item-id="item.id" class="h-5 shrink-0" />
-            <span class="flex-1">{{ item.displayName }}</span>
-            <Badge variant="secondary" class="text-xs">{{ item.category }}</Badge>
+            <span class="flex-1 truncate">{{ item.displayName }}</span>
+            <img
+              v-if="item.iconFile && getIcon(item.iconFile)"
+              :src="getIcon(item.iconFile)!"
+              loading="lazy"
+              class="h-5 w-16 shrink-0 object-contain"
+            />
+            <div v-else class="h-5 w-16 shrink-0" />
+            <Badge variant="secondary" class="text-xs shrink-0">{{ item.category }}</Badge>
           </button>
         </div>
 

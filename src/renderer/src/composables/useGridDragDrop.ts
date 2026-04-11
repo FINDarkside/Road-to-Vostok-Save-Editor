@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 import type { GridItemPlacement, DragState } from '../lib/types'
-import { getItemSize } from '../data/itemSizes'
 import { GRID_COLS, GRID_ROWS } from './useInventoryGrid'
 
 export function useGridDragDrop(
@@ -27,7 +26,7 @@ export function useGridDragDrop(
     const pointerX = event.clientX - rect.left
     const pointerY = event.clientY - rect.top
 
-    dragState.value = {
+    const ds: DragState = {
       item: placement,
       col: placement.col,
       row: placement.row,
@@ -35,11 +34,13 @@ export function useGridDragDrop(
       w: placement.w,
       h: placement.h,
       isValid: true,
-      offsetX: pointerX - placement.col * cellSize,
-      offsetY: pointerY - placement.row * cellSize,
+      offsetX: (placement.w * cellSize) / 2,
+      offsetY: (placement.h * cellSize) / 2,
       pointerX,
       pointerY
     }
+    snapToGrid(ds)
+    dragState.value = ds
 
     containerEl.setPointerCapture(event.pointerId)
   }
@@ -71,11 +72,14 @@ export function useGridDragDrop(
 
     event.preventDefault()
     const ds = dragState.value
-    const baseSize = getItemSize(ds.item.itemId)
+
+    // Derive un-rotated base size from the placement captured at drag start
+    const baseW = ds.item.rotated ? ds.item.h : ds.item.w
+    const baseH = ds.item.rotated ? ds.item.w : ds.item.h
 
     ds.rotated = !ds.rotated
-    ds.w = ds.rotated ? baseSize.h : baseSize.w
-    ds.h = ds.rotated ? baseSize.w : baseSize.h
+    ds.w = ds.rotated ? baseH : baseW
+    ds.h = ds.rotated ? baseW : baseH
 
     // Re-center grab point on the new dimensions
     ds.offsetX = (ds.w * cellSize) / 2

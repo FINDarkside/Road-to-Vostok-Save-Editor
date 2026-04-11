@@ -83,17 +83,13 @@ const gridCells = computed(() => {
   return cells
 })
 
-// Ghost placement for drag preview
-const dragGhostPlacement = computed<GridItemPlacement | null>(() => {
+// Ghost pixel position (follows mouse freely, not snapped to grid)
+const dragGhostStyle = computed(() => {
   if (!dragState.value) return null
   const ds = dragState.value
   return {
-    ...ds.item,
-    col: ds.col,
-    row: ds.row,
-    w: ds.w,
-    h: ds.h,
-    rotated: ds.rotated
+    left: `${ds.pointerX - ds.offsetX}px`,
+    top: `${ds.pointerY - ds.offsetY}px`
   }
 })
 
@@ -145,14 +141,18 @@ defineExpose({ findFreeSlot })
         @dragstart="onItemDragStart"
       />
 
-      <!-- Drag ghost -->
-      <InventoryGridItem
-        v-if="dragState && dragGhostPlacement"
-        :placement="dragGhostPlacement"
-        :cell-size="CELL_SIZE"
-        ghost
-        :class="dragState.isValid ? 'ring-2 ring-green-500/60' : 'ring-2 ring-red-500/60'"
-      />
+      <!-- Drag ghost (follows mouse freely) -->
+      <div
+        v-if="dragState && dragGhostStyle"
+        class="absolute pointer-events-none z-30"
+        :style="dragGhostStyle"
+      >
+        <InventoryGridItem
+          :placement="{ ...dragState.item, col: 0, row: 0, w: dragState.w, h: dragState.h, rotated: dragState.rotated }"
+          :cell-size="CELL_SIZE"
+          ghost
+        />
+      </div>
     </div>
   </div>
 </template>

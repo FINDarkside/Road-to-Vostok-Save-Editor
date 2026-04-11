@@ -18,12 +18,12 @@ const { status, loadIcon } = useItemIcons()
 const iconUrl = ref<string | null>(null)
 
 async function load() {
-  if (status.value !== 'done' || !props.placement.itemId) return
-  iconUrl.value = await loadIcon(props.placement.itemId)
+  if (status.value !== 'done' || !props.placement.iconFile) return
+  iconUrl.value = await loadIcon(props.placement.iconFile)
 }
 
 onMounted(load)
-watch([() => status.value, () => props.placement.itemId], () => {
+watch([() => status.value, () => props.placement.iconFile], () => {
   iconUrl.value = null
   load()
 })
@@ -33,7 +33,7 @@ watch([() => status.value, () => props.placement.itemId], () => {
   <div
     class="absolute select-none"
     :class="[
-      ghost ? 'pointer-events-none z-30' : 'cursor-grab z-10 hover:z-20 hover:ring-1 hover:ring-primary/50',
+      ghost ? 'pointer-events-none z-30' : 'cursor-grab z-10 hover:z-20 hover:bg-primary/15',
       dimmed ? 'opacity-30' : ''
     ]"
     :style="{
@@ -42,10 +42,10 @@ watch([() => status.value, () => props.placement.itemId], () => {
       width: `${placement.w * cellSize}px`,
       height: `${placement.h * cellSize}px`
     }"
-    :title="`${placement.itemName}${placement.condition ? ` (${placement.condition}%)` : ''}`"
+    :title="`${placement.itemName}${placement.condition ? ` (${Math.round(placement.condition)}%)` : ''}`"
     @pointerdown.prevent="!ghost && $emit('dragstart', placement, $event)"
   >
-    <div class="w-full h-full rounded-sm border border-border/60 bg-muted/40 relative">
+    <div class="w-full h-full relative" :class="ghost ? '' : 'rounded-sm border border-border/60 bg-muted/40'">
       <!-- Non-rotated icon -->
       <img
         v-if="iconUrl && !placement.rotated"

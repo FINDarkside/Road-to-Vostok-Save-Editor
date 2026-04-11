@@ -10,8 +10,8 @@ const props = defineProps<{
 }>()
 
 const meta = computed(() => (props.item ? ITEMS_META.get(props.item.itemPath) : undefined))
-const itemId = computed(() =>
-  props.item ? (ITEMS_BY_PATH.get(props.item.itemPath)?.id ?? '') : ''
+const iconFile = computed(() =>
+  props.item ? (ITEMS_BY_PATH.get(props.item.itemPath)?.iconFile ?? '') : ''
 )
 
 function conditionColor(value: number): string {
@@ -30,7 +30,7 @@ function conditionColor(value: number): string {
       {{ slotName }}
     </span>
     <template v-if="item">
-      <ItemIcon v-if="itemId" :item-id="itemId" class="h-8 mb-1" />
+      <ItemIcon v-if="iconFile" :icon-file="iconFile" class="h-8 mb-1" />
       <span class="text-sm font-medium truncate">{{ item.itemName }}</span>
       <div v-if="meta?.showCondition" class="mt-auto pt-1.5 flex items-center gap-2">
         <div class="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
@@ -40,7 +40,7 @@ function conditionColor(value: number): string {
             :style="{ width: `${item.condition}%` }"
           />
         </div>
-        <span class="text-[10px] text-muted-foreground">{{ item.condition }}%</span>
+        <span class="text-[10px] text-muted-foreground">{{ Math.round(item.condition) }}%</span>
       </div>
     </template>
     <span v-else class="text-xs text-muted-foreground mt-auto">Empty</span>

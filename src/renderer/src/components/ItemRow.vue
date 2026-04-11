@@ -18,7 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const meta = computed(() => ITEMS_META.get(props.item.itemPath))
-const itemId = computed(() => ITEMS_BY_PATH.get(props.item.itemPath)?.id ?? '')
+const iconFile = computed(() => ITEMS_BY_PATH.get(props.item.itemPath)?.iconFile ?? '')
 
 const editingField = ref<'condition' | 'amount' | null>(null)
 const editValue = ref('')
@@ -56,7 +56,7 @@ function cancelEdit(): void {
 <template>
   <tr class="border-b border-border hover:bg-muted/50">
     <td class="px-1 py-1.5 w-8 text-center">
-      <ItemIcon v-if="itemId" :item-id="itemId" class="h-6 inline-block" />
+      <ItemIcon v-if="iconFile" :icon-file="iconFile" class="h-6 inline-block" />
     </td>
     <td class="px-3 py-1.5 text-sm">{{ item.itemName }}</td>
     <td class="px-3 py-1.5">
@@ -82,7 +82,7 @@ function cancelEdit(): void {
           class="cursor-pointer hover:underline"
           @click="startEdit('condition')"
         >
-          {{ item.condition }}
+          {{ Math.round(item.condition) }}
         </span>
       </template>
       <span v-else class="text-muted-foreground">—</span>

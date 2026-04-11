@@ -29,6 +29,12 @@ export interface GameItem {
   id: string
   displayName: string
   resourcePath: string
+  /** Grid size width. Default: 1 */
+  sizeW?: number
+  /** Grid size height. Default: 1 */
+  sizeH?: number
+  /** Icon filename stem from the game data (e.g. "Icon_AK-12" → used for PCK cache lookup) */
+  iconFile?: string
   /** Item stacks in inventory (ammo + matches). Default: false */
   stackable?: boolean
   /** Condition is meaningful (weapons, armor, electronics). Default: false */
@@ -75,7 +81,7 @@ export interface SlotItem {
 export interface GridItemPlacement {
   subResourceId: string
   itemPath: string
-  itemId: string
+  iconFile: string
   itemName: string
   category: string
   condition: number

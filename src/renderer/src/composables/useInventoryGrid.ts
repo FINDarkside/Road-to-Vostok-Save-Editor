@@ -1,7 +1,6 @@
 import { computed } from 'vue'
 import { useSaveEditor } from './useSaveEditor'
-import { getItemSize } from '../data/itemSizes'
-import { ITEMS_BY_PATH } from '../data/items'
+import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import type { GridItemPlacement } from '../lib/types'
 
 export const GRID_COLS = 8
@@ -14,15 +13,14 @@ export function useInventoryGrid() {
   const gridPlacements = computed<GridItemPlacement[]>(() => {
     return items.value.map((item) => {
       const catalogItem = ITEMS_BY_PATH.get(item.itemPath)
-      const itemId = catalogItem?.id ?? ''
-      const baseSize = getItemSize(itemId)
+      const baseSize = catalogItem ? getItemSize(catalogItem) : { w: 1, h: 1 }
       const w = item.gridRotated ? baseSize.h : baseSize.w
       const h = item.gridRotated ? baseSize.w : baseSize.h
 
       return {
         subResourceId: item.subResourceId,
         itemPath: item.itemPath,
-        itemId,
+        iconFile: catalogItem?.iconFile ?? '',
         itemName: item.itemName,
         category: item.category,
         condition: item.condition,

@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import { findGamePckPath } from '../game-path'
-import { extractAllIcons, getIconStatus, getIconBase64, type IconStatus } from '../icon-extractor'
+import { extractAllIcons, getIconStatus, getIconUrl, type IconStatus } from '../icon-extractor'
 
 let cachedPckPath: string | null | undefined = undefined
 
@@ -35,7 +35,7 @@ export function registerIconHandlers(): void {
     )
   })
 
-  ipcMain.handle('icons:get', async (_event, itemId: string): Promise<string | null> => {
-    return getIconBase64(itemId)
+  ipcMain.handle('icons:get', (_event, itemId: string): string | null => {
+    return getIconUrl(itemId)
   })
 }
