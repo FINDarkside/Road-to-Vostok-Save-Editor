@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useInventoryGrid, GRID_COLS, GRID_ROWS } from '../composables/useInventoryGrid'
-import { useGridDragDrop } from '../composables/useGridDragDrop'
+import { useDragDrop } from '../composables/useDragDrop'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import InventoryGridItem from './InventoryGridItem.vue'
 import type { GridItemPlacement } from '../lib/types'
@@ -10,15 +10,16 @@ const CELL_SIZE = 48
 
 const containerRef = ref<HTMLElement | null>(null)
 const { gridPlacements, canPlace, findFreeSlot, getConflicts } = useInventoryGrid()
+const {
+  dragState,
+  startDragFromGrid,
+  setGridContainer,
+  enterGrid,
+  leaveGrid,
+  onKeyDown,
+  cancelDrag
+} = useDragDrop()
 const { updateItemGridPosition } = useSaveEditor()
-
-const { dragState, startDrag, onPointerMove, onPointerUp, onKeyDown, cancelDrag } = useGridDragDrop(
-  CELL_SIZE,
-  canPlace,
-  (id, col, row, rotated) => {
-    updateItemGridPosition(id, col, row, rotated)
-  }
-)
 
 const conflicts = computed(() => getConflicts())
 const conflictIds = computed(() => new Set(conflicts.value.map((c) => c.subResourceId)))
@@ -38,13 +39,17 @@ function autoFixConflicts(): void {
 }
 
 function onItemDragStart(placement: GridItemPlacement, event: PointerEvent): void {
-  if (!containerRef.value) return
-  startDrag(placement, event, containerRef.value)
+  startDragFromGrid(placement, event)
 }
 
-function handlePointerMove(event: PointerEvent): void {
-  if (!containerRef.value) return
-  onPointerMove(event, containerRef.value)
+function handleGridEnter(): void {
+  if (dragState.value) {
+    enterGrid(canPlace)
+  }
+}
+
+function handleGridLeave(): void {
+  leaveGrid()
 }
 
 function handleKeyDown(event: KeyboardEvent): void {
@@ -52,22 +57,43 @@ function handleKeyDown(event: KeyboardEvent): void {
 }
 
 onMounted(() => {
+  setGridContainer(containerRef.value)
   window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
+  setGridContainer(null)
   window.removeEventListener('keydown', handleKeyDown)
 })
+
+// When a drag starts from equipment and the pointer is already over the grid,
+// pointerenter won't fire. Watch for drag state changes to handle this.
+watch(
+  () => dragState.value,
+  (ds) => {
+    if (ds && !ds.gridSnap && containerRef.value) {
+      const rect = containerRef.value.getBoundingClientRect()
+      if (
+        ds.clientX >= rect.left &&
+        ds.clientX <= rect.right &&
+        ds.clientY >= rect.top &&
+        ds.clientY <= rect.bottom
+      ) {
+        enterGrid(canPlace)
+      }
+    }
+  }
+)
 
 const gridWidth = GRID_COLS * CELL_SIZE
 const gridHeight = GRID_ROWS * CELL_SIZE
 
 // Build cell classes for drag highlighting
 function cellHighlight(col: number, row: number): string {
-  if (!dragState.value) return ''
-  const ds = dragState.value
-  if (col >= ds.col && col < ds.col + ds.w && row >= ds.row && row < ds.row + ds.h) {
-    return ds.isValid ? 'bg-green-500/20' : 'bg-red-500/20'
+  const snap = dragState.value?.gridSnap
+  if (!snap) return ''
+  if (col >= snap.col && col < snap.col + snap.w && row >= snap.row && row < snap.row + snap.h) {
+    return snap.isValid ? 'bg-green-500/20' : 'bg-red-500/20'
   }
   return ''
 }
@@ -81,16 +107,6 @@ const gridCells = computed(() => {
     }
   }
   return cells
-})
-
-// Ghost pixel position (follows mouse freely, not snapped to grid)
-const dragGhostStyle = computed(() => {
-  if (!dragState.value) return null
-  const ds = dragState.value
-  return {
-    left: `${ds.pointerX - ds.offsetX}px`,
-    top: `${ds.pointerY - ds.offsetY}px`
-  }
 })
 
 defineExpose({ findFreeSlot })
@@ -112,8 +128,8 @@ defineExpose({ findFreeSlot })
       ref="containerRef"
       class="relative border border-border rounded bg-muted/20"
       :style="{ width: `${gridWidth}px`, height: `${gridHeight}px` }"
-      @pointermove="handlePointerMove"
-      @pointerup="onPointerUp"
+      @pointerenter="handleGridEnter"
+      @pointerleave="handleGridLeave"
       @pointercancel="cancelDrag"
     >
       <!-- Grid cells -->
@@ -136,23 +152,10 @@ defineExpose({ findFreeSlot })
         :key="p.subResourceId"
         :placement="p"
         :cell-size="CELL_SIZE"
-        :dimmed="dragState?.item.subResourceId === p.subResourceId"
+        :dimmed="dragState?.source.item.subResourceId === p.subResourceId"
         :class="{ 'ring-1 ring-amber-500/60': conflictIds.has(p.subResourceId) }"
         @dragstart="onItemDragStart"
       />
-
-      <!-- Drag ghost (follows mouse freely) -->
-      <div
-        v-if="dragState && dragGhostStyle"
-        class="absolute pointer-events-none z-30"
-        :style="dragGhostStyle"
-      >
-        <InventoryGridItem
-          :placement="{ ...dragState.item, col: 0, row: 0, w: dragState.w, h: dragState.h, rotated: dragState.rotated }"
-          :cell-size="CELL_SIZE"
-          ghost
-        />
-      </div>
     </div>
   </div>
 </template>

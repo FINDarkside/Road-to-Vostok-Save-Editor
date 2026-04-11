@@ -4,7 +4,6 @@ import { useSaveEditor } from './composables/useSaveEditor'
 import TitleBar from './components/TitleBar.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import InventoryPanel from './components/InventoryPanel.vue'
-import EquipmentPanel from './components/EquipmentPanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import BackupsPanel from './components/BackupsPanel.vue'
 import AddItemDialog from './components/AddItemDialog.vue'
@@ -29,12 +28,15 @@ onMounted(() => {
       Loading...
     </div>
 
-    <Tabs v-else-if="loadError || tresFile" :default-value="defaultTab" class="flex-1 flex flex-col min-h-0">
+    <Tabs
+      v-else-if="loadError || tresFile"
+      :default-value="defaultTab"
+      class="flex-1 flex flex-col min-h-0"
+    >
       <div class="border-b border-border px-4">
         <TabsList class="bg-transparent h-9">
           <TabsTrigger value="character" :disabled="!!loadError">Character</TabsTrigger>
           <TabsTrigger value="inventory" :disabled="!!loadError">Inventory</TabsTrigger>
-          <TabsTrigger value="equipment" :disabled="!!loadError">Equipment</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="backups">Backups</TabsTrigger>
         </TabsList>
@@ -48,11 +50,6 @@ onMounted(() => {
       <TabsContent v-if="loadError" value="inventory" class="flex-1 min-h-0 p-4 mt-0" />
       <TabsContent v-else value="inventory" class="flex-1 min-h-0 p-4 mt-0">
         <InventoryPanel @open-add-dialog="addDialogOpen = true" />
-      </TabsContent>
-
-      <TabsContent v-if="loadError" value="equipment" class="flex-1 min-h-0 p-4 mt-0" />
-      <TabsContent v-else value="equipment" class="flex-1 min-h-0 p-4 mt-0 overflow-auto">
-        <EquipmentPanel />
       </TabsContent>
 
       <TabsContent value="settings" class="flex-1 min-h-0 p-4 mt-0 overflow-auto">

@@ -108,21 +108,37 @@ function encodePng(rgba: Uint8Array, width: number, height: number): Buffer {
   const png = Buffer.alloc(8 + 25 + 12 + compressed.length + 12)
   let off = 0
 
-  Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(png, off); off += 8
-  png.writeUInt32BE(13, off); off += 4
-  png.write('IHDR', off); off += 4
-  png.writeUInt32BE(width, off); off += 4
-  png.writeUInt32BE(height, off); off += 4
-  png[off++] = 8; png[off++] = 6; png[off++] = 0; png[off++] = 0; png[off++] = 0
-  png.writeUInt32BE(crc32(png, off - 17, off), off); off += 4
+  Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(png, off)
+  off += 8
+  png.writeUInt32BE(13, off)
+  off += 4
+  png.write('IHDR', off)
+  off += 4
+  png.writeUInt32BE(width, off)
+  off += 4
+  png.writeUInt32BE(height, off)
+  off += 4
+  png[off++] = 8
+  png[off++] = 6
+  png[off++] = 0
+  png[off++] = 0
+  png[off++] = 0
+  png.writeUInt32BE(crc32(png, off - 17, off), off)
+  off += 4
 
-  png.writeUInt32BE(compressed.length, off); off += 4
-  png.write('IDAT', off); off += 4
-  compressed.copy(png, off); off += compressed.length
-  png.writeUInt32BE(crc32(png, off - compressed.length - 4, off), off); off += 4
+  png.writeUInt32BE(compressed.length, off)
+  off += 4
+  png.write('IDAT', off)
+  off += 4
+  compressed.copy(png, off)
+  off += compressed.length
+  png.writeUInt32BE(crc32(png, off - compressed.length - 4, off), off)
+  off += 4
 
-  png.writeUInt32BE(0, off); off += 4
-  png.write('IEND', off); off += 4
+  png.writeUInt32BE(0, off)
+  off += 4
+  png.write('IEND', off)
+  off += 4
   png.writeUInt32BE(crc32(png, off - 4, off), off)
 
   return png
@@ -149,7 +165,9 @@ async function main() {
 
     const fullKB = (buf.length / 1024).toFixed(1)
     const halfKB = (halfPng.length / 1024).toFixed(1)
-    console.log(`${name}: ${img.width}x${img.height} (${fullKB} KB) -> ${img.width >> 1}x${img.height >> 1} (${halfKB} KB)`)
+    console.log(
+      `${name}: ${img.width}x${img.height} (${fullKB} KB) -> ${img.width >> 1}x${img.height >> 1} (${halfKB} KB)`
+    )
   }
 
   console.log(`\nOutput: ${OUT_DIR}`)

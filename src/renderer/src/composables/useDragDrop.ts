@@ -1,0 +1,293 @@
+import { ref } from 'vue'
+import type { GridItemPlacement, DragDropState, SlotItem } from '../lib/types'
+import { ITEMS_BY_PATH, getItemSize } from '../data/items'
+import { GRID_COLS, GRID_ROWS, useInventoryGrid } from './useInventoryGrid'
+import { useSaveEditor } from './useSaveEditor'
+
+const CELL_SIZE = 48
+
+const dragState = ref<DragDropState | null>(null)
+
+// Module-level references set by InventoryGrid
+let gridContainer: HTMLElement | null = null
+let canPlaceFn:
+  | ((col: number, row: number, w: number, h: number, excludeId?: string) => boolean)
+  | null = null
+
+function buildPlacementFromSlotItem(item: SlotItem): GridItemPlacement {
+  const catalogItem = ITEMS_BY_PATH.get(item.itemPath)
+  const baseSize = catalogItem ? getItemSize(catalogItem) : { w: 1, h: 1 }
+  return {
+    subResourceId: item.subResourceId,
+    itemPath: item.itemPath,
+    iconFile: catalogItem?.iconFile ?? '',
+    itemName: item.itemName,
+    nameInventory: item.nameInventory,
+    nameRotated: item.nameRotated,
+    nameEquipment: item.nameEquipment,
+    category: item.category,
+    condition: item.condition,
+    amount: item.amount,
+    col: 0,
+    row: 0,
+    w: baseSize.w,
+    h: baseSize.h,
+    rotated: false
+  }
+}
+
+function snapToGrid(ds: DragDropState) {
+  if (!gridContainer || !ds.gridSnap) return
+
+  const rect = gridContainer.getBoundingClientRect()
+  const relX = ds.clientX - rect.left
+  const relY = ds.clientY - rect.top
+
+  const snap = ds.gridSnap
+  const col = Math.round((relX - (snap.w * CELL_SIZE) / 2) / CELL_SIZE)
+  const row = Math.round((relY - (snap.h * CELL_SIZE) / 2) / CELL_SIZE)
+  snap.col = Math.max(0, Math.min(GRID_COLS - snap.w, col))
+  snap.row = Math.max(0, Math.min(GRID_ROWS - snap.h, row))
+}
+
+function updateGridValidity() {
+  if (!dragState.value?.gridSnap || !canPlaceFn) return
+  const snap = dragState.value.gridSnap
+  const excludeId =
+    dragState.value.source.origin === 'grid' ? dragState.value.source.item.subResourceId : undefined
+  snap.isValid = canPlaceFn(snap.col, snap.row, snap.w, snap.h, excludeId)
+}
+
+function onDocumentPointerMove(event: PointerEvent) {
+  if (!dragState.value) return
+  dragState.value.clientX = event.clientX
+  dragState.value.clientY = event.clientY
+
+  if (dragState.value.gridSnap) {
+    snapToGrid(dragState.value)
+    updateGridValidity()
+  }
+}
+
+function onDocumentPointerUp() {
+  if (!dragState.value) return
+
+  const ds = dragState.value
+  const { updateItemGridPosition, moveToInventory, moveToEquipment, equipment } = useSaveEditor()
+
+  if (ds.gridSnap?.isValid) {
+    const snap = ds.gridSnap
+    if (ds.source.origin === 'grid') {
+      updateItemGridPosition(ds.source.item.subResourceId, snap.col, snap.row, snap.rotated)
+    } else {
+      moveToInventory(ds.source.item.subResourceId, snap.col, snap.row, snap.rotated)
+    }
+  } else if (ds.equipmentHover) {
+    const slotName = ds.equipmentHover.slotName
+    if (ds.source.origin === 'grid') {
+      // Grid to equipment — handle swap if slot is occupied
+      const occupant = equipment.value.find((e) => e.slot === slotName)
+      if (occupant) {
+        const { findFreeSlot } = useInventoryGrid()
+        const occupantCatalog = ITEMS_BY_PATH.get(occupant.itemPath)
+        const occupantSize = occupantCatalog ? getItemSize(occupantCatalog) : { w: 1, h: 1 }
+        const freeSlot = findFreeSlot(occupantSize.w, occupantSize.h, ds.source.item.subResourceId)
+        if (!freeSlot) {
+          cleanup()
+          return
+        }
+        moveToInventory(occupant.subResourceId, freeSlot.col, freeSlot.row, freeSlot.rotated)
+      }
+      moveToEquipment(ds.source.item.subResourceId, slotName)
+    } else {
+      // Equipment to equipment
+      const occupant = equipment.value.find((e) => e.slot === slotName)
+      if (occupant && occupant.subResourceId !== ds.source.item.subResourceId) {
+        swapEquipmentSlots(
+          ds.source.item.subResourceId,
+          ds.source.equipmentSlot!,
+          occupant.subResourceId,
+          slotName
+        )
+      } else if (!occupant) {
+        changeEquipmentSlot(ds.source.item.subResourceId, slotName)
+      }
+    }
+  }
+
+  cleanup()
+}
+
+function swapEquipmentSlots(id1: string, slot1: string, id2: string, slot2: string) {
+  const { tresFile, isDirty } = useSaveEditor()
+  if (!tresFile.value) return
+  const tres = tresFile.value
+
+  const sub1 = tres.subResources.find((s) => s.id === id1)
+  const sub2 = tres.subResources.find((s) => s.id === id2)
+  if (!sub1 || !sub2) return
+
+  const slotProp1 = sub1.properties.find((p) => p.key === 'slot')
+  const slotProp2 = sub2.properties.find((p) => p.key === 'slot')
+  if (slotProp1) slotProp1.value = { kind: 'string', value: slot2 }
+  if (slotProp2) slotProp2.value = { kind: 'string', value: slot1 }
+
+  isDirty.value = true
+  tresFile.value = { ...tres }
+}
+
+function changeEquipmentSlot(subResourceId: string, slotName: string) {
+  const { tresFile, isDirty } = useSaveEditor()
+  if (!tresFile.value) return
+  const tres = tresFile.value
+
+  const sub = tres.subResources.find((s) => s.id === subResourceId)
+  if (!sub) return
+
+  const slotProp = sub.properties.find((p) => p.key === 'slot')
+  if (slotProp) slotProp.value = { kind: 'string', value: slotName }
+
+  isDirty.value = true
+  tresFile.value = { ...tres }
+}
+
+function cleanup() {
+  dragState.value = null
+  canPlaceFn = null
+  document.removeEventListener('pointermove', onDocumentPointerMove)
+  document.removeEventListener('pointerup', onDocumentPointerUp)
+}
+
+export function useDragDrop() {
+  function startDragFromGrid(placement: GridItemPlacement, event: PointerEvent) {
+    event.preventDefault()
+
+    dragState.value = {
+      source: { origin: 'grid', item: placement },
+      clientX: event.clientX,
+      clientY: event.clientY,
+      gridSnap: null,
+      equipmentHover: null,
+      ghostW: placement.w,
+      ghostH: placement.h,
+      ghostRotated: placement.rotated,
+      offsetX: (placement.w * CELL_SIZE) / 2,
+      offsetY: (placement.h * CELL_SIZE) / 2
+    }
+
+    document.addEventListener('pointermove', onDocumentPointerMove)
+    document.addEventListener('pointerup', onDocumentPointerUp)
+  }
+
+  function startDragFromEquipment(item: SlotItem, slotName: string, event: PointerEvent) {
+    event.preventDefault()
+
+    const placement = buildPlacementFromSlotItem(item)
+
+    dragState.value = {
+      source: { origin: 'equipment', item: placement, equipmentSlot: slotName },
+      clientX: event.clientX,
+      clientY: event.clientY,
+      gridSnap: null,
+      equipmentHover: null,
+      ghostW: placement.w,
+      ghostH: placement.h,
+      ghostRotated: placement.rotated,
+      offsetX: (placement.w * CELL_SIZE) / 2,
+      offsetY: (placement.h * CELL_SIZE) / 2
+    }
+
+    document.addEventListener('pointermove', onDocumentPointerMove)
+    document.addEventListener('pointerup', onDocumentPointerUp)
+  }
+
+  function setGridContainer(el: HTMLElement | null) {
+    gridContainer = el
+  }
+
+  function enterGrid(
+    canPlace: (col: number, row: number, w: number, h: number, excludeId?: string) => boolean
+  ) {
+    if (!dragState.value) return
+
+    canPlaceFn = canPlace
+    // Use last known ghost dimensions (preserves R-key rotations across grid re-entry)
+    dragState.value.gridSnap = {
+      col: 0,
+      row: 0,
+      w: dragState.value.ghostW,
+      h: dragState.value.ghostH,
+      rotated: dragState.value.ghostRotated,
+      isValid: false
+    }
+
+    dragState.value.offsetX = (dragState.value.ghostW * CELL_SIZE) / 2
+    dragState.value.offsetY = (dragState.value.ghostH * CELL_SIZE) / 2
+
+    snapToGrid(dragState.value)
+    updateGridValidity()
+  }
+
+  function leaveGrid() {
+    if (!dragState.value) return
+    dragState.value.gridSnap = null
+    canPlaceFn = null
+  }
+
+  function enterEquipmentSlot(slotName: string) {
+    if (!dragState.value) return
+    dragState.value.equipmentHover = { slotName }
+  }
+
+  function leaveEquipmentSlot(slotName: string) {
+    if (!dragState.value) return
+    if (dragState.value.equipmentHover?.slotName === slotName) {
+      dragState.value.equipmentHover = null
+    }
+  }
+
+  function onKeyDown(event: KeyboardEvent) {
+    if (!dragState.value) return
+    if (event.key !== 'r' && event.key !== 'R') return
+    if (!dragState.value.gridSnap) return
+
+    event.preventDefault()
+    const snap = dragState.value.gridSnap
+    const src = dragState.value.source.item
+
+    const baseW = src.rotated ? src.h : src.w
+    const baseH = src.rotated ? src.w : src.h
+
+    snap.rotated = !snap.rotated
+    snap.w = snap.rotated ? baseH : baseW
+    snap.h = snap.rotated ? baseW : baseH
+
+    // Sync ghost state so rotation persists when leaving grid
+    dragState.value.ghostW = snap.w
+    dragState.value.ghostH = snap.h
+    dragState.value.ghostRotated = snap.rotated
+
+    dragState.value.offsetX = (snap.w * CELL_SIZE) / 2
+    dragState.value.offsetY = (snap.h * CELL_SIZE) / 2
+
+    snapToGrid(dragState.value)
+    updateGridValidity()
+  }
+
+  function cancelDrag() {
+    cleanup()
+  }
+
+  return {
+    dragState,
+    startDragFromGrid,
+    startDragFromEquipment,
+    setGridContainer,
+    enterGrid,
+    leaveGrid,
+    enterEquipmentSlot,
+    leaveEquipmentSlot,
+    onKeyDown,
+    cancelDrag
+  }
+}

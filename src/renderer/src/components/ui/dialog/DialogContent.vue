@@ -25,10 +25,7 @@ const rootContext = injectDialogRootContext()
 
 <template>
   <DialogPortal v-if="rootContext.open.value">
-    <DialogOverlay
-      force-mount
-      class="fixed inset-0 z-50 bg-black/80"
-    />
+    <DialogOverlay force-mount class="fixed inset-0 z-50 bg-black/80" />
     <DialogContent
       v-bind="forwarded"
       force-mount

@@ -28,6 +28,12 @@ export interface GameItem {
   category: ItemCategory
   id: string
   displayName: string
+  /** Name shown in inventory (normal orientation) */
+  nameInventory?: string
+  /** Name shown in inventory (rotated) */
+  nameRotated?: string
+  /** Name shown in equipment slots */
+  nameEquipment?: string
   resourcePath: string
   /** Grid size width. Default: 1 */
   sizeW?: number
@@ -66,6 +72,12 @@ export interface SlotItem {
   itemPath: string
   /** Human-readable name resolved from the item catalog */
   itemName: string
+  /** Name for inventory label (normal orientation) */
+  nameInventory: string
+  /** Name for inventory label (rotated) */
+  nameRotated: string
+  /** Name for equipment slot label */
+  nameEquipment: string
   /** Item category from the catalog */
   category: string
   condition: number
@@ -83,6 +95,9 @@ export interface GridItemPlacement {
   itemPath: string
   iconFile: string
   itemName: string
+  nameInventory: string
+  nameRotated: string
+  nameEquipment: string
   category: string
   condition: number
   amount: number
@@ -93,19 +108,42 @@ export interface GridItemPlacement {
   rotated: boolean
 }
 
-export interface DragState {
+export interface DragSource {
+  origin: 'grid' | 'equipment'
   item: GridItemPlacement
+  /** If origin is 'equipment', the slot name the item was dragged from */
+  equipmentSlot?: string
+}
+
+export interface GridSnapState {
   col: number
   row: number
-  rotated: boolean
   w: number
   h: number
+  rotated: boolean
   isValid: boolean
+}
+
+export interface EquipmentHoverState {
+  slotName: string
+}
+
+export interface DragDropState {
+  source: DragSource
+  /** Mouse position in document (client) coordinates */
+  clientX: number
+  clientY: number
+  /** Grid snap info — set when pointer is over the inventory grid */
+  gridSnap: GridSnapState | null
+  /** Equipment slot hover — set when pointer is over an equipment slot */
+  equipmentHover: EquipmentHoverState | null
+  /** Current ghost dimensions (updated by grid snap / rotation) */
+  ghostW: number
+  ghostH: number
+  ghostRotated: boolean
+  /** Grab offset for ghost rendering */
   offsetX: number
   offsetY: number
-  /** Last known pointer position relative to grid container */
-  pointerX: number
-  pointerY: number
 }
 
 export interface CharacterStats {
@@ -125,4 +163,5 @@ export interface StatusEffects {
   frostbite: boolean
   insanity: boolean
   rupture: boolean
+  headshot: boolean
 }

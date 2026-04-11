@@ -45,7 +45,10 @@ watch([() => status.value, () => props.placement.iconFile], () => {
     :title="`${placement.itemName}${placement.condition ? ` (${Math.round(placement.condition)}%)` : ''}`"
     @pointerdown.prevent="!ghost && $emit('dragstart', placement, $event)"
   >
-    <div class="w-full h-full relative" :class="ghost ? '' : 'rounded-sm border border-border/60 bg-muted/40'">
+    <div
+      class="w-full h-full relative"
+      :class="ghost ? '' : 'rounded-sm border border-border/60 bg-muted/40'"
+    >
       <!-- Non-rotated icon -->
       <img
         v-if="iconUrl && !placement.rotated"
@@ -76,6 +79,14 @@ watch([() => status.value, () => props.placement.iconFile], () => {
       >
         {{ placement.itemName }}
       </div>
+      <!-- Item name label -->
+      <span
+        v-if="!ghost"
+        class="absolute bottom-0 left-0 text-[8px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap"
+        style="text-overflow: '.'"
+      >
+        {{ placement.rotated ? placement.nameRotated : placement.nameInventory }}
+      </span>
     </div>
   </div>
 </template>

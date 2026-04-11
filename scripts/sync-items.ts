@@ -120,15 +120,32 @@ function parseExtResources(content: string): Map<string, string> {
  */
 async function resolveIconFile(
   content: string,
-  fields: Record<string, string>,
-  tresDir: string
+  fields: Record<string, string>
 ): Promise<string | null> {
-  const iconRef = fields.icon?.match(/ExtResource\("([^"]+)"\)/)
-  if (!iconRef) return null
-  const extResources = parseExtResources(content)
-  const iconPath = extResources.get(iconRef[1])
-  if (!iconPath) return null
+  // Try ExtResource reference first (most common)
+  const extRef = fields.icon?.match(/ExtResource\("([^"]+)"\)/)
+  if (extRef) {
+    const extResources = parseExtResources(content)
+    const iconPath = extResources.get(extRef[1])
+    if (iconPath) return resolveIconPath(iconPath)
+  }
 
+  // Try SubResource reference (icon embedded as sub_resource with load_path)
+  const subRef = fields.icon?.match(/SubResource\("([^"]+)"\)/)
+  if (subRef) {
+    const subId = subRef[1]
+    const loadPathMatch = content.match(
+      new RegExp(
+        `\\[sub_resource[^\\]]*id="${subId}"\\][\\s\\S]*?load_path\\s*=\\s*"res:\\/\\/.godot\\/imported\\/([^"]+)"`
+      )
+    )
+    if (loadPathMatch) return loadPathMatch[1]
+  }
+
+  return null
+}
+
+async function resolveIconPath(iconPath: string): Promise<string | null> {
   // The icon path is like "res://Items/Consumables/Coffee/Files/Icon_Coffee.png"
   // Resolve relative to the decompiled root to find the .import sidecar
   const relPath = iconPath.replace(/^res:\/\//, '')
@@ -199,6 +216,9 @@ interface ItemEntry {
   category: string
   id: string
   displayName: string
+  nameInventory: string
+  nameRotated: string
+  nameEquipment: string
   resourcePath: string
   sizeW: number
   sizeH: number
@@ -240,18 +260,18 @@ async function main() {
     }
 
     const id = basename(filePath, '.tres')
-    const relPath = filePath
-      .replace(/\\/g, '/')
-      .replace(/^.*\/Items\//, 'res://Items/')
+    const relPath = filePath.replace(/\\/g, '/').replace(/^.*\/Items\//, 'res://Items/')
 
     const size = parseVector2(fields.size) ?? { x: 1, y: 1 }
-    const tresDir = join(filePath, '..')
-    const iconFile = await resolveIconFile(content, fields, tresDir)
+    const iconFile = await resolveIconFile(content, fields)
 
     items.push({
       category,
       id,
       displayName: parseString(fields.name) || id,
+      nameInventory: parseString(fields.inventory) || '',
+      nameRotated: parseString(fields.rotated) || '',
+      nameEquipment: parseString(fields.equipment) || '',
       resourcePath: relPath,
       sizeW: size.x,
       sizeH: size.y,
@@ -273,7 +293,9 @@ async function main() {
   }
 
   // Sort by category, then display name
-  items.sort((a, b) => a.category.localeCompare(b.category) || a.displayName.localeCompare(b.displayName))
+  items.sort(
+    (a, b) => a.category.localeCompare(b.category) || a.displayName.localeCompare(b.displayName)
+  )
 
   // Collect all categories for the type union
   const categories = [...new Set(items.map((i) => i.category))].sort()
@@ -290,7 +312,20 @@ async function main() {
       `    category: '${item.category}'`,
       `    id: '${item.id}'`,
       `    displayName: '${item.displayName.replace(/'/g, "\\'")}'`,
-      `    resourcePath: '${item.resourcePath}'`
+      `    resourcePath: '${item.resourcePath}'`,
+      ...(item.nameInventory && item.nameInventory !== item.displayName
+        ? [`    nameInventory: '${item.nameInventory.replace(/'/g, "\\'")}'`]
+        : []),
+      ...(item.nameRotated &&
+      item.nameRotated !== item.displayName &&
+      item.nameRotated !== item.nameInventory
+        ? [`    nameRotated: '${item.nameRotated.replace(/'/g, "\\'")}'`]
+        : []),
+      ...(item.nameEquipment &&
+      item.nameEquipment !== item.displayName &&
+      item.nameEquipment !== item.nameInventory
+        ? [`    nameEquipment: '${item.nameEquipment.replace(/'/g, "\\'")}'`]
+        : [])
     ]
     if (item.sizeW !== 1 || item.sizeH !== 1) {
       props.push(`    sizeW: ${item.sizeW}`)

@@ -69,7 +69,8 @@ const effectConfigs: EffectConfig[] = [
   { key: 'starvation', label: 'Starvation' },
   { key: 'dehydration', label: 'Dehydration' },
   { key: 'insanity', label: 'Insanity' },
-  { key: 'rupture', label: 'Rupture' }
+  { key: 'rupture', label: 'Rupture' },
+  { key: 'headshot', label: 'Headshot' }
 ]
 
 function onSliderChange(key: keyof CharacterStats, value: number[] | undefined): void {

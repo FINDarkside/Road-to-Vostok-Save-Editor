@@ -30,7 +30,7 @@ const { getCachedIcon, loadIcon } = useItemIcons()
 const iconTick = ref(0)
 
 function getIcon(iconFile: string) {
-  iconTick.value // reactive dependency
+  void iconTick.value // reactive dependency
   return getCachedIcon(iconFile)
 }
 

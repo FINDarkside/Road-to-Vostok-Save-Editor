@@ -59,6 +59,9 @@ function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
     itemPath,
     itemName:
       catalogItem?.displayName ?? itemPath.split('/').pop()?.replace('.tres', '') ?? 'Unknown',
+    nameInventory: catalogItem?.nameInventory ?? catalogItem?.displayName ?? 'Unknown',
+    nameRotated: catalogItem?.nameRotated ?? catalogItem?.nameInventory ?? catalogItem?.displayName ?? 'Unknown',
+    nameEquipment: catalogItem?.nameEquipment ?? catalogItem?.nameInventory ?? catalogItem?.displayName ?? 'Unknown',
     category: catalogItem?.category ?? '',
     condition: getNumberProp(sub.properties, 'condition'),
     amount: getNumberProp(sub.properties, 'amount'),
@@ -128,7 +131,8 @@ const statusEffects = computed<StatusEffects>(() => {
       burn: false,
       frostbite: false,
       insanity: false,
-      rupture: false
+      rupture: false,
+      headshot: false
     }
   const res = tresFile.value.resource
   return {
@@ -139,7 +143,8 @@ const statusEffects = computed<StatusEffects>(() => {
     burn: getBoolProp(res, 'burn'),
     frostbite: getBoolProp(res, 'frostbite'),
     insanity: getBoolProp(res, 'insanity'),
-    rupture: getBoolProp(res, 'rupture')
+    rupture: getBoolProp(res, 'rupture'),
+    headshot: getBoolProp(res, 'headshot')
   }
 })
 
@@ -389,6 +394,98 @@ export function useSaveEditor() {
     tresFile.value = { ...tres }
   }
 
+  function moveToInventory(
+    subResourceId: string,
+    col: number,
+    row: number,
+    rotated: boolean
+  ): void {
+    if (!tresFile.value) return
+    const tres = tresFile.value
+    const sub = tres.subResources.find((s) => s.id === subResourceId)
+    if (!sub) return
+
+    // Remove from equipment array
+    const eqProp = tres.resource.find((p) => p.key === 'equipment')
+    if (eqProp && eqProp.value.kind === 'typed_array') {
+      eqProp.value.elements = eqProp.value.elements.filter(
+        (el) => !(el.kind === 'sub_resource' && el.id === subResourceId)
+      )
+    }
+
+    // Add to inventory array
+    const invProp = tres.resource.find((p) => p.key === 'inventory')
+    if (invProp && invProp.value.kind === 'typed_array') {
+      invProp.value.elements.push({ kind: 'sub_resource', id: subResourceId })
+    }
+
+    // Clear slot
+    const slotProp = sub.properties.find((p) => p.key === 'slot')
+    if (slotProp) {
+      slotProp.value = { kind: 'string', value: '' }
+    }
+
+    // Set grid position
+    const pixelX = col * 64
+    const pixelY = row * 64
+    const posProp = sub.properties.find((p) => p.key === 'gridPosition')
+    if (posProp) {
+      posProp.value = {
+        kind: 'vector2',
+        x: pixelX,
+        y: pixelY,
+        raw: `Vector2(${pixelX}, ${pixelY})`
+      }
+    }
+    const rotProp = sub.properties.find((p) => p.key === 'gridRotated')
+    if (rotProp) {
+      rotProp.value = { kind: 'bool', value: rotated }
+    }
+
+    isDirty.value = true
+    tresFile.value = { ...tres }
+  }
+
+  function moveToEquipment(subResourceId: string, slotName: string): void {
+    if (!tresFile.value) return
+    const tres = tresFile.value
+    const sub = tres.subResources.find((s) => s.id === subResourceId)
+    if (!sub) return
+
+    // Remove from inventory array
+    const invProp = tres.resource.find((p) => p.key === 'inventory')
+    if (invProp && invProp.value.kind === 'typed_array') {
+      invProp.value.elements = invProp.value.elements.filter(
+        (el) => !(el.kind === 'sub_resource' && el.id === subResourceId)
+      )
+    }
+
+    // Add to equipment array
+    const eqProp = tres.resource.find((p) => p.key === 'equipment')
+    if (eqProp && eqProp.value.kind === 'typed_array') {
+      eqProp.value.elements.push({ kind: 'sub_resource', id: subResourceId })
+    }
+
+    // Set slot
+    const slotProp = sub.properties.find((p) => p.key === 'slot')
+    if (slotProp) {
+      slotProp.value = { kind: 'string', value: slotName }
+    }
+
+    // Clear grid position
+    const posProp = sub.properties.find((p) => p.key === 'gridPosition')
+    if (posProp) {
+      posProp.value = { kind: 'vector2', x: 0, y: 0, raw: 'Vector2(0, 0)' }
+    }
+    const rotProp = sub.properties.find((p) => p.key === 'gridRotated')
+    if (rotProp) {
+      rotProp.value = { kind: 'bool', value: false }
+    }
+
+    isDirty.value = true
+    tresFile.value = { ...tres }
+  }
+
   return {
     currentFile,
     items,
@@ -407,7 +504,9 @@ export function useSaveEditor() {
     maxAllStats,
     updateStatusEffect,
     updateItem,
-    updateItemGridPosition
+    updateItemGridPosition,
+    moveToInventory,
+    moveToEquipment
   }
 }
 

@@ -28,6 +28,7 @@ export const ITEMS = [
     id: 'Ammo_45ACP',
     displayName: '.45 ACP',
     resourcePath: 'res://Items/Ammo/Ammo_45ACP/Ammo_45ACP.tres',
+    nameInventory: '.45',
     iconFile: 'Icon_Ammo_45ACP.png-4d05b54902db2ce42c630dd6764f194d.s3tc.ctex',
     stackable: true,
     showAmount: true,
@@ -50,6 +51,7 @@ export const ITEMS = [
     id: 'Ammo_46x30',
     displayName: '4.6x30',
     resourcePath: 'res://Items/Ammo/Ammo_46x30/Ammo_46x30.tres',
+    nameInventory: '4.6',
     iconFile: 'Icon_Ammo_46x30.png-7c45cc14f4288451976e07274d3d9434.s3tc.ctex',
     stackable: true,
     showAmount: true,
@@ -61,6 +63,7 @@ export const ITEMS = [
     id: 'Ammo_545x39',
     displayName: '5.45x39',
     resourcePath: 'res://Items/Ammo/Ammo_545x39/Ammo_545x39.tres',
+    nameInventory: '5.45',
     iconFile: 'Icon_Ammo_545x39.png-76202fe45c5456cf48cae74b827b724c.s3tc.ctex',
     stackable: true,
     showAmount: true,
@@ -72,6 +75,7 @@ export const ITEMS = [
     id: 'Ammo_762x39',
     displayName: '7.62x39',
     resourcePath: 'res://Items/Ammo/Ammo_762x39/Ammo_762x39.tres',
+    nameInventory: '7.62',
     iconFile: 'Icon_Ammo_762x39.png-b0af5698bb26568dd1e5592d6d5fc898.s3tc.ctex',
     stackable: true,
     showAmount: true,
@@ -83,6 +87,7 @@ export const ITEMS = [
     id: 'Ammo_762x54R',
     displayName: '7.62x54R',
     resourcePath: 'res://Items/Ammo/Ammo_762x54R/Ammo_762x54R.tres',
+    nameInventory: '7.62R',
     iconFile: 'Icon_Ammo_762x54R.png-b6c073b22058b32d61b149b1bce800c8.s3tc.ctex',
     stackable: true,
     showAmount: true,
@@ -127,6 +132,7 @@ export const ITEMS = [
     id: 'Armor_Plate_II',
     displayName: 'Armor Plate (II)',
     resourcePath: 'res://Items/Armor/Armor_Plate_II.tres',
+    nameInventory: 'Armor Plate',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_II.png-290798a3a516b1a63c9a4e53d3e57b12.s3tc.ctex',
@@ -137,6 +143,7 @@ export const ITEMS = [
     id: 'Armor_Plate_III',
     displayName: 'Armor Plate (III)',
     resourcePath: 'res://Items/Armor/Armor_Plate_III.tres',
+    nameInventory: 'Armor Plate',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_III.png-9d7396211b6e9c64537ac8a2e45b1922.s3tc.ctex',
@@ -147,6 +154,7 @@ export const ITEMS = [
     id: 'Armor_Plate_III+',
     displayName: 'Armor Plate (III+)',
     resourcePath: 'res://Items/Armor/Armor_Plate_III+.tres',
+    nameInventory: 'Armor Plate',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_III+.png-3d30d15d1417bf58d89fe08efd395da8.s3tc.ctex',
@@ -157,6 +165,7 @@ export const ITEMS = [
     id: 'Armor_Plate_IIIA',
     displayName: 'Armor Plate (IIIA)',
     resourcePath: 'res://Items/Armor/Armor_Plate_IIIA.tres',
+    nameInventory: 'Armor Plate',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_IIIA.png-76bd30f0bf8dee18cf4c42ea1f6f4f4d.s3tc.ctex',
@@ -167,6 +176,7 @@ export const ITEMS = [
     id: 'Armor_Plate_IV',
     displayName: 'Armor Plate (IV)',
     resourcePath: 'res://Items/Armor/Armor_Plate_IV.tres',
+    nameInventory: 'Armor Plate',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_IV.png-035a4349b919225880d3b3e2f5fc69ab.s3tc.ctex',
@@ -193,6 +203,7 @@ export const ITEMS = [
     id: 'Colt_1911_Magazine',
     displayName: 'C1911 Magazine',
     resourcePath: 'res://Items/Weapons/Colt_1911/Colt_1911_Magazine.tres',
+    nameInventory: 'Mag.',
     iconFile: 'Icon_Colt_1911_Magazine.png-702935f6f1110dd2bf662e4d9bfdc918.s3tc.ctex',
     showAmount: true,
     defaultAmount: 8,
@@ -210,6 +221,7 @@ export const ITEMS = [
     id: 'Glock_17_Magazine',
     displayName: 'G7 Magazine',
     resourcePath: 'res://Items/Weapons/Glock_17/Glock_17_Magazine.tres',
+    nameInventory: 'Mag.',
     iconFile: 'Icon_Glock_17_Magazine.png-52def777377b5d0c63edbefdfe0fe715.s3tc.ctex',
     showAmount: true,
     defaultAmount: 17,
@@ -238,6 +250,7 @@ export const ITEMS = [
     id: 'AK-12_Magazine',
     displayName: 'KA-12 Magazine',
     resourcePath: 'res://Items/Weapons/AK-12/AK-12_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_AK-12_Magazine.png-275794d7c58a311b4ff64d44ede762b1.s3tc.ctex',
@@ -250,6 +263,7 @@ export const ITEMS = [
     id: 'AKM_Magazine',
     displayName: 'KA-M Magazine',
     resourcePath: 'res://Items/Weapons/AKM/AKM_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_AKM_Magazine.png-b5a19e4491743e94ed4d0efce530765d.s3tc.ctex',
@@ -262,6 +276,9 @@ export const ITEMS = [
     id: 'KAR-21_Barrel',
     displayName: 'KAR-21 Barrel (.308)',
     resourcePath: 'res://Items/Weapons/KAR-21/KAR-21_Barrel.tres',
+    nameInventory: 'KAR-21 Barrel',
+    nameRotated: 'Barrel',
+    nameEquipment: 'Barrel',
     sizeW: 3,
     sizeH: 1,
     iconFile: 'Icon_KAR-21_Barrel.png-0007c282041d206948e1f9c626153531.s3tc.ctex'
@@ -271,6 +288,7 @@ export const ITEMS = [
     id: 'KAR-21_223_Magazine',
     displayName: 'KAR-21 Magazine (.223)',
     resourcePath: 'res://Items/Weapons/KAR-21/KAR-21_223_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_KAR-21_223_Magazine.png-5da62272bac5e8acc531bd1181ae71ac.s3tc.ctex',
@@ -283,6 +301,7 @@ export const ITEMS = [
     id: 'KAR-21_308_Magazine',
     displayName: 'KAR-21 Magazine (.308)',
     resourcePath: 'res://Items/Weapons/KAR-21/KAR-21_308_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_KAR-21_308_Magazine.png-3306f94c160533470aa0a7010b3361fb.s3tc.ctex',
@@ -295,6 +314,7 @@ export const ITEMS = [
     id: 'Makarov_Magazine',
     displayName: 'Karov Magazine',
     resourcePath: 'res://Items/Weapons/Makarov/Makarov_Magazine.tres',
+    nameInventory: 'Mag.',
     iconFile: 'Icon_Makarov_Magazine.png-bd8312f92543e0aaa309c6a4bd583e21.s3tc.ctex',
     showAmount: true,
     defaultAmount: 8,
@@ -305,6 +325,7 @@ export const ITEMS = [
     id: 'AKS-74U_Magazine',
     displayName: 'KAS-74U Magazine',
     resourcePath: 'res://Items/Weapons/AKS-74U/AKS-74U_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     showAmount: true,
@@ -346,6 +367,7 @@ export const ITEMS = [
     id: 'M78_Magazine',
     displayName: 'M78 Magazine',
     resourcePath: 'res://Items/Weapons/M78/M78_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_M78_Magazine.png-4a931050e62e6f7fa320db123adc76be.s3tc.ctex',
@@ -374,8 +396,10 @@ export const ITEMS = [
     id: 'MP7_Magazine',
     displayName: 'MP7 Magazine',
     resourcePath: 'res://Items/Weapons/MP7/MP7_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
+    iconFile: 'Icon_MP7_Magazine.png-c253d868515a3f78cfa34774a1c8677c.s3tc.ctex',
     showAmount: true,
     defaultAmount: 40,
     maxAmount: 40
@@ -410,6 +434,7 @@ export const ITEMS = [
     id: 'P320_Magazine',
     displayName: 'P3 Magazine',
     resourcePath: 'res://Items/Weapons/P320/P320_Magazine.tres',
+    nameInventory: 'Mag.',
     iconFile: 'Icon_P320_Magazine.png-b7e8a5f5364791f255ca810e23b28e93.s3tc.ctex',
     showAmount: true,
     defaultAmount: 15,
@@ -429,6 +454,7 @@ export const ITEMS = [
     id: 'MP5_Magazine',
     displayName: 'PM5 Magazine',
     resourcePath: 'res://Items/Weapons/MP5/MP5_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_MP5_Magazine.png-4e794211934c3d2db436d7c64830a99c.s3tc.ctex',
@@ -486,6 +512,7 @@ export const ITEMS = [
     id: 'RK_Magazine',
     displayName: 'RK Magazine',
     resourcePath: 'res://Items/Weapons/RK-62/RK_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_RK_Magazine.png-48b510c37ff6b4e2624ad2ead443be9b.s3tc.ctex',
@@ -530,6 +557,7 @@ export const ITEMS = [
     id: 'VSS_Magazine',
     displayName: 'SS Magazine',
     resourcePath: 'res://Items/Weapons/VSS/VSS_Magazine.tres',
+    nameInventory: 'Mag.',
     iconFile: 'Icon_VSS_Magazine.png-7575a4a9ebce3df75246840b580b3375.s3tc.ctex',
     showAmount: true,
     defaultAmount: 20,
@@ -540,6 +568,7 @@ export const ITEMS = [
     id: 'STANAG_Magazine',
     displayName: 'STANAG Magazine',
     resourcePath: 'res://Items/Weapons/M4A1/STANAG_Magazine.tres',
+    nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_M4A1_Magazine.png-e1d82d525caeb3f649da50804de753b2.s3tc.ctex',
@@ -570,6 +599,7 @@ export const ITEMS = [
     id: 'SVD_Magazine',
     displayName: 'VSD Magazine',
     resourcePath: 'res://Items/Weapons/SVD/SVD_Magazine.tres',
+    nameInventory: 'Mag.',
     iconFile: 'Icon_SVD_Magazine.png-966132db3894cf89893838552a96f52d.s3tc.ctex',
     showAmount: true,
     defaultAmount: 10,
@@ -580,6 +610,7 @@ export const ITEMS = [
     id: 'Duffel_Retro',
     displayName: 'Duffel (Retro)',
     resourcePath: 'res://Items/Backpacks/Duffel_Retro/Duffel_Retro.tres',
+    nameInventory: 'R. Duffel',
     sizeW: 4,
     sizeH: 2,
     iconFile: 'Icon_Duffel_Retro.png-7d1f678b7467b606256347135f8ff090.s3tc.ctex'
@@ -589,6 +620,7 @@ export const ITEMS = [
     id: 'Backpack_Jaeger_Black',
     displayName: 'Jääkäri Backpack (Black)',
     resourcePath: 'res://Items/Backpacks/Backpack_Jaeger/Backpack_Jaeger_Black.tres',
+    nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
     iconFile: 'Icon_Backpack_Jaeger_Black.png-ce085bb0390c9b41d54097c5256198f9.s3tc.ctex'
@@ -598,6 +630,7 @@ export const ITEMS = [
     id: 'Backpack_Jaeger_Brown',
     displayName: 'Jääkäri Backpack (Brown)',
     resourcePath: 'res://Items/Backpacks/Backpack_Jaeger/Backpack_Jaeger_Brown.tres',
+    nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
     iconFile: 'Icon_Backpack_Jaeger_Brown.png-197fb8f940ccbd77f7e00a2aa79f3adb.s3tc.ctex'
@@ -607,6 +640,7 @@ export const ITEMS = [
     id: 'Backpack_Jaeger_Green',
     displayName: 'Jääkäri Backpack (Green)',
     resourcePath: 'res://Items/Backpacks/Backpack_Jaeger/Backpack_Jaeger_Green.tres',
+    nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
     iconFile: 'Icon_Backpack_Jaeger_Green.png-c71ed79765f984fed33d6e903c3f1438.s3tc.ctex'
@@ -616,6 +650,7 @@ export const ITEMS = [
     id: 'Backpack_Jaeger_M05',
     displayName: 'Jääkäri Backpack (M05)',
     resourcePath: 'res://Items/Backpacks/Backpack_Jaeger/Backpack_Jaeger_M05.tres',
+    nameInventory: 'Jääkäri BP.',
     sizeW: 3,
     sizeH: 5,
     iconFile: 'Icon_Backpack_Jaeger_M05.png-6abb65f9c57178d1e79331fc0b546c3a.s3tc.ctex'
@@ -625,6 +660,7 @@ export const ITEMS = [
     id: 'Backpack_Nomad',
     displayName: 'Nomad Backpack',
     resourcePath: 'res://Items/Backpacks/Backpack_Nomad/Backpack_Nomad.tres',
+    nameInventory: 'Nomad BP.',
     sizeW: 3,
     sizeH: 4,
     iconFile: 'Icon_Backpack_Nomad.png-cf9aef898118f3d36540dd41c8688dac.s3tc.ctex'
@@ -634,6 +670,7 @@ export const ITEMS = [
     id: 'Backpack_Patrol',
     displayName: 'Patrol Backpack',
     resourcePath: 'res://Items/Backpacks/Backpack_Patrol/Backpack_Patrol.tres',
+    nameInventory: 'Patrol BP.',
     sizeW: 3,
     sizeH: 4,
     iconFile: 'Icon_Backpack_Patrol.png-1940b7cd1e8e1883e0af45e3a3fac197.s3tc.ctex'
@@ -643,6 +680,7 @@ export const ITEMS = [
     id: 'Kukkaro_Black',
     displayName: 'Kukkaro (Black)',
     resourcePath: 'res://Items/Belts/Kukkaro/Kukkaro_Black.tres',
+    nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Kukkaro_Black.png-7cad12797daea9c1f2dc1f2cb35124e7.s3tc.ctex'
@@ -652,6 +690,7 @@ export const ITEMS = [
     id: 'Kukkaro_Brown',
     displayName: 'Kukkaro (Brown)',
     resourcePath: 'res://Items/Belts/Kukkaro/Kukkaro_Brown.tres',
+    nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Kukkaro_Brown.png-452a20e5eff60c009b591b5fc38150d9.s3tc.ctex'
@@ -661,6 +700,7 @@ export const ITEMS = [
     id: 'Kukkaro_Green',
     displayName: 'Kukkaro (Green)',
     resourcePath: 'res://Items/Belts/Kukkaro/Kukkaro_Green.tres',
+    nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Kukkaro_Green.png-3a75f4448b6f66fbc751cf7a77602247.s3tc.ctex'
@@ -670,6 +710,7 @@ export const ITEMS = [
     id: 'Kukkaro_M05',
     displayName: 'Kukkaro (M05)',
     resourcePath: 'res://Items/Belts/Kukkaro/Kukkaro_M05.tres',
+    nameInventory: 'Kukkaro',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Kukkaro_M05.png-d80913b04636bc8ec8c4f6936173a122.s3tc.ctex'
@@ -679,6 +720,7 @@ export const ITEMS = [
     id: 'Book_Children',
     displayName: 'Book (Children)',
     resourcePath: 'res://Items/Books/Book_Children.tres',
+    nameInventory: 'Children',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Book_Children.png-87df35ddafc8c3be7e66eceb53d5e127.s3tc.ctex'
@@ -688,6 +730,7 @@ export const ITEMS = [
     id: 'Book_Cooking',
     displayName: 'Book (Cooking)',
     resourcePath: 'res://Items/Books/Book_Cooking.tres',
+    nameInventory: 'Cooking',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Book_Cooking.png-67220f037eed6ea542d6178ee75f7d79.s3tc.ctex'
@@ -697,6 +740,7 @@ export const ITEMS = [
     id: 'Book_Fishing',
     displayName: 'Book (Fishing)',
     resourcePath: 'res://Items/Books/Book_Fishing.tres',
+    nameInventory: 'Fishing',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Book_Fishing.png-e5e5ba2259321c57819beb205ff9c94e.s3tc.ctex'
@@ -706,6 +750,7 @@ export const ITEMS = [
     id: 'Book_Religion',
     displayName: 'Book (Religion)',
     resourcePath: 'res://Items/Books/Book_Religion.tres',
+    nameInventory: 'Religion',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Book_Religion.png-dc6102f614d7689809c4f49e0f0bb196.s3tc.ctex'
@@ -715,6 +760,7 @@ export const ITEMS = [
     id: 'Boots_Combat',
     displayName: 'Combat Boots',
     resourcePath: 'res://Items/Clothing/Boots_Combat/Boots_Combat.tres',
+    nameEquipment: 'C. Boots',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Boots_Combat.png-9f7b38179b35a93d2a3930322673b9d9.s3tc.ctex'
@@ -724,6 +770,7 @@ export const ITEMS = [
     id: 'Beanie_Flame',
     displayName: 'Flame Beanie',
     resourcePath: 'res://Items/Clothing/Beanie_Flame/Beanie_Flame.tres',
+    nameEquipment: 'F. Beanie',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Beanie_Flame.png-3a780dc85a8e5a0e547505f43465de5b.s3tc.ctex'
@@ -733,6 +780,7 @@ export const ITEMS = [
     id: 'Pants_Hiking',
     displayName: 'Hiking Pants',
     resourcePath: 'res://Items/Clothing/Pants_Hiking/Pants_Hiking.tres',
+    nameInventory: 'Hiking P.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Pants_Hiking.png-de55054d477684832b11b5fe8d64fb54.s3tc.ctex'
@@ -742,6 +790,8 @@ export const ITEMS = [
     id: 'Hoodie_Border_Zone',
     displayName: 'Hoodie (Border Zone)',
     resourcePath: 'res://Items/Clothing/Hoodie_Border_Zone/Hoodie_Border_Zone.tres',
+    nameInventory: 'Hoodie BZ.',
+    nameEquipment: 'Hoodie B.',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Hoodie_Border_Zone.png-505a7f7052e1cef45ef0b59ea0dab006.s3tc.ctex'
@@ -751,6 +801,7 @@ export const ITEMS = [
     id: 'Hoodie_Gray',
     displayName: 'Hoodie (Gray)',
     resourcePath: 'res://Items/Clothing/Hoodie_Gray/Hoodie_Gray.tres',
+    nameInventory: 'Hoodie',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Hoodie_Gray.png-292f489136a7f576b09ea5ea7989d29d.s3tc.ctex'
@@ -760,6 +811,7 @@ export const ITEMS = [
     id: 'Jeans_Black',
     displayName: 'Jeans (Black)',
     resourcePath: 'res://Items/Clothing/Jeans_Black/Jeans_Black.tres',
+    nameInventory: 'Jeans',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Jeans_Black.png-b5f5efcf98ebe800391c3154e54e5abe.s3tc.ctex'
@@ -769,6 +821,7 @@ export const ITEMS = [
     id: 'Gloves_Leather',
     displayName: 'Leather Gloves',
     resourcePath: 'res://Items/Clothing/Gloves_Leather/Gloves_Leather.tres',
+    nameInventory: 'L. Gloves',
     iconFile: 'Icon_Gloves_Leather.png-08420816813a1b1e1b5d3c810c8935d3.s3tc.ctex'
   },
   {
@@ -785,6 +838,7 @@ export const ITEMS = [
     id: 'Jacket_M62',
     displayName: 'M62 Jacket',
     resourcePath: 'res://Items/Clothing/Jacket_M62/Jacket_M62.tres',
+    nameEquipment: 'M62 J.',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Jacket_M62.png-8f445de9a7e63911b096e4bfd58a87ea.s3tc.ctex'
@@ -794,6 +848,7 @@ export const ITEMS = [
     id: 'Hat_Mosquito',
     displayName: 'Mosquito Hat',
     resourcePath: 'res://Items/Clothing/Hat_Mosquito/Hat_Mosquito.tres',
+    nameEquipment: 'M. Hat',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Hat_Mosquito.png-b1cfac481001781188406fc18201365b.s3tc.ctex'
@@ -803,6 +858,7 @@ export const ITEMS = [
     id: 'Jacket_Santa',
     displayName: 'Santa Jacket',
     resourcePath: 'res://Items/Clothing/Jacket_Santa/Jacket_Santa.tres',
+    nameEquipment: 'Santa J.',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Jacket_Santa.png-7e7668c74fbd72d21727d4074647f5b2.s3tc.ctex'
@@ -812,6 +868,7 @@ export const ITEMS = [
     id: 'Hat_Sauna',
     displayName: 'Sauna Hat',
     resourcePath: 'res://Items/Clothing/Hat_Sauna/Hat_Sauna.tres',
+    nameEquipment: 'S. Hat',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Hat_Sauna.png-5e03f27a73044008bbacd0cae9700441.s3tc.ctex'
@@ -821,6 +878,7 @@ export const ITEMS = [
     id: 'Fleece_Tactical_Brown',
     displayName: 'Tactical Fleece (Brown)',
     resourcePath: 'res://Items/Clothing/Fleece_Tactical_Brown/Fleece_Tactical_Brown.tres',
+    nameInventory: 'T. Fleece',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Fleece_Tactical_Brown.png-c4c638ec96400d11725e310eef2e4cd1.s3tc.ctex'
@@ -830,6 +888,7 @@ export const ITEMS = [
     id: 'Fleece_Tactical_Green',
     displayName: 'Tactical Fleece (Green)',
     resourcePath: 'res://Items/Clothing/Fleece_Tactical_Green/Fleece_Tactical_Green.tres',
+    nameInventory: 'T. Fleece',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Fleece_Tactical_Green.png-32f57f33c3e06506c191ae362b32bbc0.s3tc.ctex'
@@ -839,6 +898,8 @@ export const ITEMS = [
     id: 'Windbreaker_Black',
     displayName: 'Windbreaker (Black)',
     resourcePath: 'res://Items/Clothing/Windbreaker_Black/Windbreaker_Black.tres',
+    nameInventory: 'Windbreaker',
+    nameEquipment: 'Windbr.',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Windbreaker_Black.png-61f28c52d2e084682c7bb9de6a33ae4c.s3tc.ctex'
@@ -848,6 +909,8 @@ export const ITEMS = [
     id: 'Windbreaker_Green',
     displayName: 'Windbreaker (Green)',
     resourcePath: 'res://Items/Clothing/Windbreaker_Green/Windbreaker_Green.tres',
+    nameInventory: 'Windbreaker',
+    nameEquipment: 'Windbr.',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Windbreaker_Green.png-43a6a44d3c92b86ba078946d9c4a8f80.s3tc.ctex'
@@ -857,6 +920,8 @@ export const ITEMS = [
     id: 'Jacket_Winter_Blue',
     displayName: 'Winter Jacket (Blue)',
     resourcePath: 'res://Items/Clothing/Jacket_Winter_Blue/Jacket_Winter_Blue.tres',
+    nameInventory: 'Winter Jacket',
+    nameEquipment: 'Winter J.',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Jacket_Winter_Blue.png-7712a27fbdaea589c3dffa5c28f8bd4b.s3tc.ctex'
@@ -866,6 +931,8 @@ export const ITEMS = [
     id: 'Jacket_Winter_Red',
     displayName: 'Winter Jacket (Red)',
     resourcePath: 'res://Items/Clothing/Jacket_Winter_Red/Jacket_Winter_Red.tres',
+    nameInventory: 'Winter Jacket',
+    nameEquipment: 'Winter J.',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Jacket_Winter_Red.png-04506ce616b3a0a80e7c7f3439df2149.s3tc.ctex'
@@ -875,6 +942,7 @@ export const ITEMS = [
     id: 'Gloves_Work',
     displayName: 'Work Gloves',
     resourcePath: 'res://Items/Clothing/Gloves_Work/Gloves_Work.tres',
+    nameInventory: 'W. Gloves',
     iconFile: 'Icon_Gloves_Work.png-0a4e05c6bdda8c8ce883e4eaa3592446.s3tc.ctex'
   },
   {
@@ -889,6 +957,7 @@ export const ITEMS = [
     id: 'Canned_Meat',
     displayName: 'Canned Meat',
     resourcePath: 'res://Items/Consumables/Canned_Meat/Canned_Meat.tres',
+    nameInventory: 'Meat',
     iconFile: 'Icon_Canned_Meat.png-b1c9359d4aca1b535817b502fc58fe8a.s3tc.ctex'
   },
   {
@@ -896,6 +965,7 @@ export const ITEMS = [
     id: 'Canned_Meatballs',
     displayName: 'Canned Meatballs',
     resourcePath: 'res://Items/Consumables/Canned_Meatballs/Canned_Meatballs.tres',
+    nameInventory: 'Meatballs',
     iconFile: 'Icon_Canned_Meatballs.png-192f964974752b2d9b2c11a15d380818.s3tc.ctex'
   },
   {
@@ -903,6 +973,7 @@ export const ITEMS = [
     id: 'Canned_Pea_Soup',
     displayName: 'Canned Pea Soup',
     resourcePath: 'res://Items/Consumables/Canned_Pea_Soup/Canned_Pea_Soup.tres',
+    nameInventory: 'Pea Soup',
     iconFile: 'Icon_Canned_Pea_Soup.png-051afe9fe26152a282a62402101e51f9.s3tc.ctex'
   },
   {
@@ -910,6 +981,7 @@ export const ITEMS = [
     id: 'Canned_Peaches',
     displayName: 'Canned Peaches',
     resourcePath: 'res://Items/Consumables/Canned_Peaches/Canned_Peaches.tres',
+    nameInventory: 'Peaches',
     iconFile: 'Icon_Canned_Peaches.png-296ac697455a6319dd3a4246247bb2c8.s3tc.ctex'
   },
   {
@@ -917,6 +989,7 @@ export const ITEMS = [
     id: 'Canned_Pear',
     displayName: 'Canned Pear',
     resourcePath: 'res://Items/Consumables/Canned_Pear/Canned_Pear.tres',
+    nameInventory: 'Pear',
     iconFile: 'Icon_Canned_Pear.png-3444555a4190fc37ca5572dc03b87f17.s3tc.ctex'
   },
   {
@@ -924,6 +997,7 @@ export const ITEMS = [
     id: 'Canned_Peas',
     displayName: 'Canned Peas',
     resourcePath: 'res://Items/Consumables/Canned_Peas/Canned_Peas.tres',
+    nameInventory: 'Peas',
     iconFile: 'Icon_Canned_Peas.png-c9c882408d14d23e4cac1504228dcf6f.s3tc.ctex'
   },
   {
@@ -931,6 +1005,7 @@ export const ITEMS = [
     id: 'Canned_Pineapple',
     displayName: 'Canned Pineapple',
     resourcePath: 'res://Items/Consumables/Canned_Pineapple/Canned_Pineapple.tres',
+    nameInventory: 'Pineapple',
     iconFile: 'Icon_Canned_Pineapple.png-097ae3a81d05c45c72b33a704513056b.s3tc.ctex'
   },
   {
@@ -938,6 +1013,7 @@ export const ITEMS = [
     id: 'Canned_Tomatoes',
     displayName: 'Canned Tomatoes',
     resourcePath: 'res://Items/Consumables/Canned_Tomatoes/Canned_Tomatoes.tres',
+    nameInventory: 'Tomatoes',
     iconFile: 'Icon_Canned_Tomatoes.png-94e120550ee57d760cd5660ee3d8c5e1.s3tc.ctex'
   },
   {
@@ -945,6 +1021,7 @@ export const ITEMS = [
     id: 'Canned_Tuna',
     displayName: 'Canned Tuna',
     resourcePath: 'res://Items/Consumables/Canned_Tuna/Canned_Tuna.tres',
+    nameInventory: 'Tuna',
     iconFile: 'Icon_Canned_Tuna.png-6efbf81cf20dc8cb1d37ae49fd9a4763.s3tc.ctex'
   },
   {
@@ -959,6 +1036,7 @@ export const ITEMS = [
     id: 'Cigarettes',
     displayName: 'Cigarettes',
     resourcePath: 'res://Items/Consumables/Cigarettes/Cigarettes.tres',
+    nameInventory: 'Cigs',
     iconFile: 'Icon_Cigarettes.png-a07756c0bbd0ba233e3e90c921305149.s3tc.ctex'
   },
   {
@@ -1002,6 +1080,7 @@ export const ITEMS = [
     id: 'Can_Empty',
     displayName: 'Empty Can',
     resourcePath: 'res://Items/Consumables/Can_Empty/Can_Empty.tres',
+    nameInventory: 'Can',
     iconFile: 'Icon_Can_Empty.png-8cd81596f96666c07c2c13348a6c1052.s3tc.ctex'
   },
   {
@@ -1009,6 +1088,7 @@ export const ITEMS = [
     id: 'Energy_Drink',
     displayName: 'Energy Drink',
     resourcePath: 'res://Items/Consumables/Energy_Drink/Energy_Drink.tres',
+    nameInventory: 'E. Drink',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Energy_Drink.png-180e1cf913c35eef9b11161fbfb70e17.s3tc.ctex'
@@ -1018,6 +1098,7 @@ export const ITEMS = [
     id: 'Energy_Powder',
     displayName: 'Energy Powder',
     resourcePath: 'res://Items/Consumables/Energy_Powder/Energy_Powder.tres',
+    nameInventory: 'E. Powder',
     iconFile: 'Icon_Energy_Powder.png-9de4c4a90f238af095a6fa6812566347.s3tc.ctex'
   },
   {
@@ -1034,6 +1115,7 @@ export const ITEMS = [
     id: 'Cooked_Fish_Soup',
     displayName: 'Fish Soup (Cooked)',
     resourcePath: 'res://Items/Consumables/Cooked_Fish_Soup/Cooked_Fish_Soup.tres',
+    nameInventory: 'F. Soup (Cooked)',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Cooked_Fish_Soup.png-cf781cc608462224dcd259c925305b05.s3tc.ctex'
@@ -1043,6 +1125,7 @@ export const ITEMS = [
     id: 'Juice_Orange',
     displayName: 'Juice (Orange)',
     resourcePath: 'res://Items/Consumables/Juice_Orange/Juice_Orange.tres',
+    nameInventory: 'Juice',
     iconFile: 'Icon_Juice_Orange.png-c6c46ff9f4b33db944649b8b78e4e6d3.s3tc.ctex'
   },
   {
@@ -1050,6 +1133,7 @@ export const ITEMS = [
     id: 'Juice_Pear',
     displayName: 'Juice (Pear)',
     resourcePath: 'res://Items/Consumables/Juice_Pear/Juice_Pear.tres',
+    nameInventory: 'Juice',
     iconFile: 'Icon_Juice_Pear.png-91c2fbb9a43314fd638cea2717ff8fc3.s3tc.ctex'
   },
   {
@@ -1057,6 +1141,7 @@ export const ITEMS = [
     id: 'Juice_Raspberry',
     displayName: 'Juice (Raspberry)',
     resourcePath: 'res://Items/Consumables/Juice_Raspberry/Juice_Raspberry.tres',
+    nameInventory: 'Juice',
     iconFile: 'Icon_Juice_Raspberry.png-a0e8a2399a3e9655caa227ac5b13392d.s3tc.ctex'
   },
   {
@@ -1082,6 +1167,7 @@ export const ITEMS = [
     id: 'Cooked_Meatballs',
     displayName: 'Meatballs (Cooked)',
     resourcePath: 'res://Items/Consumables/Cooked_Meatballs/Cooked_Meatballs.tres',
+    nameInventory: 'M. Balls (Cooked)',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Cooked_Meatballs.png-368d468322737840930f2cc5b176ffee.s3tc.ctex'
@@ -1100,6 +1186,7 @@ export const ITEMS = [
     id: 'Cooked_Pea_Soup',
     displayName: 'Pea Soup (Cooked)',
     resourcePath: 'res://Items/Consumables/Cooked_Pea_Soup/Cooked_Pea_Soup.tres',
+    nameInventory: 'P. Soup (Cooked)',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Cooked_Pea_Soup.png-b00bad161e1cde830f10f59d18f2bef3.s3tc.ctex'
@@ -1123,6 +1210,7 @@ export const ITEMS = [
     id: 'Salty_Liquorice',
     displayName: 'Salty Liquorice',
     resourcePath: 'res://Items/Consumables/Salty_Liquorice/Salty_Liquorice.tres',
+    nameInventory: 'Salty Liq.',
     iconFile: 'Icon_Salty_Liquorice.png-3550ff0ef3a8ac9a20d7626cc044db39.s3tc.ctex'
   },
   {
@@ -1137,6 +1225,7 @@ export const ITEMS = [
     id: 'Soda_Lemon',
     displayName: 'Soda (Lemon)',
     resourcePath: 'res://Items/Consumables/Soda_Lemon/Soda_Lemon.tres',
+    nameInventory: 'Soda',
     iconFile: 'Icon_Soda_Lemon.png-a67a4e1568e459a63e06ec8c152efd53.s3tc.ctex'
   },
   {
@@ -1153,6 +1242,7 @@ export const ITEMS = [
     id: 'Cooked_Tomato_Soup',
     displayName: 'Tomato Soup (Cooked)',
     resourcePath: 'res://Items/Consumables/Cooked_Tomato_Soup/Cooked_Tomato_Soup.tres',
+    nameInventory: 'T. Soup (Cooked)',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Cooked_Tomato_Soup.png-398fff87624fda56c4dd0ea9da01011b.s3tc.ctex'
@@ -1162,6 +1252,7 @@ export const ITEMS = [
     id: 'Chocolate_War',
     displayName: 'War Chocolate',
     resourcePath: 'res://Items/Consumables/Chocolate_War/Chocolate_War.tres',
+    nameInventory: 'W. Choco',
     iconFile: 'Icon_Chocolate_War.png-4ad4e6bbd3ee2cf8cf4d6d32bd1b6a18.s3tc.ctex'
   },
   {
@@ -1169,6 +1260,7 @@ export const ITEMS = [
     id: 'Water_Bottle',
     displayName: 'Water Bottle',
     resourcePath: 'res://Items/Consumables/Water_Bottle/Water_Bottle.tres',
+    nameInventory: 'Water',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Water_Bottle.png-e7f9b9b9dc69dcb70481de97b92e224d.s3tc.ctex'
@@ -1185,6 +1277,7 @@ export const ITEMS = [
     id: 'Alarm_Clock',
     displayName: 'Alarm Clock',
     resourcePath: 'res://Items/Electronics/Alarm_Clock/Alarm_Clock.tres',
+    nameInventory: 'A. Clock',
     iconFile: 'Icon_Alarm_Clock.png-efdaf46146cc6d1bdb0c79cd8d942d56.s3tc.ctex'
   },
   {
@@ -1208,6 +1301,7 @@ export const ITEMS = [
     id: 'Battery_Cables',
     displayName: 'Battery Cables',
     resourcePath: 'res://Items/Electronics/Battery_Cables/Battery_Cables.tres',
+    nameInventory: 'B. Cables',
     iconFile: 'Icon_Battery_Cables.png-7c853612cd23c3f9a9007a45b187b9d9.s3tc.ctex'
   },
   {
@@ -1215,6 +1309,7 @@ export const ITEMS = [
     id: 'Casette_Electrofolk',
     displayName: 'Casette (Electrofolk)',
     resourcePath: 'res://Items/Electronics/Casette_Electrofolk/Casette_Electrofolk.tres',
+    nameInventory: 'Casette',
     iconFile: 'Icon_Casette_Electrofolk.png-7fa7ea0e07e2047b2a9d8d302ea29189.s3tc.ctex'
   },
   {
@@ -1222,6 +1317,7 @@ export const ITEMS = [
     id: 'Casette_Nomad',
     displayName: 'Casette (Nomad)',
     resourcePath: 'res://Items/Electronics/Casette_Nomad/Casette_Nomad.tres',
+    nameInventory: 'Casette',
     iconFile: 'Icon_Casette_Nomad.png-48a3ab2d4dfc0d229f60def9b799d6b2.s3tc.ctex'
   },
   {
@@ -1229,6 +1325,7 @@ export const ITEMS = [
     id: 'Casette_OST',
     displayName: 'Casette (OST)',
     resourcePath: 'res://Items/Electronics/Casette_OST/Casette_OST.tres',
+    nameInventory: 'Casette',
     iconFile: 'Icon_Casette_OST.png-21a38cbe1a780387f99dcea95498bcab.s3tc.ctex'
   },
   {
@@ -1236,6 +1333,7 @@ export const ITEMS = [
     id: 'Casette_Radio',
     displayName: 'Casette (Radio Hits)',
     resourcePath: 'res://Items/Electronics/Casette_Radio/Casette_Radio.tres',
+    nameInventory: 'Casette',
     iconFile: 'Icon_Casette_Radio.png-045817ddd7196da8b3337b8352113eff.s3tc.ctex'
   },
   {
@@ -1243,6 +1341,7 @@ export const ITEMS = [
     id: 'Casette_Symphony',
     displayName: 'Casette (Symphony)',
     resourcePath: 'res://Items/Electronics/Casette_Symphony/Casette_Symphony.tres',
+    nameInventory: 'Casette',
     iconFile: 'Icon_Casette_Symphony.png-94451c6bfae4be79c8851857ed591cdc.s3tc.ctex'
   },
   {
@@ -1250,6 +1349,7 @@ export const ITEMS = [
     id: 'Casette_Player',
     displayName: 'Casette Player',
     resourcePath: 'res://Items/Electronics/Casette_Player/Casette_Player.tres',
+    nameInventory: 'C. Player',
     iconFile: 'Icon_Casette_Player.png-c3e6f03e451e324bdaae9d8cd08f612c.s3tc.ctex',
     showCondition: true
   },
@@ -1329,6 +1429,7 @@ export const ITEMS = [
     id: 'Fishing_Rod',
     displayName: 'Fishing Rod',
     resourcePath: 'res://Items/Fishing/Fishing_Rod/Fishing_Rod.tres',
+    nameRotated: 'F. Rod',
     sizeW: 6,
     sizeH: 1,
     iconFile: 'Icon_Fishing_Rod.png-a7592b83f789592a4337777613da3bcf.s3tc.ctex'
@@ -1391,6 +1492,8 @@ export const ITEMS = [
     id: 'Helmet_Police',
     displayName: 'Police Helmet (IIIA)',
     resourcePath: 'res://Items/Helmets/Helmet_Police/Helmet_Police.tres',
+    nameInventory: 'Police Helmet',
+    nameEquipment: 'P. Helmet',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Helmet_Police.png-08476abc1799bee433c7696350d70eea.s3tc.ctex',
@@ -1401,6 +1504,7 @@ export const ITEMS = [
     id: 'SSh-39',
     displayName: 'SSh-39 (II)',
     resourcePath: 'res://Items/Helmets/SSh-39/SSh-39.tres',
+    nameInventory: 'SSh-39',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_SSh-39.png-1116cea93367083ece65f5d9352675e0.s3tc.ctex',
@@ -1420,6 +1524,7 @@ export const ITEMS = [
     id: 'Harmonica',
     displayName: 'Harmonica',
     resourcePath: 'res://Items/Instruments/Harmonica/Harmonica.tres',
+    nameRotated: 'Harmo.',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Harmonica.png-54943cc1c10a9bf3002fa2665ab7d4f6.s3tc.ctex'
@@ -1429,6 +1534,7 @@ export const ITEMS = [
     id: 'Key_Attic',
     displayName: 'Attic Key',
     resourcePath: 'res://Items/Keys/Key_Attic.tres',
+    nameInventory: 'Attic K.',
     iconFile: 'Icon_Key_Attic.png-9e40e33f792513695c480ea626526c1e.s3tc.ctex'
   },
   {
@@ -1436,6 +1542,7 @@ export const ITEMS = [
     id: 'Key_Bunker',
     displayName: 'Bunker Key',
     resourcePath: 'res://Items/Keys/Key_Bunker.tres',
+    nameInventory: 'Bunker K.',
     iconFile: 'Icon_Key_Bunker.png-2236e15cab1d238f255c51ec0004f856.s3tc.ctex'
   },
   {
@@ -1443,6 +1550,7 @@ export const ITEMS = [
     id: 'Key_Cellar',
     displayName: 'Cellar Key',
     resourcePath: 'res://Items/Keys/Key_Cellar.tres',
+    nameInventory: 'Cellar K.',
     iconFile: 'Icon_Key_Cellar.png-fa7a60bae98928ef6a2bec62a390dda5.s3tc.ctex'
   },
   {
@@ -1450,6 +1558,7 @@ export const ITEMS = [
     id: 'Key_Classroom',
     displayName: 'Classroom Key',
     resourcePath: 'res://Items/Keys/Key_Classroom.tres',
+    nameInventory: 'Class. K.',
     iconFile: 'Icon_Key_Classroom.png-f3092845ee35c8a5bd63dafd6bb4cfa6.s3tc.ctex'
   },
   {
@@ -1457,6 +1566,7 @@ export const ITEMS = [
     id: 'Key_Gymnasium',
     displayName: 'Gymnasium Key',
     resourcePath: 'res://Items/Keys/Key_Gymnasium.tres',
+    nameInventory: 'Gym. K.',
     iconFile: 'Icon_Key_Gymnasium.png-9fb0facd5903c5d845d0d1d1cfece493.s3tc.ctex'
   },
   {
@@ -1464,6 +1574,7 @@ export const ITEMS = [
     id: 'Key_Tunnel',
     displayName: 'Tunnel Key',
     resourcePath: 'res://Items/Keys/Key_Tunnel.tres',
+    nameInventory: 'Tunnel K.',
     iconFile: 'Icon_Key_Tunnel.png-6894e7e76aa97160841b9baaf3aec37e.s3tc.ctex'
   },
   {
@@ -1471,6 +1582,7 @@ export const ITEMS = [
     id: 'Jaeger_140',
     displayName: 'Jaeger 140',
     resourcePath: 'res://Items/Knives/Jaeger_140/Jaeger_140.tres',
+    nameRotated: 'Jaeger',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Jaeger_140.png-f62536d78a4ca0ef40607dbac56abc41.s3tc.ctex'
@@ -1480,6 +1592,7 @@ export const ITEMS = [
     id: 'Skrama_200',
     displayName: 'Skrama 200',
     resourcePath: 'res://Items/Knives/Skrama_200/Skrama_200.tres',
+    nameRotated: 'Skrama',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Skrama_200.png-680f47696df834a45dfbca7143bfb465.s3tc.ctex'
@@ -1489,6 +1602,7 @@ export const ITEMS = [
     id: 'Skrama_240',
     displayName: 'Skrama 240',
     resourcePath: 'res://Items/Knives/Skrama_240/Skrama_240.tres',
+    nameRotated: 'Skrama',
     sizeW: 3,
     sizeH: 1,
     iconFile: 'Icon_Skrama_240.png-307387c167f5bb645fd2818a45da4854.s3tc.ctex'
@@ -1507,6 +1621,7 @@ export const ITEMS = [
     id: 'Oil_Sample',
     displayName: 'Oil Sample',
     resourcePath: 'res://Items/Lore/Oil_Sample/Oil_Sample.tres',
+    nameInventory: 'Oil S.',
     sizeW: 2,
     sizeH: 6,
     iconFile: 'Icon_Oil_Sample.png-dba8017604a1a83497efca1aa1ead89c.s3tc.ctex'
@@ -1516,6 +1631,7 @@ export const ITEMS = [
     id: 'Patient_Report',
     displayName: 'Patient Report',
     resourcePath: 'res://Items/Lore/Patient_Report/Patient_Report.tres',
+    nameEquipment: 'P. Report',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Patient_Report.png-f0d89eb8ce7d184d50c65f176b2bf768.s3tc.ctex'
@@ -1534,6 +1650,7 @@ export const ITEMS = [
     id: 'Antibiotics',
     displayName: 'Antibiotics',
     resourcePath: 'res://Items/Medical/Antibiotics/Antibiotics.tres',
+    nameInventory: 'Antibio.',
     iconFile: 'Icon_Antibiotics.png-062124f9cbdbdf5fd57a2ce2ad54c482.s3tc.ctex'
   },
   {
@@ -1541,6 +1658,7 @@ export const ITEMS = [
     id: 'Antiseptic',
     displayName: 'Antiseptic',
     resourcePath: 'res://Items/Medical/Antiseptic/Antiseptic.tres',
+    nameInventory: 'A. Septic',
     iconFile: 'Icon_Antiseptic.png-92f79c2643aa0aae52363e26926ed86b.s3tc.ctex'
   },
   {
@@ -1562,6 +1680,7 @@ export const ITEMS = [
     id: 'Bandage_Improvised',
     displayName: 'Bandage (Improvised)',
     resourcePath: 'res://Items/Medical/Bandage_Improvised/Bandage_Improvised.tres',
+    nameInventory: 'Bandage',
     iconFile: 'Icon_Bandage_Improvised.png-a0bd5fbadc0470921cbf9277037866ea.s3tc.ctex'
   },
   {
@@ -1569,6 +1688,7 @@ export const ITEMS = [
     id: 'Cold_Medicine',
     displayName: 'Cold Medicine',
     resourcePath: 'res://Items/Medical/Cold_Medicine/Cold_Medicine.tres',
+    nameInventory: 'C. Med.',
     iconFile: 'Icon_Cold_Medicine.png-75ac251721769dce9bbab0bc8d588c8d.s3tc.ctex'
   },
   {
@@ -1576,6 +1696,7 @@ export const ITEMS = [
     id: 'Deodorant',
     displayName: 'Deodorant',
     resourcePath: 'res://Items/Medical/Deodorant/Deodorant.tres',
+    nameInventory: 'Deodora.',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Deodorant.png-690a3d95e018ad538fb1acd218616608.s3tc.ctex'
@@ -1610,6 +1731,7 @@ export const ITEMS = [
     id: 'Melatonin',
     displayName: 'Melatonin',
     resourcePath: 'res://Items/Medical/Melatonin/Melatonin.tres',
+    nameInventory: 'Melaton.',
     iconFile: 'Icon_Melatonin.png-8da15977309437085f2651c60ad72375.s3tc.ctex'
   },
   {
@@ -1640,6 +1762,8 @@ export const ITEMS = [
     id: 'Splint_Improvised',
     displayName: 'Splint (Improvised)',
     resourcePath: 'res://Items/Medical/Splint_Improvised/Splint_Improvised.tres',
+    nameRotated: 'Splint',
+    nameEquipment: 'Splint',
     sizeW: 3,
     sizeH: 1,
     iconFile: 'Icon_Splint_Improvised.png-6c7f33ece5b2cd68a18c991bb213a2cb.s3tc.ctex'
@@ -1649,6 +1773,7 @@ export const ITEMS = [
     id: 'Thermal_Blanket',
     displayName: 'Thermal Blanket',
     resourcePath: 'res://Items/Medical/Thermal_Blanket/Thermal_Blanket.tres',
+    nameEquipment: 'Thermal',
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Thermal_Blanket.png-c3424b6bd9f6015ec2bae80c7d22c4bc.s3tc.ctex'
@@ -1667,6 +1792,7 @@ export const ITEMS = [
     id: 'Tourniquet',
     displayName: 'Tourniquet',
     resourcePath: 'res://Items/Medical/Tourniquet/Tourniquet.tres',
+    nameInventory: 'Tourni.',
     iconFile: 'Icon_Tourniquet.png-c7f40bcf051758f49494e11f3fd72fec.s3tc.ctex'
   },
   {
@@ -1674,6 +1800,9 @@ export const ITEMS = [
     id: 'Tourniquet_Improvised',
     displayName: 'Tourniquet (Improvised)',
     resourcePath: 'res://Items/Medical/Tourniquet_Improvised/Tourniquet_Improvised.tres',
+    nameInventory: 'Tourniquet',
+    nameRotated: 'Tourni.',
+    nameEquipment: 'Tourni.',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Tourniquet_Improvised.png-6845f57deaa73015d0e3741740ee3191.s3tc.ctex'
@@ -1726,6 +1855,7 @@ export const ITEMS = [
     id: 'Duct_Tape',
     displayName: 'Duct Tape',
     resourcePath: 'res://Items/Misc/Duct_Tape/Duct_Tape.tres',
+    nameInventory: 'D. Tape',
     iconFile: 'Icon_Duct_Tape.png-1eb5a56d28b68f0c7b64f93c6401af04.s3tc.ctex'
   },
   {
@@ -1770,6 +1900,7 @@ export const ITEMS = [
     id: 'Map_Tactical',
     displayName: 'Map (Tactical)',
     resourcePath: 'res://Items/Misc/Map_Tactical/Map_Tactical.tres',
+    nameInventory: 'T. Map',
     sizeW: 2,
     sizeH: 1,
     iconFile: 'Icon_Map_Tactical.png-391af5b9c79d43586ba1e7fd175e97ca.s3tc.ctex'
@@ -1779,6 +1910,7 @@ export const ITEMS = [
     id: 'Matches',
     displayName: 'Matches',
     resourcePath: 'res://Items/Misc/Matches/Matches.tres',
+    nameInventory: 'Mat.',
     iconFile: 'Icon_Matches.png-61d12284830ac1bc82abca79c00ff373.s3tc.ctex',
     stackable: true,
     showAmount: true,
@@ -1817,6 +1949,7 @@ export const ITEMS = [
     id: 'Oil_Filter',
     displayName: 'Oil Filter',
     resourcePath: 'res://Items/Misc/Oil_Filter/Oil_Filter.tres',
+    nameInventory: 'O. Filter',
     sizeW: 1,
     sizeH: 2,
     iconFile: 'Icon_Oil_Filter.png-4640485f861df1556adccca222511334.s3tc.ctex'
@@ -1871,6 +2004,7 @@ export const ITEMS = [
     id: 'Toilet_Paper',
     displayName: 'Toilet Paper',
     resourcePath: 'res://Items/Misc/Toilet_Paper/Toilet_Paper.tres',
+    nameInventory: 'T. Paper',
     iconFile: 'Icon_Toilet_Paper.png-433793247ac5b17e966e18d853743e55.s3tc.ctex'
   },
   {
@@ -1887,6 +2021,7 @@ export const ITEMS = [
     id: 'Water_Lock',
     displayName: 'Water Lock',
     resourcePath: 'res://Items/Misc/Water_Lock/Water_Lock.tres',
+    nameInventory: 'W. Lock',
     iconFile: 'Icon_Water_Lock.png-638324466e7a1cda70c81e80f56a5433.s3tc.ctex'
   },
   {
@@ -1894,6 +2029,8 @@ export const ITEMS = [
     id: 'Weapon_Repair_Kit',
     displayName: 'Weapon Repair Kit',
     resourcePath: 'res://Items/Misc/Weapon_Repair_Kit/Weapon_Repair_Kit.tres',
+    nameRotated: 'Repair Kit',
+    nameEquipment: 'Repair Kit',
     sizeW: 3,
     sizeH: 2,
     iconFile: 'Icon_Weapon_Repair_Kit.png-77e1a1abbe94a2f7bf127564eecda17e.s3tc.ctex'
@@ -1904,7 +2041,8 @@ export const ITEMS = [
     displayName: 'Fishing Vest',
     resourcePath: 'res://Items/Rigs/Vest_Fishing/Vest_Fishing.tres',
     sizeW: 3,
-    sizeH: 4
+    sizeH: 4,
+    iconFile: 'Icon_Vest_Fishing.png-2ef066baf4704610812bb2fd8c00c49e.s3tc.ctex'
   },
   {
     category: 'Rigs',
@@ -1920,6 +2058,7 @@ export const ITEMS = [
     id: 'LVPC_Green',
     displayName: 'LVPC (Green)',
     resourcePath: 'res://Items/Rigs/LVPC/LVPC_Green.tres',
+    nameInventory: 'LVPC',
     sizeW: 3,
     sizeH: 3,
     iconFile: 'Icon_LVPC_Green.png-66ac4a5a9f4f8ba78ec884e9ddc9e60e.s3tc.ctex'
@@ -1929,6 +2068,7 @@ export const ITEMS = [
     id: 'LVPC_M05',
     displayName: 'LVPC (M05)',
     resourcePath: 'res://Items/Rigs/LVPC/LVPC_M05.tres',
+    nameInventory: 'LVPC',
     sizeW: 3,
     sizeH: 3,
     iconFile: 'Icon_LVPC_M05.png-dd28b4ec476a3f4d2e694a81420f108b.s3tc.ctex'
@@ -1938,6 +2078,7 @@ export const ITEMS = [
     id: 'LVPC_Winter',
     displayName: 'LVPC (Winter)',
     resourcePath: 'res://Items/Rigs/LVPC/LVPC_Winter.tres',
+    nameInventory: 'LVPC',
     sizeW: 3,
     sizeH: 3,
     iconFile: 'Icon_LVPC_Winter.png-1bd29dba8d05bb46b9266bbe2f57607c.s3tc.ctex'
