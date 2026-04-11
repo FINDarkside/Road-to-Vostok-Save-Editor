@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useSaveEditor } from './useSaveEditor'
-import { ITEMS_BY_PATH, getItemSize } from '../data/items'
+import { ITEMS_BY_PATH, ITEMS_META, getItemSize } from '../data/items'
 import type { GridItemPlacement } from '../lib/types'
 
 export const GRID_COLS = 8
@@ -27,6 +27,7 @@ export function useInventoryGrid() {
         nameEquipment: item.nameEquipment,
         category: item.category,
         condition: item.condition,
+        showCondition: item.showCondition,
         amount: item.amount,
         col: Math.round(item.gridPosition.x / GAME_CELL_SIZE),
         row: Math.round(item.gridPosition.y / GAME_CELL_SIZE),

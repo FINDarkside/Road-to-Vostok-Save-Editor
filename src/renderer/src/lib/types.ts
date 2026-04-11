@@ -81,6 +81,8 @@ export interface SlotItem {
   /** Item category from the catalog */
   category: string
   condition: number
+  /** Whether condition is meaningful for this item type */
+  showCondition: boolean
   amount: number
   gridPosition: { x: number; y: number }
   gridRotated: boolean
@@ -100,6 +102,7 @@ export interface GridItemPlacement {
   nameEquipment: string
   category: string
   condition: number
+  showCondition: boolean
   amount: number
   col: number
   row: number

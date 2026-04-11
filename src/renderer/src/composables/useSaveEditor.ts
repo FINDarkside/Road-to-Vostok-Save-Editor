@@ -72,6 +72,7 @@ function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
       'Unknown',
     category: catalogItem?.category ?? '',
     condition: getNumberProp(sub.properties, 'condition'),
+    showCondition: ITEMS_META.get(itemPath)?.showCondition ?? false,
     amount: getNumberProp(sub.properties, 'amount'),
     gridPosition: {
       x: getVector2Prop(sub.properties, 'gridPosition')?.x ?? 0,

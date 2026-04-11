@@ -49,17 +49,31 @@ const { dragState } = useDragDrop()
         :cell-size="cellSize"
         :rotated="placement.rotated"
       />
+      <!-- Condition percentage -->
+      <span
+        v-if="!ghost && placement.showCondition"
+        class="absolute top-0 right-0 text-[9px] leading-none font-medium px-[3px] pt-[2px] z-10"
+        :class="
+          placement.condition > 50
+            ? 'text-green-500'
+            : placement.condition > 25
+              ? 'text-yellow-300'
+              : 'text-red-400'
+        "
+      >
+        {{ Math.round(placement.condition) }}%
+      </span>
       <!-- Fallback name when no icon -->
       <div
         v-if="!placement.iconFile"
-        class="absolute inset-0 flex items-center justify-center text-[8px] text-muted-foreground text-center leading-tight px-0.5 truncate"
+        class="absolute inset-0 flex items-center justify-center text-[9px] text-muted-foreground text-center leading-tight px-0.5 truncate"
       >
         {{ placement.itemName }}
       </div>
       <!-- Item name label -->
       <span
         v-if="!ghost"
-        class="absolute bottom-0 left-0 text-[8px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
+        class="absolute bottom-0 left-0 text-[9px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
         style="text-overflow: '.'"
       >
         {{ placement.rotated ? placement.nameRotated : placement.nameInventory }}

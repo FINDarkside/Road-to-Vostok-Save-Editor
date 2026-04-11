@@ -33,6 +33,7 @@ function buildPlacementFromSlotItem(item: SlotItem): GridItemPlacement {
     nameEquipment: item.nameEquipment,
     category: item.category,
     condition: item.condition,
+    showCondition: item.showCondition,
     amount: item.amount,
     col: 0,
     row: 0,

@@ -33,9 +33,15 @@ const isHovered = computed(
 )
 
 function conditionColor(value: number): string {
-  if (value > 70) return 'bg-green-500'
-  if (value > 30) return 'bg-yellow-500'
+  if (value > 50) return 'bg-green-500'
+  if (value > 25) return 'bg-yellow-500'
   return 'bg-red-500'
+}
+
+function conditionTextColor(value: number): string {
+  if (value > 50) return 'text-green-500'
+  if (value > 25) return 'text-yellow-300'
+  return 'text-red-400'
 }
 
 function onPointerDown(event: PointerEvent): void {
@@ -71,11 +77,19 @@ function onPointerLeave(): void {
     @pointerleave="onPointerLeave"
   >
     <div class="flex items-center gap-2 flex-1 min-h-0 px-2 py-1.5">
-      <ItemIcon
-        v-if="item && iconFile"
-        :icon-file="iconFile"
-        :class="size === 'large' ? 'h-10 w-10 shrink-0' : 'h-7 w-7 shrink-0'"
-      />
+      <div v-if="item && iconFile" class="relative shrink-0">
+        <ItemIcon
+          :icon-file="iconFile"
+          :class="size === 'large' ? 'h-10 w-10' : 'h-7 w-7'"
+        />
+        <span
+          v-if="meta?.showCondition"
+          class="absolute -top-1 -right-2 text-[8px] leading-none font-medium"
+          :class="conditionTextColor(item.condition)"
+        >
+          {{ Math.round(item.condition) }}%
+        </span>
+      </div>
       <div class="flex flex-col min-w-0 flex-1">
         <span
           class="text-[10px] font-medium text-muted-foreground uppercase tracking-wider leading-none"
