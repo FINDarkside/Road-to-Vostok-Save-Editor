@@ -1,5 +1,11 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 
+interface BackupEntry {
+  folderName: string
+  timestamp: number
+  size: number
+}
+
 type IconStatus =
   | { status: 'idle' }
   | { status: 'extracting'; progress: number; total: number }
@@ -13,6 +19,11 @@ interface SaveApi {
   saveSave(fileName: string, content: string): Promise<void>
   getSaveDir(): Promise<string>
   openSaveDir(): Promise<void>
+
+  // Backups
+  listBackups(): Promise<BackupEntry[]>
+  restoreBackup(folderName: string): Promise<void>
+  openBackupsDir(): Promise<void>
 
   // Icons
   getIconStatus(): Promise<IconStatus>

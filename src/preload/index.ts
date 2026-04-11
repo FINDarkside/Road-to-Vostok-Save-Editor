@@ -9,6 +9,12 @@ const api = {
   getSaveDir: (): Promise<string> => ipcRenderer.invoke('saves:get-dir'),
   openSaveDir: (): Promise<void> => ipcRenderer.invoke('saves:open-dir'),
 
+  // Backups
+  listBackups: (): Promise<BackupEntry[]> => ipcRenderer.invoke('backups:list'),
+  restoreBackup: (folderName: string): Promise<void> =>
+    ipcRenderer.invoke('backups:restore', folderName),
+  openBackupsDir: (): Promise<void> => ipcRenderer.invoke('backups:open-dir'),
+
   // Icons
   getIconStatus: (): Promise<IconStatus> => ipcRenderer.invoke('icons:get-status'),
   extractIcons: (force?: boolean): Promise<void> => ipcRenderer.invoke('icons:extract-all', force),
@@ -21,6 +27,12 @@ const api = {
     ipcRenderer.on('icons:progress', handler)
     return () => ipcRenderer.removeListener('icons:progress', handler)
   }
+}
+
+export interface BackupEntry {
+  folderName: string
+  timestamp: number
+  size: number
 }
 
 export type IconStatus =

@@ -1,10 +1,11 @@
 import { ipcMain, shell } from 'electron'
-import { readdir, readFile, copyFile, writeFile } from 'fs/promises'
+import { readdir, readFile, writeFile } from 'fs/promises'
 import { join, basename, extname } from 'path'
+import { createBackup } from './backup-handlers'
 
-const SAVE_DIR_NAME = 'Road to Vostok'
+export const SAVE_DIR_NAME = 'Road to Vostok'
 
-function getSaveDir(): string {
+export function getSaveDir(): string {
   const appData = process.env.APPDATA
   if (!appData) throw new Error('APPDATA environment variable not set')
   return join(appData, SAVE_DIR_NAME)
@@ -38,17 +39,9 @@ export function registerSaveHandlers(): void {
 
   ipcMain.handle('saves:save', async (_event, fileName: string, content: string) => {
     validateFileName(fileName)
-    const dir = getSaveDir()
-    const filePath = join(dir, fileName)
-    const backupPath = join(dir, `${fileName}.bak`)
+    const filePath = join(getSaveDir(), fileName)
 
-    // Create backup of original
-    try {
-      await copyFile(filePath, backupPath)
-    } catch {
-      // Original may not exist yet — that's fine
-    }
-
+    await createBackup(fileName)
     await writeFile(filePath, content, 'utf-8')
   })
 }
