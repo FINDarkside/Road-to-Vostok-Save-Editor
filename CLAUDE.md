@@ -30,3 +30,5 @@ A desktop save file editor for the game "Road to Vostok", built with Electron.
 - `npm run lint` — Run ESLint
 - `npm run format` — Format code with Prettier
 - `npm run typecheck` — Run TypeScript type checking
+
+@import CLAUDE.local.md

@@ -6,3 +6,4 @@ out
 *.log*
 .claude/settings.local.json
 .claude/skills/
+CLAUDE.local.md

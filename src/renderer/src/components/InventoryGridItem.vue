@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useItemIcons } from '../composables/useItemIcons'
+import { useDragDrop } from '../composables/useDragDrop'
 import type { GridItemPlacement } from '../lib/types'
 
 const props = defineProps<{
@@ -14,6 +15,7 @@ defineEmits<{
   dragstart: [placement: GridItemPlacement, event: PointerEvent]
 }>()
 
+const { dragState } = useDragDrop()
 const { status, loadIcon } = useItemIcons()
 const iconUrl = ref<string | null>(null)
 
@@ -33,7 +35,8 @@ watch([() => status.value, () => props.placement.iconFile], () => {
   <div
     class="absolute select-none"
     :class="[
-      ghost ? 'pointer-events-none z-30' : 'cursor-grab z-10 hover:z-20 hover:bg-primary/15',
+      ghost ? 'pointer-events-none z-30' : 'cursor-grab z-10',
+      !ghost && !dragState ? 'hover:z-20 hover:bg-primary/15' : '',
       dimmed ? 'opacity-30' : ''
     ]"
     :style="{

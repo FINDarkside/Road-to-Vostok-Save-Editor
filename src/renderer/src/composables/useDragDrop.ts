@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { GridItemPlacement, DragDropState, SlotItem } from '../lib/types'
+import type { GridItemPlacement, GridSnapState, DragDropState, DragSource, SlotItem } from '../lib/types'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { GRID_COLS, GRID_ROWS, useInventoryGrid } from './useInventoryGrid'
 import { useSaveEditor } from './useSaveEditor'
@@ -50,12 +50,51 @@ function snapToGrid(ds: DragDropState) {
   snap.row = Math.max(0, Math.min(GRID_ROWS - snap.h, row))
 }
 
+function findSwapTarget(
+  snap: GridSnapState,
+  source: DragSource
+): GridItemPlacement | null {
+  const { occupancyMap, gridPlacements } = useInventoryGrid()
+  const excludeId = source.origin === 'grid' ? source.item.subResourceId : undefined
+
+  const occupantIds = new Set<string>()
+  for (let r = snap.row; r < snap.row + snap.h; r++) {
+    for (let c = snap.col; c < snap.col + snap.w; c++) {
+      const occ = occupancyMap.value.get(`${c},${r}`)
+      if (occ && occ !== excludeId) occupantIds.add(occ)
+    }
+  }
+
+  if (occupantIds.size !== 1) return null
+
+  const occupantId = [...occupantIds][0]
+  const occupant = gridPlacements.value.find((p) => p.subResourceId === occupantId)
+  if (!occupant || occupant.w !== snap.w || occupant.h !== snap.h) return null
+
+  // For grid→grid, verify occupant fits at source position (exclude both moving items)
+  if (source.origin === 'grid') {
+    const src = source.item
+    const bothExclude = new Set([src.subResourceId, occupantId])
+    for (let r = src.row; r < src.row + occupant.h; r++) {
+      for (let c = src.col; c < src.col + occupant.w; c++) {
+        if (c < 0 || r < 0 || c >= GRID_COLS || r >= GRID_ROWS) return null
+        const occ = occupancyMap.value.get(`${c},${r}`)
+        if (occ && !bothExclude.has(occ)) return null
+      }
+    }
+  }
+
+  return occupant
+}
+
 function updateGridValidity() {
   if (!dragState.value?.gridSnap || !canPlaceFn) return
   const snap = dragState.value.gridSnap
   const excludeId =
     dragState.value.source.origin === 'grid' ? dragState.value.source.item.subResourceId : undefined
-  snap.isValid = canPlaceFn(snap.col, snap.row, snap.w, snap.h, excludeId)
+  snap.isValid =
+    canPlaceFn(snap.col, snap.row, snap.w, snap.h, excludeId) ||
+    !!findSwapTarget(snap, dragState.value.source)
 }
 
 function onDocumentPointerMove(event: PointerEvent) {
@@ -77,10 +116,30 @@ function onDocumentPointerUp() {
 
   if (ds.gridSnap?.isValid) {
     const snap = ds.gridSnap
-    if (ds.source.origin === 'grid') {
-      updateItemGridPosition(ds.source.item.subResourceId, snap.col, snap.row, snap.rotated)
+    const { canPlace } = useInventoryGrid()
+    const excludeId =
+      ds.source.origin === 'grid' ? ds.source.item.subResourceId : undefined
+
+    if (canPlace(snap.col, snap.row, snap.w, snap.h, excludeId)) {
+      // Direct placement on empty cells
+      if (ds.source.origin === 'grid') {
+        updateItemGridPosition(ds.source.item.subResourceId, snap.col, snap.row, snap.rotated)
+      } else {
+        moveToInventory(ds.source.item.subResourceId, snap.col, snap.row, snap.rotated)
+      }
     } else {
-      moveToInventory(ds.source.item.subResourceId, snap.col, snap.row, snap.rotated)
+      // Same-size swap
+      const occupant = findSwapTarget(snap, ds.source)
+      if (occupant) {
+        if (ds.source.origin === 'grid') {
+          const src = ds.source.item
+          updateItemGridPosition(occupant.subResourceId, src.col, src.row, occupant.rotated)
+          updateItemGridPosition(src.subResourceId, occupant.col, occupant.row, snap.rotated)
+        } else if (ds.source.origin === 'equipment') {
+          moveToEquipment(occupant.subResourceId, ds.source.equipmentSlot!)
+          moveToInventory(ds.source.item.subResourceId, occupant.col, occupant.row, snap.rotated)
+        }
+      }
     }
   } else if (ds.equipmentHover) {
     const slotName = ds.equipmentHover.slotName
@@ -88,15 +147,28 @@ function onDocumentPointerUp() {
       // Grid to equipment — handle swap if slot is occupied
       const occupant = equipment.value.find((e) => e.slot === slotName)
       if (occupant) {
-        const { findFreeSlot } = useInventoryGrid()
+        const { canPlace, findFreeSlot } = useInventoryGrid()
         const occupantCatalog = ITEMS_BY_PATH.get(occupant.itemPath)
         const occupantSize = occupantCatalog ? getItemSize(occupantCatalog) : { w: 1, h: 1 }
-        const freeSlot = findFreeSlot(occupantSize.w, occupantSize.h, ds.source.item.subResourceId)
-        if (!freeSlot) {
-          cleanup()
-          return
+        const src = ds.source.item
+
+        // Try to place displaced item at the source item's original position
+        if (canPlace(src.col, src.row, occupantSize.w, occupantSize.h, src.subResourceId)) {
+          moveToInventory(occupant.subResourceId, src.col, src.row, false)
+        } else if (
+          occupantSize.w !== occupantSize.h &&
+          canPlace(src.col, src.row, occupantSize.h, occupantSize.w, src.subResourceId)
+        ) {
+          moveToInventory(occupant.subResourceId, src.col, src.row, true)
+        } else {
+          // Fall back to first free slot
+          const freeSlot = findFreeSlot(occupantSize.w, occupantSize.h, src.subResourceId)
+          if (!freeSlot) {
+            cleanup()
+            return
+          }
+          moveToInventory(occupant.subResourceId, freeSlot.col, freeSlot.row, freeSlot.rotated)
         }
-        moveToInventory(occupant.subResourceId, freeSlot.col, freeSlot.row, freeSlot.rotated)
       }
       moveToEquipment(ds.source.item.subResourceId, slotName)
     } else {
@@ -236,7 +308,25 @@ export function useDragDrop() {
 
   function enterEquipmentSlot(slotName: string) {
     if (!dragState.value) return
-    dragState.value.equipmentHover = { slotName }
+
+    let isValid = true
+    if (dragState.value.source.origin === 'grid') {
+      const { equipment } = useSaveEditor()
+      const occupant = equipment.value.find((e) => e.slot === slotName)
+      if (occupant) {
+        const { canPlace, findFreeSlot } = useInventoryGrid()
+        const occupantCatalog = ITEMS_BY_PATH.get(occupant.itemPath)
+        const occupantSize = occupantCatalog ? getItemSize(occupantCatalog) : { w: 1, h: 1 }
+        const src = dragState.value.source.item
+        isValid =
+          canPlace(src.col, src.row, occupantSize.w, occupantSize.h, src.subResourceId) ||
+          (occupantSize.w !== occupantSize.h &&
+            canPlace(src.col, src.row, occupantSize.h, occupantSize.w, src.subResourceId)) ||
+          !!findFreeSlot(occupantSize.w, occupantSize.h, src.subResourceId)
+      }
+    }
+
+    dragState.value.equipmentHover = { slotName, isValid }
   }
 
   function leaveEquipmentSlot(slotName: string) {

@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import type { TresFile, ExtResource, SubResource, Property } from '../lib/tres/types'
-import type { SlotItem, CharacterStats, StatusEffects, SaveFileInfo } from '../lib/types'
+import type { SlotItem, CharacterStats, StatusEffects, CatStatus, SaveFileInfo } from '../lib/types'
 import { parseTresFile } from '../lib/tres/parser'
 import { serializeTresFile } from '../lib/tres/serializer'
 import { ITEMS_BY_PATH, ITEMS_META } from '../data/items'
@@ -145,6 +145,16 @@ const statusEffects = computed<StatusEffects>(() => {
     insanity: getBoolProp(res, 'insanity'),
     rupture: getBoolProp(res, 'rupture'),
     headshot: getBoolProp(res, 'headshot')
+  }
+})
+
+const catStatus = computed<CatStatus>(() => {
+  if (!tresFile.value) return { cat: 0, catFound: false, catDead: false }
+  const res = tresFile.value.resource
+  return {
+    cat: getNumberProp(res, 'cat'),
+    catFound: getBoolProp(res, 'catFound'),
+    catDead: getBoolProp(res, 'catDead')
   }
 })
 
@@ -306,6 +316,40 @@ export function useSaveEditor() {
       isDirty.value = true
       tresFile.value = { ...tresFile.value }
     }
+  }
+
+  function updateCatHealth(value: number): void {
+    if (!tresFile.value) return
+    const prop = tresFile.value.resource.find((p) => p.key === 'cat')
+    if (prop && (prop.value.kind === 'float' || prop.value.kind === 'int')) {
+      prop.value = { kind: 'float', value, raw: String(value) }
+      isDirty.value = true
+      tresFile.value = { ...tresFile.value }
+    }
+  }
+
+  function reviveCat(): void {
+    if (!tresFile.value) return
+    const deadProp = tresFile.value.resource.find((p) => p.key === 'catDead')
+    if (deadProp && deadProp.value.kind === 'bool') {
+      deadProp.value = { kind: 'bool', value: false }
+    }
+    const healthProp = tresFile.value.resource.find((p) => p.key === 'cat')
+    if (healthProp && (healthProp.value.kind === 'float' || healthProp.value.kind === 'int')) {
+      healthProp.value = { kind: 'float', value: 100, raw: '100' }
+    }
+    isDirty.value = true
+    tresFile.value = { ...tresFile.value }
+  }
+
+  function killCat(): void {
+    if (!tresFile.value) return
+    const deadProp = tresFile.value.resource.find((p) => p.key === 'catDead')
+    if (deadProp && deadProp.value.kind === 'bool') {
+      deadProp.value = { kind: 'bool', value: true }
+    }
+    isDirty.value = true
+    tresFile.value = { ...tresFile.value }
   }
 
   function maxAllStats(): void {
@@ -492,6 +536,7 @@ export function useSaveEditor() {
     equipment,
     stats,
     statusEffects,
+    catStatus,
     isLoading,
     isDirty,
     loadError,
@@ -503,6 +548,9 @@ export function useSaveEditor() {
     updateStat,
     maxAllStats,
     updateStatusEffect,
+    updateCatHealth,
+    reviveCat,
+    killCat,
     updateItem,
     updateItemGridPosition,
     moveToInventory,

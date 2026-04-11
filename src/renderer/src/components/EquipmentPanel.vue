@@ -103,7 +103,9 @@ const gridHeight = ROWS * CELL_SIZE
       class="absolute z-10 border rounded-sm flex flex-col items-center justify-center overflow-hidden transition-colors select-none"
       :class="[
         isSlotHovered(slot)
-          ? 'border-green-500 bg-green-500/10'
+          ? dragState?.equipmentHover?.isValid
+            ? 'border-green-500 bg-green-500/10'
+            : 'border-red-500 bg-red-500/10'
           : equipmentBySlot.get(slot.name)
             ? 'border-border/60 bg-muted/40'
             : 'border-border/60 bg-background',

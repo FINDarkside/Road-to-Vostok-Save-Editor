@@ -126,6 +126,7 @@ export interface GridSnapState {
 
 export interface EquipmentHoverState {
   slotName: string
+  isValid: boolean
 }
 
 export interface DragDropState {
@@ -164,4 +165,10 @@ export interface StatusEffects {
   insanity: boolean
   rupture: boolean
   headshot: boolean
+}
+
+export interface CatStatus {
+  cat: number
+  catFound: boolean
+  catDead: boolean
 }
