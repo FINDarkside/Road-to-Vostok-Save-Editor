@@ -1,10 +1,11 @@
 {
   "name": "road-to-vostok-save-editor",
-  "version": "1.0.0",
-  "description": "An Electron application with Vue and TypeScript",
+  "version": "0.1.0",
+  "description": "Desktop save file editor for Road to Vostok",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "FINDarkside",
+  "license": "MIT",
+  "homepage": "https://github.com/FINDarkside/Road-to-Vostok-Save-Editor",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
@@ -16,9 +17,7 @@
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "npm run build && electron-builder --win",
-    "build:mac": "npm run build && electron-builder --mac",
-    "build:linux": "npm run build && electron-builder --linux"
+    "build:win": "npm run build && electron-builder --win"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",

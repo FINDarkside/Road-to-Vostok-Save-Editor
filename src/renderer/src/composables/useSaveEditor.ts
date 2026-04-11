@@ -60,8 +60,16 @@ function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
     itemName:
       catalogItem?.displayName ?? itemPath.split('/').pop()?.replace('.tres', '') ?? 'Unknown',
     nameInventory: catalogItem?.nameInventory ?? catalogItem?.displayName ?? 'Unknown',
-    nameRotated: catalogItem?.nameRotated ?? catalogItem?.nameInventory ?? catalogItem?.displayName ?? 'Unknown',
-    nameEquipment: catalogItem?.nameEquipment ?? catalogItem?.nameInventory ?? catalogItem?.displayName ?? 'Unknown',
+    nameRotated:
+      catalogItem?.nameRotated ??
+      catalogItem?.nameInventory ??
+      catalogItem?.displayName ??
+      'Unknown',
+    nameEquipment:
+      catalogItem?.nameEquipment ??
+      catalogItem?.nameInventory ??
+      catalogItem?.displayName ??
+      'Unknown',
     category: catalogItem?.category ?? '',
     condition: getNumberProp(sub.properties, 'condition'),
     amount: getNumberProp(sub.properties, 'amount'),
