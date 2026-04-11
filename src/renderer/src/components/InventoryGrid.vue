@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useInventoryGrid, GRID_COLS, GRID_ROWS } from '../composables/useInventoryGrid'
+import { ref, computed, inject, onMounted, onUnmounted, watch } from 'vue'
+import { useInventoryGrid, GRID_COLS, GRID_ROWS, CELL_SIZE } from '../composables/useInventoryGrid'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useSaveEditor } from '../composables/useSaveEditor'
+import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
+import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import InventoryGridItem from './InventoryGridItem.vue'
 import ItemContextMenu from './ItemContextMenu.vue'
-import type { GridItemPlacement } from '../lib/types'
+import type { GridItemPlacement, SlotItem } from '../lib/types'
 
-const CELL_SIZE = 48
 
 const containerRef = ref<HTMLElement | null>(null)
 const { gridPlacements, canPlace, findFreeSlot, getConflicts } = useInventoryGrid()
@@ -21,8 +22,22 @@ const {
   cancelDrag
 } = useDragDrop()
 const { updateItemGridPosition, removeItem, addItem, items: allItems } = useSaveEditor()
+const openWorkbench = inject<(weapon: SlotItem) => void>('openWorkbench')
 
 const contextMenu = ref<{ placement: GridItemPlacement; x: number; y: number } | null>(null)
+
+const showEditLoadout = computed(() => {
+  if (!contextMenu.value) return false
+  const p = contextMenu.value.placement
+  return p.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(p.itemPath)
+})
+
+function handleEditLoadout() {
+  if (!contextMenu.value) return
+  const item = allItems.value.find((i) => i.subResourceId === contextMenu.value!.placement.subResourceId)
+  if (item) openWorkbench?.(item)
+  contextMenu.value = null
+}
 
 function onItemContextMenu(placement: GridItemPlacement, event: MouseEvent) {
   contextMenu.value = { placement, x: event.clientX, y: event.clientY }
@@ -33,7 +48,9 @@ function handleDuplicate() {
   const p = contextMenu.value.placement
   const original = allItems.value.find((i) => i.subResourceId === p.subResourceId)
   if (!original) return
-  const slot = findFreeSlot(p.w, p.h, p.subResourceId)
+  const catalogItem = ITEMS_BY_PATH.get(original.itemPath)
+  const size = catalogItem ? getItemSize(catalogItem) : { w: p.w, h: p.h }
+  const slot = findFreeSlot(size.w, size.h)
   if (!slot) return
   addItem(original.itemPath, {
     condition: original.condition,
@@ -193,6 +210,8 @@ defineExpose({ findFreeSlot })
       v-if="contextMenu"
       :x="contextMenu.x"
       :y="contextMenu.y"
+      :show-edit-loadout="showEditLoadout"
+      @edit-loadout="handleEditLoadout"
       @duplicate="handleDuplicate"
       @delete="handleDelete"
       @close="contextMenu = null"

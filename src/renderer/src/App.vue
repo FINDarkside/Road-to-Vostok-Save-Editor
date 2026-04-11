@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, provide, onMounted } from 'vue'
 import { useSaveEditor } from './composables/useSaveEditor'
 import TitleBar from './components/TitleBar.vue'
 import StatsPanel from './components/StatsPanel.vue'
@@ -8,13 +8,22 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import BackupsPanel from './components/BackupsPanel.vue'
 import CatPanel from './components/CatPanel.vue'
 import AddItemDialog from './components/AddItemDialog.vue'
+import WeaponWorkbench from './components/WeaponWorkbench.vue'
 import IconStatusBanner from './components/IconStatusBanner.vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
+import type { SlotItem } from './lib/types'
 
 const { tresFile, isLoading, loadError, init } = useSaveEditor()
 
 const addDialogOpen = ref(false)
+const workbenchOpen = ref(false)
+const workbenchWeapon = ref<SlotItem | null>(null)
 const defaultTab = computed(() => (loadError.value ? 'backups' : 'inventory'))
+
+provide('openWorkbench', (weapon: SlotItem) => {
+  workbenchWeapon.value = weapon
+  workbenchOpen.value = true
+})
 
 onMounted(() => {
   init()
@@ -70,5 +79,6 @@ onMounted(() => {
 
     <IconStatusBanner />
     <AddItemDialog v-model:open="addDialogOpen" />
+    <WeaponWorkbench v-model:open="workbenchOpen" :weapon="workbenchWeapon" />
   </div>
 </template>

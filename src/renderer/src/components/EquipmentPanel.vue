@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
-import { useInventoryGrid } from '../composables/useInventoryGrid'
+import { useInventoryGrid, CELL_SIZE } from '../composables/useInventoryGrid'
 import { ITEMS_BY_PATH } from '../data/items'
+import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
 import CompositeIcon from './CompositeIcon.vue'
 import ItemContextMenu from './ItemContextMenu.vue'
 import type { SlotItem } from '../lib/types'
 
-const CELL_SIZE = 48
 const COLS = 6
 const ROWS = 8
 
@@ -47,8 +47,21 @@ const slots: SlotDef[] = [
 const { equipment, removeItem, addItem } = useSaveEditor()
 const { dragState, startDragFromEquipment, enterEquipmentSlot, leaveEquipmentSlot } = useDragDrop()
 const { findFreeSlot } = useInventoryGrid()
+const openWorkbench = inject<(weapon: SlotItem) => void>('openWorkbench')
 
 const contextMenu = ref<{ item: SlotItem; x: number; y: number } | null>(null)
+
+const showEditLoadout = computed(() => {
+  if (!contextMenu.value) return false
+  const item = contextMenu.value.item
+  return item.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(item.itemPath)
+})
+
+function handleEditLoadout() {
+  if (!contextMenu.value) return
+  openWorkbench?.(contextMenu.value.item)
+  contextMenu.value = null
+}
 
 function onSlotContextMenu(slot: SlotDef, event: MouseEvent) {
   const item = equipmentBySlot.value.get(slot.name)
@@ -172,7 +185,7 @@ const gridHeight = ROWS * CELL_SIZE
         <!-- Condition percentage -->
         <span
           v-if="equipmentBySlot.get(slot.name)!.showCondition"
-          class="absolute top-0 right-0 text-[9px] leading-none font-medium px-[3px] pt-[2px] z-10"
+          class="absolute top-0 right-0 text-[10px] leading-none font-medium px-[3px] pt-[2px] z-10"
           :class="
             equipmentBySlot.get(slot.name)!.condition > 50
               ? 'text-green-500'
@@ -186,31 +199,33 @@ const gridHeight = ROWS * CELL_SIZE
         <!-- Ammo count -->
         <span
           v-if="equipmentBySlot.get(slot.name)!.category === 'Weapons'"
-          class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+          class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
         >
           {{ equipmentBySlot.get(slot.name)!.amount }} + {{ equipmentBySlot.get(slot.name)!.chamber ? 1 : 0 }}
         </span>
         <span
           v-else-if="equipmentBySlot.get(slot.name)!.showAmount"
-          class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+          class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
         >
           {{ equipmentBySlot.get(slot.name)!.amount }}
         </span>
         <!-- Item name label -->
         <span
-          class="absolute bottom-0 left-0 text-[9px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
+          class="absolute bottom-0 left-0 text-[10px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
           style="text-overflow: '.'"
         >
           {{ equipmentBySlot.get(slot.name)!.nameEquipment }}
         </span>
       </div>
-      <span v-else class="text-[9px] text-muted-foreground/60 uppercase flex items-center justify-center w-full h-full">{{ slot.label ?? slot.name }}</span>
+      <span v-else class="text-[10px] text-muted-foreground/60 uppercase flex items-center justify-center w-full h-full">{{ slot.label ?? slot.name }}</span>
     </div>
 
     <ItemContextMenu
       v-if="contextMenu"
       :x="contextMenu.x"
       :y="contextMenu.y"
+      :show-edit-loadout="showEditLoadout"
+      @edit-loadout="handleEditLoadout"
       @duplicate="handleDuplicate"
       @delete="handleDelete"
       @close="contextMenu = null"

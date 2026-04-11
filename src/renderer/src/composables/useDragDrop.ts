@@ -7,10 +7,8 @@ import type {
   SlotItem
 } from '../lib/types'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
-import { GRID_COLS, GRID_ROWS, useInventoryGrid } from './useInventoryGrid'
+import { GRID_COLS, GRID_ROWS, CELL_SIZE, useInventoryGrid } from './useInventoryGrid'
 import { useSaveEditor } from './useSaveEditor'
-
-const CELL_SIZE = 48
 
 const dragState = ref<DragDropState | null>(null)
 

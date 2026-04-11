@@ -7,8 +7,7 @@ import { Trash2 } from 'lucide-vue-next'
 import EquipmentPanel from './EquipmentPanel.vue'
 import InventoryGrid from './InventoryGrid.vue'
 import InventoryGridItem from './InventoryGridItem.vue'
-
-const CELL_SIZE = 48
+import { CELL_SIZE } from '../composables/useInventoryGrid'
 
 const { items } = useSaveEditor()
 const { dragState, enterDeleteZone, leaveDeleteZone } = useDragDrop()

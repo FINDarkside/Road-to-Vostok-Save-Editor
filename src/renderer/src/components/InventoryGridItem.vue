@@ -52,7 +52,7 @@ const { dragState } = useDragDrop()
       <!-- Condition percentage -->
       <span
         v-if="!ghost && placement.showCondition"
-        class="absolute top-0 right-0 text-[9px] leading-none font-medium px-[3px] pt-[2px] z-10"
+        class="absolute top-0 right-0 text-[10px] leading-none font-medium px-[3px] pt-[2px] z-10"
         :class="
           placement.condition > 50
             ? 'text-green-500'
@@ -66,27 +66,27 @@ const { dragState } = useDragDrop()
       <!-- Fallback name when no icon -->
       <div
         v-if="!placement.iconFile"
-        class="absolute inset-0 flex items-center justify-center text-[9px] text-muted-foreground text-center leading-tight px-0.5 truncate"
+        class="absolute inset-0 flex items-center justify-center text-[10px] text-muted-foreground text-center leading-tight px-0.5 truncate"
       >
         {{ placement.itemName }}
       </div>
       <!-- Ammo count -->
       <span
         v-if="!ghost && placement.category === 'Weapons'"
-        class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+        class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
       >
         {{ placement.amount }} + {{ placement.chamber ? 1 : 0 }}
       </span>
       <span
         v-else-if="!ghost && placement.showAmount"
-        class="absolute bottom-0 right-0 text-[9px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+        class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
       >
         {{ placement.amount }}
       </span>
       <!-- Item name label -->
       <span
         v-if="!ghost"
-        class="absolute bottom-0 left-0 text-[9px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
+        class="absolute bottom-0 left-0 text-[10px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
         style="text-overflow: '.'"
       >
         {{ placement.rotated ? placement.nameRotated : placement.nameInventory }}

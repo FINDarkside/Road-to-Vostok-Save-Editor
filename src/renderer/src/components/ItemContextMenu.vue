@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Copy, Trash2 } from 'lucide-vue-next'
+import { Copy, Trash2, Wrench } from 'lucide-vue-next'
 
-defineProps<{
-  x: number
-  y: number
-}>()
+withDefaults(
+  defineProps<{
+    x: number
+    y: number
+    showEditLoadout?: boolean
+  }>(),
+  { showEditLoadout: false }
+)
 
 const emit = defineEmits<{
   duplicate: []
   delete: []
+  editLoadout: []
   close: []
 }>()
 
@@ -43,6 +48,14 @@ onUnmounted(() => {
       class="fixed z-50 min-w-[140px] rounded-md border border-border bg-popover p-1 shadow-md"
       :style="{ left: `${x}px`, top: `${y}px` }"
     >
+      <button
+        v-if="showEditLoadout"
+        class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+        @click="emit('editLoadout')"
+      >
+        <Wrench class="h-3.5 w-3.5" />
+        Edit Loadout
+      </button>
       <button
         class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
         @click="emit('duplicate')"

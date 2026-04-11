@@ -4,6 +4,7 @@ import type { SlotItem, CharacterStats, StatusEffects, CatStatus, SaveFileInfo }
 import { parseTresFile } from '../lib/tres/parser'
 import { serializeTresFile } from '../lib/tres/serializer'
 import { ITEMS_BY_PATH, ITEMS_META } from '../data/items'
+import { ATTACHMENT_SUBTYPE } from '../data/attachment-subtypes'
 
 const currentFile = ref<SaveFileInfo | null>(null)
 const tresFile = ref<TresFile | null>(null)
@@ -309,6 +310,54 @@ export function useSaveEditor() {
     tresFile.value = { ...tres }
   }
 
+  function setWeaponNested(subResourceId: string, nestedPaths: string[]): void {
+    if (!tresFile.value) return
+    const tres = tresFile.value
+
+    const sub = tres.subResources.find((s) => s.id === subResourceId)
+    if (!sub) return
+
+    // Resolve current nested to detect magazine changes
+    const oldNested = resolveNestedPaths(tres, sub)
+    const oldMag = oldNested.find((p) => ATTACHMENT_SUBTYPE.get(p) === 'Magazine')
+    const newMag = nestedPaths.find((p) => ATTACHMENT_SUBTYPE.get(p) === 'Magazine')
+
+    // Ensure ext_resources exist for each nested path
+    const extIds: string[] = []
+    for (const path of nestedPaths) {
+      let extId = tres.extResources.find((e) => e.path === path)?.id
+      if (!extId) {
+        extId = String(Math.max(0, ...tres.extResources.map((e) => parseInt(e.id, 10))) + 1)
+        tres.extResources.push({
+          id: extId,
+          type: 'Resource',
+          path,
+          raw: `[ext_resource type="Resource" path="${path}" id="${extId}"]`
+        })
+      }
+      extIds.push(extId)
+    }
+
+    // Rebuild nested typed_array
+    const nestedProp = sub.properties.find((p) => p.key === 'nested')
+    if (nestedProp && nestedProp.value.kind === 'typed_array') {
+      nestedProp.value.elements = extIds.map((id) => ({ kind: 'ext_resource' as const, id }))
+    }
+
+    // Handle magazine ammo changes
+    if (oldMag !== newMag) {
+      const amountProp = sub.properties.find((p) => p.key === 'amount')
+      if (amountProp && (amountProp.value.kind === 'int' || amountProp.value.kind === 'float')) {
+        const newAmount = newMag ? (ITEMS_META.get(newMag)?.defaultAmount ?? 0) : 0
+        amountProp.value = { kind: 'int', value: newAmount, raw: String(newAmount) }
+      }
+    }
+
+    updateLoadSteps(tres)
+    isDirty.value = true
+    tresFile.value = { ...tres }
+  }
+
   function updateStat(key: keyof CharacterStats, value: number): void {
     if (!tresFile.value) return
     const prop = tresFile.value.resource.find((p) => p.key === key)
@@ -556,6 +605,7 @@ export function useSaveEditor() {
     saveFile,
     addItem,
     removeItem,
+    setWeaponNested,
     updateStat,
     maxAllStats,
     updateStatusEffect,

@@ -1,11 +1,13 @@
 import { computed } from 'vue'
 import { useSaveEditor } from './useSaveEditor'
-import { ITEMS_BY_PATH, ITEMS_META, getItemSize } from '../data/items'
+import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import type { GridItemPlacement } from '../lib/types'
 
 export const GRID_COLS = 8
 export const GRID_ROWS = 13
 export const GAME_CELL_SIZE = 64
+/** UI cell size in pixels (used by grid, equipment panel, drag ghost) */
+export const CELL_SIZE = 56
 
 export function useInventoryGrid() {
   const { items } = useSaveEditor()

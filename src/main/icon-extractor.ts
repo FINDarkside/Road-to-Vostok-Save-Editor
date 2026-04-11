@@ -166,30 +166,6 @@ function decodeDxt5(data: Buffer, width: number, height: number): Uint8Array {
 // ---------------------------------------------------------------------------
 // Box-filter 2x downscale
 // ---------------------------------------------------------------------------
-
-function downscaleHalf(rgba: Uint8Array, w: number, h: number): Uint8Array {
-  const hw = w >> 1
-  const hh = h >> 1
-  const out = new Uint8Array(hw * hh * 4)
-
-  for (let y = 0; y < hh; y++) {
-    for (let x = 0; x < hw; x++) {
-      const sx = x * 2
-      const sy = y * 2
-      for (let c = 0; c < 4; c++) {
-        const tl = rgba[(sy * w + sx) * 4 + c]
-        const tr = rgba[(sy * w + sx + 1) * 4 + c]
-        const bl = rgba[((sy + 1) * w + sx) * 4 + c]
-        const br = rgba[((sy + 1) * w + sx + 1) * 4 + c]
-        out[(y * hw + x) * 4 + c] = (tl + tr + bl + br + 2) >> 2
-      }
-    }
-  }
-
-  return out
-}
-
-// ---------------------------------------------------------------------------
 // Minimal PNG encoder (uses Node's built-in zlib)
 // ---------------------------------------------------------------------------
 
@@ -319,7 +295,7 @@ function getVersionPath(): string {
 }
 
 /** Bump this when the cache key scheme changes to force re-extraction */
-const CACHE_VERSION = 3
+const CACHE_VERSION = 4
 
 async function isCacheValid(pckPath: string): Promise<boolean> {
   try {
@@ -418,12 +394,9 @@ export async function extractAllIcons(
       const ctexBuf = Buffer.alloc(entry.size)
       await fh.read(ctexBuf, 0, entry.size, entry.offset)
 
-      // Decode, downscale 2x, and save as PNG
+      // Decode and save as PNG (full resolution)
       const decoded = decodeCtex(ctexBuf)
-      const hw = decoded.width >> 1
-      const hh = decoded.height >> 1
-      const rgba = downscaleHalf(decoded.rgba, decoded.width, decoded.height)
-      const png = encodePng(rgba, hw, hh)
+      const png = encodePng(decoded.rgba, decoded.width, decoded.height)
       await writeFile(outPath, png)
 
       currentStatus = { status: 'extracting', progress: i + 1, total }
