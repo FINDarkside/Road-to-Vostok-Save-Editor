@@ -106,6 +106,8 @@ export interface GridItemPlacement {
   w: number
   h: number
   rotated: boolean
+  /** Resource paths of nested items (magazine, attachments) */
+  nested: string[]
 }
 
 export interface DragSource {

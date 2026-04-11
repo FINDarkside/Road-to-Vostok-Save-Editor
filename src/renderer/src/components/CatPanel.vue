@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button'
 import { Slider } from '../components/ui/slider'
 import { Cat, Skull, Search } from 'lucide-vue-next'
 
-const { catStatus, tresFile, updateCatHealth, reviveCat, killCat } = useSaveEditor()
+const { catStatus, tresFile, updateCatHealth, reviveCat } = useSaveEditor()
 
 function onSliderChange(value: number[] | undefined): void {
   if (value) updateCatHealth(value[0])

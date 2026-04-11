@@ -32,7 +32,8 @@ function buildPlacementFromSlotItem(item: SlotItem): GridItemPlacement {
     row: 0,
     w: baseSize.w,
     h: baseSize.h,
-    rotated: false
+    rotated: false,
+    nested: item.nested
   }
 }
 

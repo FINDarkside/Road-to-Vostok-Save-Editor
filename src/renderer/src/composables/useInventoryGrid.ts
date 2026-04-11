@@ -32,7 +32,8 @@ export function useInventoryGrid() {
         row: Math.round(item.gridPosition.y / GAME_CELL_SIZE),
         w,
         h,
-        rotated: item.gridRotated
+        rotated: item.gridRotated,
+        nested: item.nested
       }
     })
   })

@@ -16,6 +16,7 @@ const DECOMPILED = join(__dirname, '../../Vostok RE/decompiled')
 const DECOMPILED_ITEMS = join(DECOMPILED, 'Items')
 const DECOMPILED_SCRIPTS = join(DECOMPILED, 'Scripts')
 const OUT_ITEMS = join(__dirname, '../src/renderer/src/data/items.ts')
+const OUT_ATTACHMENTS = join(__dirname, '../src/renderer/src/data/weapon-attachments.ts')
 
 /** Map game `type` field → our ItemCategory name */
 const TYPE_TO_CATEGORY: Record<string, string> = {
@@ -192,6 +193,141 @@ function getScriptClass(firstLine: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// Attachment layout extraction from weapon tetris .tscn files
+// ---------------------------------------------------------------------------
+
+interface AttachmentOverlayEntry {
+  attachmentPath: string
+  position: [number, number]
+  scale: number
+  rotation?: number
+  behind?: boolean
+}
+
+/** Convert a scene path like res://Items/Attachments/ACOG/ACOG_2x1.tscn to res://...ACOG.tres */
+function scenePathToTresPath(scenePath: string): string {
+  const lastSlash = scenePath.lastIndexOf('/')
+  const dir = scenePath.substring(0, lastSlash + 1)
+  const filename = scenePath.substring(lastSlash + 1)
+  const tresFilename = filename.replace(/_\d+x\d+(?:_\w+)?\.tscn$/, '.tres')
+  return dir + tresFilename
+}
+
+/** Parse a weapon tetris .tscn file and extract attachment overlay positions */
+function parseTscnAttachments(content: string): AttachmentOverlayEntry[] {
+  // Parse ext_resources (PackedScene type only)
+  const extResources = new Map<string, string>()
+  for (const line of content.split('\n')) {
+    if (!line.startsWith('[ext_resource')) continue
+    const typeMatch = line.match(/type="([^"]+)"/)
+    if (!typeMatch || typeMatch[1] !== 'PackedScene') continue
+    const idMatch = line.match(/ id="([^"]+)"/)
+    const pathMatch = line.match(/path="([^"]+)"/)
+    if (idMatch && pathMatch) {
+      extResources.set(idMatch[1], pathMatch[1])
+    }
+  }
+
+  const overlays: AttachmentOverlayEntry[] = []
+  const lines = content.split('\n')
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    if (!line.startsWith('[node ') || !line.includes('parent="."')) continue
+
+    const instanceMatch = line.match(/instance=ExtResource\("([^"]+)"\)/)
+    if (!instanceMatch) continue
+
+    const scenePath = extResources.get(instanceMatch[1])
+    if (!scenePath) continue
+
+    const attachmentPath = scenePathToTresPath(scenePath)
+
+    let position: [number, number] | null = null
+    let scale: number | null = null
+    let rotation: number | null = null
+    let behind = false
+
+    for (let j = i + 1; j < lines.length; j++) {
+      const propLine = lines[j].trim()
+      if (propLine.startsWith('[')) break
+      if (!propLine) continue
+
+      const posMatch = propLine.match(
+        /^position\s*=\s*Vector2\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\)/
+      )
+      if (posMatch) {
+        position = [parseFloat(posMatch[1]), parseFloat(posMatch[2])]
+        continue
+      }
+
+      const scaleMatch = propLine.match(
+        /^scale\s*=\s*Vector2\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\)/
+      )
+      if (scaleMatch) {
+        scale = parseFloat(scaleMatch[1])
+        continue
+      }
+
+      const rotMatch = propLine.match(/^rotation\s*=\s*(-?[\d.]+)/)
+      if (rotMatch) {
+        rotation = parseFloat(rotMatch[1])
+        continue
+      }
+
+      if (propLine === 'show_behind_parent = true') {
+        behind = true
+      }
+    }
+
+    if (position) {
+      const entry: AttachmentOverlayEntry = {
+        attachmentPath,
+        position,
+        scale: scale ?? 0.5
+      }
+      if (rotation) entry.rotation = rotation
+      if (behind) entry.behind = behind
+      overlays.push(entry)
+    }
+  }
+
+  return overlays
+}
+
+/**
+ * For each weapon in items, find its tetris .tscn file and extract attachment layout data.
+ * Weapon tetris scene path: {weapon_dir}/{weapon_id}_{sizeW}x{sizeH}.tscn
+ */
+async function extractAttachmentLayouts(
+  items: ItemEntry[]
+): Promise<Map<string, AttachmentOverlayEntry[]>> {
+  const layouts = new Map<string, AttachmentOverlayEntry[]>()
+
+  const weapons = items.filter((i) => i.category === 'Weapons')
+
+  for (const weapon of weapons) {
+    const relDir = weapon.resourcePath.replace(/^res:\/\//, '').replace(/\/[^/]+$/, '')
+    const sceneFilename = `${weapon.id}_${weapon.sizeW}x${weapon.sizeH}.tscn`
+    const scenePath = join(DECOMPILED, relDir, sceneFilename)
+
+    let content: string
+    try {
+      content = await readFile(scenePath, 'utf-8')
+    } catch {
+      continue
+    }
+
+    const overlays = parseTscnAttachments(content)
+    if (overlays.length > 0) {
+      layouts.set(weapon.resourcePath, overlays)
+    }
+  }
+
+  return layouts
+}
+
+// ---------------------------------------------------------------------------
 // File scanning
 // ---------------------------------------------------------------------------
 
@@ -305,6 +441,10 @@ async function main() {
     console.log(`  ${cat}: ${items.filter((i) => i.category === cat).length}`)
   }
 
+  // ---- Extract attachment layouts from weapon tetris scenes ----
+  const attachmentLayouts = await extractAttachmentLayouts(items)
+  console.log(`\nExtracted attachment layouts for ${attachmentLayouts.size} weapons`)
+
   // ---- Generate items.ts ----
   const itemLines: string[] = []
   for (const item of items) {
@@ -339,6 +479,22 @@ async function main() {
     if (item.maxAmount) props.push(`    maxAmount: ${item.maxAmount}`)
     if (item.repairs) props.push('    repairs: true')
     itemLines.push(`  {\n${props.join(',\n')}\n  }`)
+  }
+
+  // Generate WEAPON_ATTACHMENT_LAYOUTS entries
+  const layoutEntries: string[] = []
+  for (const [weaponPath, overlays] of attachmentLayouts) {
+    const overlayLines = overlays.map((o) => {
+      const props = [
+        `attachmentPath: '${o.attachmentPath}'`,
+        `position: [${o.position[0]}, ${o.position[1]}]`,
+        `scale: ${o.scale}`
+      ]
+      if (o.rotation !== undefined) props.push(`rotation: ${o.rotation}`)
+      if (o.behind) props.push('behind: true')
+      return `    { ${props.join(', ')} }`
+    })
+    layoutEntries.push(`  ['${weaponPath}', [\n${overlayLines.join(',\n')}\n  ]]`)
   }
 
   const itemsSrc = `import type { GameItem, ResolvedItemMeta } from '../lib/types'
@@ -376,8 +532,29 @@ export function getItemSize(item: GameItem): { w: number; h: number } {
 }
 `
 
+  const attachmentsSrc = `export interface AttachmentOverlay {
+  /** Resource path of the attachment (matches ITEMS_BY_PATH keys) */
+  attachmentPath: string
+  /** Position in weapon's local coordinate space (from tetris .tscn) */
+  position: [number, number]
+  /** Scale from weapon tetris scene (default 0.5 from sub-scene if not overridden) */
+  scale: number
+  /** Rotation in radians */
+  rotation?: number
+  /** Render behind the weapon icon */
+  behind?: boolean
+}
+
+/** Attachment overlay positions per weapon, keyed by weapon resource path */
+export const WEAPON_ATTACHMENT_LAYOUTS = new Map<string, AttachmentOverlay[]>([
+${layoutEntries.join(',\n')}
+])
+`
+
   await writeFile(OUT_ITEMS, itemsSrc, 'utf-8')
+  await writeFile(OUT_ATTACHMENTS, attachmentsSrc, 'utf-8')
   console.log(`\nWrote ${OUT_ITEMS}`)
+  console.log(`Wrote ${OUT_ATTACHMENTS}`)
 }
 
 main().catch((err) => {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
-import { useItemIcons } from '../composables/useItemIcons'
 import { useDragDrop } from '../composables/useDragDrop'
+import CompositeIcon from './CompositeIcon.vue'
 import type { GridItemPlacement } from '../lib/types'
 
 const props = defineProps<{
@@ -16,19 +15,6 @@ defineEmits<{
 }>()
 
 const { dragState } = useDragDrop()
-const { status, loadIcon } = useItemIcons()
-const iconUrl = ref<string | null>(null)
-
-async function load() {
-  if (status.value !== 'done' || !props.placement.iconFile) return
-  iconUrl.value = await loadIcon(props.placement.iconFile)
-}
-
-onMounted(load)
-watch([() => status.value, () => props.placement.iconFile], () => {
-  iconUrl.value = null
-  load()
-})
 </script>
 
 <template>
@@ -52,32 +38,18 @@ watch([() => status.value, () => props.placement.iconFile], () => {
       class="w-full h-full relative"
       :class="ghost ? '' : 'rounded-sm border border-border/60 bg-muted/40'"
     >
-      <!-- Non-rotated icon -->
-      <img
-        v-if="iconUrl && !placement.rotated"
-        :src="iconUrl"
-        :alt="placement.itemName"
-        class="absolute inset-[2px] object-contain"
-        draggable="false"
+      <CompositeIcon
+        :icon-file="placement.iconFile"
+        :item-path="placement.itemPath"
+        :nested="placement.nested"
+        :w="placement.w"
+        :h="placement.h"
+        :cell-size="cellSize"
+        :rotated="placement.rotated"
       />
-      <!-- Rotated icon: sized to natural (un-rotated) dimensions, then CSS-rotated into place -->
-      <img
-        v-else-if="iconUrl"
-        :src="iconUrl"
-        :alt="placement.itemName"
-        class="absolute max-w-none object-contain"
-        :style="{
-          top: '2px',
-          left: '2px',
-          width: `${placement.h * cellSize - 4}px`,
-          height: `${placement.w * cellSize - 4}px`,
-          transformOrigin: '0 0',
-          transform: 'rotate(-90deg) translateX(-100%)'
-        }"
-        draggable="false"
-      />
+      <!-- Fallback name when no icon -->
       <div
-        v-else
+        v-if="!placement.iconFile"
         class="absolute inset-0 flex items-center justify-center text-[8px] text-muted-foreground text-center leading-tight px-0.5 truncate"
       >
         {{ placement.itemName }}
@@ -85,7 +57,7 @@ watch([() => status.value, () => props.placement.iconFile], () => {
       <!-- Item name label -->
       <span
         v-if="!ghost"
-        class="absolute bottom-0 left-0 text-[8px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap"
+        class="absolute bottom-0 left-0 text-[8px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
         style="text-overflow: '.'"
       >
         {{ placement.rotated ? placement.nameRotated : placement.nameInventory }}

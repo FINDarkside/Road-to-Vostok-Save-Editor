@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
 import { ITEMS_BY_PATH } from '../data/items'
-import ItemIcon from './ItemIcon.vue'
+import CompositeIcon from './CompositeIcon.vue'
 import type { SlotItem } from '../lib/types'
 
 const CELL_SIZE = 48
@@ -100,7 +100,7 @@ const gridHeight = ROWS * CELL_SIZE
     <div
       v-for="slot in slots"
       :key="slot.name"
-      class="absolute z-10 border rounded-sm flex flex-col items-center justify-center overflow-hidden transition-colors select-none"
+      class="absolute z-10 border rounded-sm overflow-hidden transition-colors select-none"
       :class="[
         isSlotHovered(slot)
           ? dragState?.equipmentHover?.isValid
@@ -122,19 +122,23 @@ const gridHeight = ROWS * CELL_SIZE
       @pointerenter="onSlotPointerEnter(slot)"
       @pointerleave="onSlotPointerLeave(slot)"
     >
-      <template v-if="equipmentBySlot.get(slot.name)">
-        <ItemIcon
+      <div v-if="equipmentBySlot.get(slot.name)" class="relative w-full h-full">
+        <CompositeIcon
           :icon-file="getIconFile(equipmentBySlot.get(slot.name)!)"
-          class="max-w-[calc(100%-4px)] max-h-[calc(100%-4px)] object-contain"
+          :item-path="equipmentBySlot.get(slot.name)!.itemPath"
+          :nested="equipmentBySlot.get(slot.name)!.nested"
+          :w="slot.w"
+          :h="slot.h"
+          :cell-size="CELL_SIZE"
         />
         <span
-          class="absolute bottom-0 left-0 text-[8px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap"
+          class="absolute bottom-0 left-0 text-[8px] leading-none text-foreground/80 px-[3px] pb-[4px] max-w-full overflow-hidden whitespace-nowrap z-10"
           style="text-overflow: '.'"
         >
           {{ equipmentBySlot.get(slot.name)!.nameEquipment }}
         </span>
-      </template>
-      <span v-else class="text-[9px] text-muted-foreground/60 uppercase">{{ slot.label ?? slot.name }}</span>
+      </div>
+      <span v-else class="text-[9px] text-muted-foreground/60 uppercase flex items-center justify-center w-full h-full">{{ slot.label ?? slot.name }}</span>
     </div>
   </div>
 </template>
