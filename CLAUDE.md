@@ -6,7 +6,7 @@ A desktop save file editor for the game "Road to Vostok", built with Electron.
 
 - **Framework**: Electron + electron-vite (https://electron-vite.org)
 - **Frontend**: Vue 3 + TypeScript
-- **Package Manager**: pnpm
+- **Package Manager**: npm
 - **Build**: electron-builder
 - **Linting**: ESLint + Prettier
 
@@ -20,16 +20,16 @@ A desktop save file editor for the game "Road to Vostok", built with Electron.
 
 ## Rules
 
-- Do NOT start the dev server (`pnpm run dev`). The user will run it themselves.
+- Do NOT start the dev server (`npm run dev`). The user will run it themselves.
 - Prefer implicit typing when reasonable — let TypeScript infer return types, variable types, etc. Only add explicit type annotations when they improve clarity or are required.
 
 ## Commands
 
-- `pnpm run dev` — Start dev mode with hot reload
-- `pnpm run build` — Typecheck and build for production
-- `pnpm run build:win` — Build Windows distributable
-- `pnpm run lint` — Run ESLint
-- `pnpm run format` — Format code with Prettier
-- `pnpm run typecheck` — Run TypeScript type checking
+- `npm run dev` — Start dev mode with hot reload
+- `npm run build` — Typecheck and build for production
+- `npm run build:win` — Build Windows distributable
+- `npm run lint` — Run ESLint
+- `npm run format` — Format code with Prettier
+- `npm run typecheck` — Run TypeScript type checking
 
 @import CLAUDE.local.md

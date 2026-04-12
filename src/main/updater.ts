@@ -14,12 +14,18 @@ export function initAutoUpdater(): void {
 
   autoUpdater.on('update-downloaded', (info) => {
     const window = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0]
+    const notes = Array.isArray(info.releaseNotes)
+      ? info.releaseNotes.map((n) => n.note).join('\n')
+      : info.releaseNotes || ''
+    const detail = notes
+      ? `${notes}\n\nRestart now to apply the update?`
+      : 'Restart now to apply the update?'
     dialog
       .showMessageBox(window, {
         type: 'info',
         title: 'Update Ready',
         message: `Version ${info.version} has been downloaded.`,
-        detail: 'The update will be installed when you restart the app. Restart now?',
+        detail,
         buttons: ['Restart Now', 'Later'],
         defaultId: 0,
         cancelId: 1
