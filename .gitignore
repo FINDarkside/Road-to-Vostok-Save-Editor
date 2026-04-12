@@ -4,6 +4,5 @@ out
 .DS_Store
 .eslintcache
 *.log*
-.claude/settings.local.json
-.claude/skills/
+.claude/
 CLAUDE.local.md

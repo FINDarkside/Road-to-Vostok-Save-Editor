@@ -47,7 +47,7 @@ function onDayInput(event: Event): void {
         <label
           v-for="d in difficulties"
           :key="d.value"
-          class="flex items-center justify-center gap-2 text-sm cursor-pointer select-none rounded-md border border-border px-3 py-2 hover:bg-muted/50 transition-colors"
+          class="flex flex-col items-center gap-1 text-sm cursor-pointer select-none rounded-md border border-border px-3 py-2 hover:bg-muted/50 transition-colors"
           :class="worldState.difficulty === d.value ? 'border-primary bg-primary/10' : ''"
         >
           <input
@@ -58,13 +58,13 @@ function onDayInput(event: Event): void {
             class="sr-only"
             @change="updateWorldProp('difficulty', d.value)"
           />
-          <Skull v-if="d.value === 3" class="h-3.5 w-3.5" />
-          {{ d.label }}
+          <span class="flex items-center gap-1.5 font-medium">
+            <Skull v-if="d.value === 3" class="h-3.5 w-3.5" />
+            {{ d.label }}
+          </span>
+          <span class="text-xs text-muted-foreground text-center">{{ d.description }}</span>
         </label>
       </div>
-      <p v-if="worldState.difficulty === 3" class="text-xs text-destructive">
-        Ironman enables permadeath. Dying will erase all save data.
-      </p>
     </div>
 
     <!-- Season -->
