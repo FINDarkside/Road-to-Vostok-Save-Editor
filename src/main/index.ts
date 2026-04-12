@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import { registerSaveHandlers } from './ipc/save-handlers'
 import { registerIconHandlers } from './ipc/icon-handlers'
 import { registerBackupHandlers } from './ipc/backup-handlers'
+import { initAutoUpdater } from './updater'
 
 const ICON_CACHE_DIR = join(app.getPath('userData'), 'icon-cache')
 
@@ -70,6 +71,7 @@ app.whenReady().then(() => {
   registerBackupHandlers()
 
   createWindow()
+  initAutoUpdater()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

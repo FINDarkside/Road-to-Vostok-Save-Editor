@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useBackups } from '../composables/useBackups'
+import { useToast } from '../composables/useToast'
 import { Button } from '../components/ui/button'
 import {
   Table,
@@ -13,6 +14,7 @@ import {
 import { FolderOpen, RotateCcw } from 'lucide-vue-next'
 
 const { backups, isLoading, loadBackups, restoreBackup, openBackupsDir } = useBackups()
+const toast = useToast()
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`
@@ -25,7 +27,11 @@ function formatDate(timestamp: number) {
 }
 
 async function handleRestore(folderName: string) {
-  await restoreBackup(folderName)
+  try {
+    await restoreBackup(folderName)
+  } catch (e) {
+    toast.show(`Restore failed: ${e instanceof Error ? e.message : e}`)
+  }
 }
 
 onMounted(() => {

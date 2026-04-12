@@ -32,9 +32,14 @@ async function getBackupFolders() {
   }
 }
 
-export async function createBackup(fileName: string): Promise<void> {
+export async function createBackup(): Promise<void> {
   const backupDir = getBackupDir()
-  const sourceFile = join(getSaveDir(), fileName)
+  const saveDir = getSaveDir()
+
+  // Backup all .tres files together
+  const allFiles = await readdir(saveDir)
+  const tresFiles = allFiles.filter((f) => f.endsWith('.tres'))
+  if (tresFiles.length === 0) return
 
   // Generate folder name, handle same-second collisions
   let folderName = formatTimestamp(new Date())
@@ -49,12 +54,8 @@ export async function createBackup(fileName: string): Promise<void> {
 
   await mkdir(targetDir, { recursive: true })
 
-  try {
-    await copyFile(sourceFile, join(targetDir, fileName))
-  } catch {
-    // Source file may not exist yet on first save
-    await rm(targetDir, { recursive: true })
-    return
+  for (const file of tresFiles) {
+    await copyFile(join(saveDir, file), join(targetDir, file))
   }
 
   // Enforce cap
@@ -109,9 +110,7 @@ export function registerBackupHandlers(): void {
     const saveDir = getSaveDir()
 
     // Backup current save files before overwriting them
-    for (const file of files) {
-      await createBackup(file)
-    }
+    await createBackup()
 
     for (const file of files) {
       await copyFile(join(folderPath, file), join(saveDir, file))

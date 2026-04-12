@@ -115,7 +115,11 @@ function onDayInput(event: Event): void {
       </div>
       <Select
         :model-value="worldState.weather"
-        @update:model-value="(v: string) => updateWorldProp('weather', v)"
+        @update:model-value="
+          (v) => {
+            if (typeof v === 'string') updateWorldProp('weather', v)
+          }
+        "
       >
         <SelectTrigger class="w-48">
           <SelectValue />

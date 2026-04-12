@@ -40,8 +40,10 @@ export function registerSaveHandlers(): void {
   ipcMain.handle('saves:save', async (_event, fileName: string, content: string) => {
     validateFileName(fileName)
     const filePath = join(getSaveDir(), fileName)
-
-    await createBackup(fileName)
     await writeFile(filePath, content, 'utf-8')
+  })
+
+  ipcMain.handle('saves:backup', async () => {
+    await createBackup()
   })
 }

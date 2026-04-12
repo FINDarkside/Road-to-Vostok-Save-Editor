@@ -13,6 +13,7 @@ asarUnpack:
   - resources/**
 win:
   executableName: road-to-vostok-save-editor
+  verifyUpdateCodeSignature: false
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -20,3 +21,7 @@ nsis:
   createDesktopShortcut: always
   deleteAppDataOnUninstall: true
 npmRebuild: false
+publish:
+  provider: github
+  owner: FINDarkside
+  repo: Road-to-Vostok-Save-Editor

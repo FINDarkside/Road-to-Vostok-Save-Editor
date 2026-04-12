@@ -1,3 +1,4 @@
-provider: generic
-url: https://example.com/auto-updates
+provider: github
+owner: FINDarkside
+repo: Road-to-Vostok-Save-Editor
 updaterCacheDirName: road-to-vostok-save-editor-updater

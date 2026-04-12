@@ -11,6 +11,7 @@ import WorldPanel from './components/WorldPanel.vue'
 import AddItemDialog from './components/AddItemDialog.vue'
 import WeaponWorkbench from './components/WeaponWorkbench.vue'
 import IconStatusBanner from './components/IconStatusBanner.vue'
+import ToastContainer from './components/ToastContainer.vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
 import type { SlotItem } from './lib/types'
 
@@ -88,5 +89,6 @@ onMounted(() => {
     <IconStatusBanner />
     <AddItemDialog v-model:open="addDialogOpen" />
     <WeaponWorkbench v-model:open="workbenchOpen" :weapon="workbenchWeapon" />
+    <ToastContainer />
   </div>
 </template>

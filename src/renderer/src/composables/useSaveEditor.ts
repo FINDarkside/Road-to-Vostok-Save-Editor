@@ -214,6 +214,7 @@ export function useSaveEditor() {
 
   async function saveFile(): Promise<void> {
     if (!tresFile.value || !currentFile.value) return
+    await window.api.backupSave()
     const content = serializeTresFile(tresFile.value)
     await window.api.saveSave(currentFile.value.fileName, content)
     if (worldFile.value) {
