@@ -1,34 +1,12 @@
-# road-to-vostok-save-editor
+# Road to Vostok Save Editor
 
-An Electron application with Vue and TypeScript
+A desktop save file editor for [Road to Vostok](https://store.steampowered.com/app/1963610/Road_to_Vostok/). Edit your character inventory, equipment, world settings, and more.
 
-## Recommended IDE Setup
+**[Download latest release](https://github.com/FINDarkside/Road-to-Vostok-Save-Editor/releases)**
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-
-## Project Setup
-
-### Install
+## Development
 
 ```bash
-$ npm install
-```
-
-### Development
-
-```bash
-$ npm run dev
-```
-
-### Build
-
-```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
+npm install
+npm run dev
 ```
