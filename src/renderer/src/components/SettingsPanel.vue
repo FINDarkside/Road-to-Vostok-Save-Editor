@@ -20,7 +20,7 @@ onMounted(async () => {
     <!-- Save Location -->
     <div class="flex items-center gap-3">
       <span class="text-sm text-muted-foreground shrink-0">Save location</span>
-      <span class="text-sm truncate" :title="saveDir">{{ saveDir }}</span>
+      <span class="text-sm truncate select-text" :title="saveDir">{{ saveDir }}</span>
       <Button variant="ghost" size="icon" class="h-7 w-7 shrink-0" @click="openSaveDir">
         <FolderOpen class="h-4 w-4" />
       </Button>

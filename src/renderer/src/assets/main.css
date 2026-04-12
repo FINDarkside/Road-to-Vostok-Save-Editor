@@ -76,6 +76,18 @@
   border-color: var(--border);
 }
 
+@layer base {
+  * {
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  [contenteditable='true'] {
+    user-select: text;
+  }
+}
+
 *:focus-visible {
   outline: 1px solid white;
   outline-offset: 0px;
