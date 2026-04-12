@@ -50,6 +50,7 @@ export type TresValue =
   | TresSubResourceRef
   | TresTypedArray
   | TresDict
+  | TresRaw
   | TresNull
 
 export interface TresString {
@@ -109,6 +110,12 @@ export interface TresTypedArray {
 export interface TresDict {
   kind: 'dict'
   /** Store raw string for roundtrip — dict parsing not needed for MVP */
+  raw: string
+}
+
+/** Unrecognized value type — preserved as-is for roundtrip safety */
+export interface TresRaw {
+  kind: 'raw'
   raw: string
 }
 

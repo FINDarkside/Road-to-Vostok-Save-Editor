@@ -42,17 +42,9 @@ export function parseTresFile(content: string): TresFile {
 
     // [resource] section
     if (line === '[resource]') {
-      i++
-      while (i < lines.length) {
-        const propLine = lines[i]
-        if (propLine.trim() === '' || propLine.trim().startsWith('[')) {
-          i++
-          continue
-        }
-        const prop = parseProperty(propLine)
-        if (prop) resource.push(prop)
-        i++
-      }
+      const result = parseProperties(lines, i + 1)
+      resource.push(...result.properties)
+      i = result.nextIndex
       continue
     }
 
@@ -91,29 +83,61 @@ function parseSubResource(
   const headerLine = lines[startIndex]
   const id = extractAttr(headerLine, 'id') ?? ''
   const type = extractAttr(headerLine, 'type') ?? 'Resource'
-  const properties: Property[] = []
+  const { properties, nextIndex } = parseProperties(lines, startIndex + 1)
+  return { subResource: { id, type, properties }, nextIndex }
+}
 
-  let i = startIndex + 1
+/**
+ * Parse a sequence of property lines, handling multi-line dict values
+ * (e.g. `data = { ... }` blocks that span several lines).
+ * Stops at a blank line, a section header, or end of file.
+ */
+function parseProperties(
+  lines: string[],
+  startIndex: number
+): { properties: Property[]; nextIndex: number } {
+  const properties: Property[] = []
+  let i = startIndex
+
   while (i < lines.length) {
     const line = lines[i]
-    // Stop at next section header or blank line (sub_resources are separated by blank lines)
-    if (line.trim() === '' || line.trim().startsWith('[')) {
+    const trimmed = line.trim()
+
+    if (trimmed === '' || trimmed.startsWith('[')) {
       break
     }
-    const prop = parseProperty(line)
-    if (prop) properties.push(prop)
+
+    const eqIndex = line.indexOf(' = ')
+    if (eqIndex === -1) {
+      i++
+      continue
+    }
+
+    const key = line.slice(0, eqIndex).trim()
+    const valueStr = line.slice(eqIndex + 3).trim()
+
+    // Detect multi-line dict: value starts with '{' but doesn't close on this line
+    if (valueStr.startsWith('{') && !valueStr.endsWith('}')) {
+      const dictLines = [valueStr]
+      i++
+      while (i < lines.length) {
+        dictLines.push(lines[i])
+        if (lines[i].trim() === '}') {
+          i++
+          break
+        }
+        i++
+      }
+      const raw = dictLines.join('\n')
+      properties.push({ key, value: parseValue(raw) })
+      continue
+    }
+
+    properties.push({ key, value: parseValue(valueStr) })
     i++
   }
 
-  return { subResource: { id, type, properties }, nextIndex: i }
-}
-
-function parseProperty(line: string): Property | null {
-  const eqIndex = line.indexOf(' = ')
-  if (eqIndex === -1) return null
-  const key = line.slice(0, eqIndex).trim()
-  const valueStr = line.slice(eqIndex + 3)
-  return { key, value: parseValue(valueStr) }
+  return { properties, nextIndex: i }
 }
 
 /**

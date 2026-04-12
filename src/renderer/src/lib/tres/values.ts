@@ -66,8 +66,8 @@ export function parseValue(raw: string): TresValue {
     return { kind: 'int', value: parseInt(raw, 10), raw }
   }
 
-  // Fallback: treat as string
-  return { kind: 'string', value: raw }
+  // Fallback: preserve raw value as-is
+  return { kind: 'raw', raw }
 }
 
 function parseGodotString(raw: string): string {
@@ -168,6 +168,8 @@ export function serializeValue(val: TresValue): string {
       return `Array[${val.elementType}]([${elems}])`
     }
     case 'dict':
+      return val.raw
+    case 'raw':
       return val.raw
   }
 }
