@@ -12,14 +12,17 @@ import { parseTresFile } from '../lib/tres/parser'
 import { serializeTresFile } from '../lib/tres/serializer'
 import { ITEMS_BY_PATH, ITEMS_META } from '../data/items'
 import { ATTACHMENT_SUBTYPE } from '../data/attachment-subtypes'
+import type { TraderKey } from '../data/quests'
 
 const currentFile = ref<SaveFileInfo | null>(null)
 const tresFile = ref<TresFile | null>(null)
 const worldFile = ref<TresFile | null>(null)
+const tradersFile = ref<TresFile | null>(null)
 const isLoading = ref(false)
 const isDirty = ref(false)
 const loadError = ref<string | null>(null)
 const worldLoadError = ref<string | null>(null)
+const tradersLoadError = ref<string | null>(null)
 
 function getStringProp(props: Property[], key: string): string {
   const prop = props.find((p) => p.key === key)
@@ -190,6 +193,25 @@ const worldState = computed<WorldState>(() => {
   }
 })
 
+function getStringArrayProp(props: Property[], key: string): string[] {
+  const prop = props.find((p) => p.key === key)
+  if (!prop || prop.value.kind !== 'typed_array') return []
+  return prop.value.elements
+    .filter((el): el is { kind: 'string'; value: string } => el.kind === 'string')
+    .map((el) => el.value)
+}
+
+const questCompletion = computed<Record<TraderKey, string[]>>(() => {
+  if (!tradersFile.value) return { generalist: [], doctor: [], gunsmith: [], grandma: [] }
+  const res = tradersFile.value.resource
+  return {
+    generalist: getStringArrayProp(res, 'generalist'),
+    doctor: getStringArrayProp(res, 'doctor'),
+    gunsmith: getStringArrayProp(res, 'gunsmith'),
+    grandma: getStringArrayProp(res, 'grandma')
+  }
+})
+
 export function useSaveEditor() {
   async function init(): Promise<void> {
     isLoading.value = true
@@ -209,6 +231,12 @@ export function useSaveEditor() {
     } catch (e) {
       worldLoadError.value = e instanceof Error ? e.message : 'Failed to load World.tres'
     }
+    try {
+      const tradersContent = await window.api.loadSave('Traders.tres')
+      tradersFile.value = parseTresFile(tradersContent)
+    } catch (e) {
+      tradersLoadError.value = e instanceof Error ? e.message : 'Failed to load Traders.tres'
+    }
     isLoading.value = false
   }
 
@@ -220,6 +248,10 @@ export function useSaveEditor() {
     if (worldFile.value) {
       const worldContent = serializeTresFile(worldFile.value)
       await window.api.saveSave('World.tres', worldContent)
+    }
+    if (tradersFile.value) {
+      const tradersContent = serializeTresFile(tradersFile.value)
+      await window.api.saveSave('Traders.tres', tradersContent)
     }
     isDirty.value = false
   }
@@ -531,6 +563,55 @@ export function useSaveEditor() {
     tresFile.value = { ...tresFile.value }
   }
 
+  function toggleQuestCompletion(traderKey: TraderKey, questName: string): void {
+    if (!tradersFile.value) return
+    const tres = tradersFile.value
+    const prop = tres.resource.find((p) => p.key === traderKey)
+    if (!prop || prop.value.kind !== 'typed_array') return
+
+    const idx = prop.value.elements.findIndex(
+      (el) => el.kind === 'string' && el.value === questName
+    )
+    if (idx >= 0) {
+      prop.value.elements.splice(idx, 1)
+    } else {
+      prop.value.elements.push({ kind: 'string', value: questName })
+    }
+    isDirty.value = true
+    tradersFile.value = { ...tres }
+  }
+
+  function setAllQuestsForTrader(
+    traderKey: TraderKey,
+    questNames: string[],
+    completed: boolean
+  ): void {
+    if (!tradersFile.value) return
+    const tres = tradersFile.value
+    const prop = tres.resource.find((p) => p.key === traderKey)
+    if (!prop || prop.value.kind !== 'typed_array') return
+
+    if (completed) {
+      const existing = new Set(
+        prop.value.elements
+          .filter((el): el is { kind: 'string'; value: string } => el.kind === 'string')
+          .map((el) => el.value)
+      )
+      for (const name of questNames) {
+        if (!existing.has(name)) {
+          prop.value.elements.push({ kind: 'string', value: name })
+        }
+      }
+    } else {
+      const toRemove = new Set(questNames)
+      prop.value.elements = prop.value.elements.filter(
+        (el) => !(el.kind === 'string' && toRemove.has(el.value))
+      )
+    }
+    isDirty.value = true
+    tradersFile.value = { ...tres }
+  }
+
   function updateWorldProp(key: keyof WorldState, value: number | string): void {
     if (!worldFile.value) return
     const prop = worldFile.value.resource.find((p) => p.key === key)
@@ -732,6 +813,11 @@ export function useSaveEditor() {
     worldState,
     worldFile,
     worldLoadError,
+    tradersFile,
+    tradersLoadError,
+    questCompletion,
+    toggleQuestCompletion,
+    setAllQuestsForTrader,
     isLoading,
     isDirty,
     loadError,
