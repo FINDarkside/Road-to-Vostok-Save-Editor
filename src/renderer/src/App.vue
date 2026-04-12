@@ -44,12 +44,13 @@ onMounted(() => {
       :default-value="defaultTab"
       class="flex-1 flex flex-col min-h-0"
     >
-      <div class="border-b border-border px-4">
-        <TabsList class="bg-transparent h-9">
+      <div class="border-b border-border">
+        <TabsList class="bg-transparent h-full p-0">
           <TabsTrigger value="character" :disabled="!!loadError">Character</TabsTrigger>
           <TabsTrigger value="inventory" :disabled="!!loadError">Inventory</TabsTrigger>
           <TabsTrigger value="cat" :disabled="!!loadError">Cat</TabsTrigger>
           <TabsTrigger value="world" :disabled="!!loadError || !worldFile">World</TabsTrigger>
+          <div class="w-px self-stretch bg-border" />
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="backups">Backups</TabsTrigger>
         </TabsList>

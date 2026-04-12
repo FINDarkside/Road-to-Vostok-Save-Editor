@@ -23,7 +23,7 @@ function dismiss(): void {
     </span>
     <div class="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
       <div
-        class="h-full rounded-full bg-primary transition-all"
+        class="h-full rounded-full bg-primary"
         :style="{ width: total > 0 ? `${(progress / total) * 100}%` : '0%' }"
       />
     </div>

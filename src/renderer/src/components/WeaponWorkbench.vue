@@ -6,7 +6,6 @@ import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
 import {
   getWeaponSlots,
-  resolveLayoutPath,
   resolveItemPath,
   ATTACHMENT_SUBTYPE,
   type AttachmentSubtype,
@@ -79,15 +78,7 @@ const slots = computed(() => {
   return getWeaponSlots(props.weapon.itemPath)
 })
 
-const previewNested = computed(() => {
-  if (!props.weapon) return []
-  const result: string[] = []
-  for (const itemPath of selectedPaths.value) {
-    const layoutPath = resolveLayoutPath(itemPath, props.weapon.itemPath)
-    result.push(layoutPath ?? itemPath)
-  }
-  return result
-})
+const previewNested = computed(() => [...selectedPaths.value])
 
 interface SlotPosition {
   subtype: AttachmentSubtype

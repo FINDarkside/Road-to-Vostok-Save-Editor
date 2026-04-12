@@ -3,6 +3,7 @@ import { ref, watch, onMounted, computed } from 'vue'
 import { useItemIcons } from '../composables/useItemIcons'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
+import { resolveLayoutPath } from '../data/attachment-subtypes'
 import type { AttachmentOverlay } from '../data/weapon-attachments'
 
 const props = withDefaults(
@@ -38,7 +39,8 @@ const resolvedAttachments = computed<ResolvedAttachment[]>(() => {
 
   const result: ResolvedAttachment[] = []
   for (const nestedPath of props.nested) {
-    const overlay = layouts.find((l) => l.attachmentPath === nestedPath)
+    const layoutPath = resolveLayoutPath(nestedPath, props.itemPath) ?? nestedPath
+    const overlay = layouts.find((l) => l.attachmentPath === layoutPath)
     if (!overlay) continue
     const item = ITEMS_BY_PATH.get(nestedPath)
     if (!item?.iconFile) continue
