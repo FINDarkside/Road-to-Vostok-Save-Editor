@@ -14,6 +14,7 @@ import { join, basename } from 'path'
 
 const DECOMPILED = join(__dirname, '../../Vostok RE/decompiled')
 const DECOMPILED_ITEMS = join(DECOMPILED, 'Items')
+const DECOMPILED_ASSETS = join(DECOMPILED, 'Assets')
 const DECOMPILED_SCRIPTS = join(DECOMPILED, 'Scripts')
 const OUT_ITEMS = join(__dirname, '../src/renderer/src/data/items.ts')
 const OUT_ATTACHMENTS = join(__dirname, '../src/renderer/src/data/weapon-attachments.ts')
@@ -31,6 +32,7 @@ const TYPE_TO_CATEGORY: Record<string, string> = {
   Electronics: 'Electronics',
   Fish: 'Fishing',
   Fishing: 'Fishing',
+  Furniture: 'Furniture',
   Grenade: 'Grenades',
   Helmet: 'Helmets',
   Instrument: 'Instruments',
@@ -123,15 +125,33 @@ async function resolveIconFile(
   content: string,
   fields: Record<string, string>
 ): Promise<string | null> {
-  // Try ExtResource reference first (most common)
-  const extRef = fields.icon?.match(/ExtResource\("([^"]+)"\)/)
-  if (extRef) {
-    const extResources = parseExtResources(content)
-    const iconPath = extResources.get(extRef[1])
-    if (iconPath) return resolveIconPath(iconPath)
+  const extResources = parseExtResources(content)
+
+  // Primary: extract icon from the tetris PackedScene. Matches what the game
+  // actually renders in the inventory grid (Item.gd line 53 instantiates
+  // tetris, whose root Sprite2D references the icon texture directly). This
+  // also handles items where the ItemData.icon field is null but the tetris
+  // scene still has the icon (e.g. AKS-74U_Magazine).
+  const tetrisRef = fields.tetris?.match(/ExtResource\("([^"]+)"\)/)
+  if (tetrisRef) {
+    const tetrisPath = extResources.get(tetrisRef[1])
+    if (tetrisPath) {
+      const iconFromTetris = await resolveTetrisIcon(tetrisPath)
+      if (iconFromTetris) return iconFromTetris
+    }
   }
 
-  // Try SubResource reference (icon embedded as sub_resource with load_path)
+  // Fallback: ExtResource reference on the icon field
+  const extRef = fields.icon?.match(/ExtResource\("([^"]+)"\)/)
+  if (extRef) {
+    const iconPath = extResources.get(extRef[1])
+    if (iconPath) {
+      const resolved = await resolveIconPath(iconPath)
+      if (resolved) return resolved
+    }
+  }
+
+  // Fallback: SubResource reference (icon embedded as sub_resource with load_path)
   const subRef = fields.icon?.match(/SubResource\("([^"]+)"\)/)
   if (subRef) {
     const subId = subRef[1]
@@ -143,6 +163,27 @@ async function resolveIconFile(
     if (loadPathMatch) return loadPathMatch[1]
   }
 
+  return null
+}
+
+/** Read a tetris .tscn and return the ctex filename of its first Icon_*.png Texture2D */
+async function resolveTetrisIcon(tetrisPath: string): Promise<string | null> {
+  const relPath = tetrisPath.replace(/^res:\/\//, '')
+  const scenePath = join(DECOMPILED, relPath)
+  try {
+    const sceneContent = await readFile(scenePath, 'utf-8')
+    for (const line of sceneContent.split('\n')) {
+      if (!line.startsWith('[ext_resource')) continue
+      if (!line.includes('type="Texture2D"')) continue
+      const pathMatch = line.match(/path="([^"]+)"/)
+      if (!pathMatch) continue
+      const iconPath = pathMatch[1]
+      if (!basename(iconPath).startsWith('Icon_')) continue
+      return resolveIconPath(iconPath)
+    }
+  } catch {
+    // Tetris scene not found
+  }
   return null
 }
 
@@ -382,7 +423,10 @@ async function main() {
   const itemClasses = await findItemDataClasses()
   console.log(`Item script classes: ${[...itemClasses].join(', ')}`)
 
-  const tresFiles = await findTresFiles(DECOMPILED_ITEMS)
+  const tresFiles = [
+    ...(await findTresFiles(DECOMPILED_ITEMS)),
+    ...(await findTresFiles(DECOMPILED_ASSETS))
+  ]
   console.log(`Found ${tresFiles.length} .tres files`)
 
   const items: ItemEntry[] = []
@@ -407,7 +451,7 @@ async function main() {
     }
 
     const id = basename(filePath, '.tres')
-    const relPath = filePath.replace(/\\/g, '/').replace(/^.*\/Items\//, 'res://Items/')
+    const relPath = filePath.replace(/\\/g, '/').replace(/^.*?\/(Items|Assets)\//, 'res://$1/')
 
     const size = parseVector2(fields.size) ?? { x: 1, y: 1 }
     const iconFile = await resolveIconFile(content, fields)

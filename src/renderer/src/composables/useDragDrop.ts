@@ -7,16 +7,25 @@ import type {
   SlotItem
 } from '../lib/types'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
-import { GRID_COLS, GRID_ROWS, CELL_SIZE, useInventoryGrid } from './useInventoryGrid'
+import { CELL_SIZE, useInventoryGrid } from './useInventoryGrid'
 import { useSaveEditor } from './useSaveEditor'
+
+type ActiveGrid = ReturnType<typeof useInventoryGrid>
 
 const dragState = ref<DragDropState | null>(null)
 
 // Module-level references set by InventoryGrid
+
 let gridContainer: HTMLElement | null = null
+
+let activeGrid: ActiveGrid | null = null
 let canPlaceFn:
   | ((col: number, row: number, w: number, h: number, excludeId?: string) => boolean)
   | null = null
+
+function getActiveCellSize(): number {
+  return activeGrid?.cellSize ?? CELL_SIZE
+}
 
 function buildPlacementFromSlotItem(item: SlotItem): GridItemPlacement {
   const catalogItem = ITEMS_BY_PATH.get(item.itemPath)
@@ -52,14 +61,18 @@ function snapToGrid(ds: DragDropState) {
   const relY = ds.clientY - rect.top
 
   const snap = ds.gridSnap
-  const col = Math.round((relX - (snap.w * CELL_SIZE) / 2) / CELL_SIZE)
-  const row = Math.round((relY - (snap.h * CELL_SIZE) / 2) / CELL_SIZE)
-  snap.col = Math.max(0, Math.min(GRID_COLS - snap.w, col))
-  snap.row = Math.max(0, Math.min(GRID_ROWS - snap.h, row))
+  const cellSize = getActiveCellSize()
+  const col = Math.round((relX - (snap.w * cellSize) / 2) / cellSize)
+  const row = Math.round((relY - (snap.h * cellSize) / 2) / cellSize)
+  const cols = activeGrid?.cols ?? 8
+  const rows = activeGrid?.rows ?? 13
+  snap.col = Math.max(0, Math.min(cols - snap.w, col))
+  snap.row = Math.max(0, Math.min(rows - snap.h, row))
 }
 
 function findSwapTarget(snap: GridSnapState, source: DragSource): GridItemPlacement | null {
-  const { occupancyMap, gridPlacements } = useInventoryGrid()
+  if (!activeGrid) return null
+  const { occupancyMap, gridPlacements, cols, rows } = activeGrid
   const excludeId = source.origin === 'grid' ? source.item.subResourceId : undefined
 
   const occupantIds = new Set<string>()
@@ -82,7 +95,7 @@ function findSwapTarget(snap: GridSnapState, source: DragSource): GridItemPlacem
     const bothExclude = new Set([src.subResourceId, occupantId])
     for (let r = src.row; r < src.row + occupant.h; r++) {
       for (let c = src.col; c < src.col + occupant.w; c++) {
-        if (c < 0 || r < 0 || c >= GRID_COLS || r >= GRID_ROWS) return null
+        if (c < 0 || r < 0 || c >= cols || r >= rows) return null
         const occ = occupancyMap.value.get(`${c},${r}`)
         if (occ && !bothExclude.has(occ)) return null
       }
@@ -128,7 +141,11 @@ function onDocumentPointerUp() {
 
   if (ds.gridSnap?.isValid) {
     const snap = ds.gridSnap
-    const { canPlace } = useInventoryGrid()
+    if (!activeGrid) {
+      cleanup()
+      return
+    }
+    const { canPlace } = activeGrid
     const excludeId = ds.source.origin === 'grid' ? ds.source.item.subResourceId : undefined
 
     if (canPlace(snap.col, snap.row, snap.w, snap.h, excludeId)) {
@@ -158,7 +175,11 @@ function onDocumentPointerUp() {
       // Grid to equipment — handle swap if slot is occupied
       const occupant = equipment.value.find((e) => e.slot === slotName)
       if (occupant) {
-        const { canPlace, findFreeSlot } = useInventoryGrid()
+        if (!activeGrid) {
+          cleanup()
+          return
+        }
+        const { canPlace, findFreeSlot } = activeGrid
         const occupantCatalog = ITEMS_BY_PATH.get(occupant.itemPath)
         const occupantSize = occupantCatalog ? getItemSize(occupantCatalog) : { w: 1, h: 1 }
         const src = ds.source.item
@@ -244,6 +265,7 @@ function cleanup() {
 export function useDragDrop() {
   function startDragFromGrid(placement: GridItemPlacement, event: PointerEvent) {
     event.preventDefault()
+    const cellSize = getActiveCellSize()
 
     dragState.value = {
       source: { origin: 'grid', item: placement },
@@ -255,8 +277,9 @@ export function useDragDrop() {
       ghostW: placement.w,
       ghostH: placement.h,
       ghostRotated: placement.rotated,
-      offsetX: (placement.w * CELL_SIZE) / 2,
-      offsetY: (placement.h * CELL_SIZE) / 2
+      ghostCellSize: cellSize,
+      offsetX: (placement.w * cellSize) / 2,
+      offsetY: (placement.h * cellSize) / 2
     }
 
     document.addEventListener('pointermove', onDocumentPointerMove)
@@ -267,6 +290,7 @@ export function useDragDrop() {
     event.preventDefault()
 
     const placement = buildPlacementFromSlotItem(item)
+    const cellSize = getActiveCellSize()
 
     dragState.value = {
       source: { origin: 'equipment', item: placement, equipmentSlot: slotName },
@@ -278,16 +302,18 @@ export function useDragDrop() {
       ghostW: placement.w,
       ghostH: placement.h,
       ghostRotated: placement.rotated,
-      offsetX: (placement.w * CELL_SIZE) / 2,
-      offsetY: (placement.h * CELL_SIZE) / 2
+      ghostCellSize: cellSize,
+      offsetX: (placement.w * cellSize) / 2,
+      offsetY: (placement.h * cellSize) / 2
     }
 
     document.addEventListener('pointermove', onDocumentPointerMove)
     document.addEventListener('pointerup', onDocumentPointerUp)
   }
 
-  function setGridContainer(el: HTMLElement | null) {
+  function setGridContainer(el: HTMLElement | null, grid: ActiveGrid | null = null) {
     gridContainer = el
+    activeGrid = el ? grid : null
   }
 
   function enterGrid(
@@ -295,6 +321,7 @@ export function useDragDrop() {
   ) {
     if (!dragState.value) return
 
+    const cellSize = getActiveCellSize()
     canPlaceFn = canPlace
     // Use last known ghost dimensions (preserves R-key rotations across grid re-entry)
     dragState.value.gridSnap = {
@@ -306,8 +333,9 @@ export function useDragDrop() {
       isValid: false
     }
 
-    dragState.value.offsetX = (dragState.value.ghostW * CELL_SIZE) / 2
-    dragState.value.offsetY = (dragState.value.ghostH * CELL_SIZE) / 2
+    dragState.value.ghostCellSize = cellSize
+    dragState.value.offsetX = (dragState.value.ghostW * cellSize) / 2
+    dragState.value.offsetY = (dragState.value.ghostH * cellSize) / 2
 
     snapToGrid(dragState.value)
     updateGridValidity()
@@ -327,7 +355,8 @@ export function useDragDrop() {
       const { equipment } = useSaveEditor()
       const occupant = equipment.value.find((e) => e.slot === slotName)
       if (occupant) {
-        const { canPlace, findFreeSlot } = useInventoryGrid()
+        if (!activeGrid) return
+        const { canPlace, findFreeSlot } = activeGrid
         const occupantCatalog = ITEMS_BY_PATH.get(occupant.itemPath)
         const occupantSize = occupantCatalog ? getItemSize(occupantCatalog) : { w: 1, h: 1 }
         const src = dragState.value.source.item
@@ -370,8 +399,10 @@ export function useDragDrop() {
     dragState.value.ghostH = snap.h
     dragState.value.ghostRotated = snap.rotated
 
-    dragState.value.offsetX = (snap.w * CELL_SIZE) / 2
-    dragState.value.offsetY = (snap.h * CELL_SIZE) / 2
+    const cellSize = getActiveCellSize()
+    dragState.value.ghostCellSize = cellSize
+    dragState.value.offsetX = (snap.w * cellSize) / 2
+    dragState.value.offsetY = (snap.h * cellSize) / 2
 
     snapToGrid(dragState.value)
     updateGridValidity()

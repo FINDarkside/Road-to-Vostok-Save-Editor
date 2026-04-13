@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, inject, onMounted, onUnmounted, watch } from 'vue'
-import { useInventoryGrid, GRID_COLS, GRID_ROWS, CELL_SIZE } from '../composables/useInventoryGrid'
+import {
+  useInventoryGrid,
+  GRID_COLS,
+  GRID_ROWS,
+  CATALOG_COLS,
+  CATALOG_ROWS,
+  CELL_SIZE,
+  CATALOG_CELL_SIZE
+} from '../composables/useInventoryGrid'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
@@ -9,8 +17,36 @@ import InventoryGridItem from './InventoryGridItem.vue'
 import ItemContextMenu from './ItemContextMenu.vue'
 import type { GridItemPlacement, SlotItem } from '../lib/types'
 
+const props = withDefaults(
+  defineProps<{
+    mode?: 'inventory' | 'catalog'
+  }>(),
+  { mode: 'inventory' }
+)
+
+const {
+  updateItemGridPosition,
+  removeItem,
+  addItem,
+  addCatalogItem,
+  items: inventoryItems,
+  catalogItems
+} = useSaveEditor()
+
+const sourceItems = props.mode === 'catalog' ? catalogItems : inventoryItems
+const gridCols = props.mode === 'catalog' ? CATALOG_COLS : GRID_COLS
+const gridRows = props.mode === 'catalog' ? CATALOG_ROWS : GRID_ROWS
+const cellSize = props.mode === 'catalog' ? CATALOG_CELL_SIZE : CELL_SIZE
+const addFn = props.mode === 'catalog' ? addCatalogItem : addItem
+
 const containerRef = ref<HTMLElement | null>(null)
-const { gridPlacements, canPlace, findFreeSlot, getConflicts } = useInventoryGrid()
+const gridInstance = useInventoryGrid({
+  items: sourceItems,
+  cols: gridCols,
+  rows: gridRows,
+  cellSize
+})
+const { gridPlacements, canPlace, findFreeSlot, getConflicts } = gridInstance
 const {
   dragState,
   startDragFromGrid,
@@ -20,7 +56,6 @@ const {
   onKeyDown,
   cancelDrag
 } = useDragDrop()
-const { updateItemGridPosition, removeItem, addItem, items: allItems } = useSaveEditor()
 const openWorkbench = inject<(weapon: SlotItem) => void>('openWorkbench')
 
 const contextMenu = ref<{ placement: GridItemPlacement; x: number; y: number } | null>(null)
@@ -38,7 +73,7 @@ const canDuplicate = computed(() => {
 
 function handleEditLoadout() {
   if (!contextMenu.value) return
-  const item = allItems.value.find(
+  const item = sourceItems.value.find(
     (i) => i.subResourceId === contextMenu.value!.placement.subResourceId
   )
   if (item) openWorkbench?.(item)
@@ -53,13 +88,13 @@ function handleDuplicate() {
   if (!contextMenu.value) return
   const p = contextMenu.value.placement
   if (p.itemPath === '') return
-  const original = allItems.value.find((i) => i.subResourceId === p.subResourceId)
+  const original = sourceItems.value.find((i) => i.subResourceId === p.subResourceId)
   if (!original) return
   const catalogItem = ITEMS_BY_PATH.get(original.itemPath)
   const size = catalogItem ? getItemSize(catalogItem) : { w: p.w, h: p.h }
   const slot = findFreeSlot(size.w, size.h)
   if (!slot) return
-  addItem(original.itemPath, {
+  addFn(original.itemPath, {
     condition: original.condition,
     amount: original.amount,
     gridCol: slot.col,
@@ -111,7 +146,7 @@ function handleKeyDown(event: KeyboardEvent): void {
 }
 
 onMounted(() => {
-  setGridContainer(containerRef.value)
+  setGridContainer(containerRef.value, gridInstance)
   window.addEventListener('keydown', handleKeyDown)
 })
 
@@ -139,8 +174,8 @@ watch(
   }
 )
 
-const gridWidth = GRID_COLS * CELL_SIZE
-const gridHeight = GRID_ROWS * CELL_SIZE
+const gridWidth = gridCols * cellSize
+const gridHeight = gridRows * cellSize
 
 // Build cell classes for drag highlighting
 function cellHighlight(col: number, row: number): string {
@@ -155,8 +190,8 @@ function cellHighlight(col: number, row: number): string {
 // Generate grid cells array
 const gridCells = computed(() => {
   const cells: { col: number; row: number }[] = []
-  for (let row = 0; row < GRID_ROWS; row++) {
-    for (let col = 0; col < GRID_COLS; col++) {
+  for (let row = 0; row < gridRows; row++) {
+    for (let col = 0; col < gridCols; col++) {
       cells.push({ col, row })
     }
   }
@@ -180,7 +215,7 @@ defineExpose({ findFreeSlot })
 
     <div
       ref="containerRef"
-      class="relative border border-border rounded bg-muted/20"
+      class="relative border border-border rounded bg-muted/20 shrink-0"
       :style="{ width: `${gridWidth}px`, height: `${gridHeight}px` }"
       @pointerenter="handleGridEnter"
       @pointerleave="handleGridLeave"
@@ -193,10 +228,10 @@ defineExpose({ findFreeSlot })
         class="absolute border border-border/20 transition-colors duration-75"
         :class="cellHighlight(cell.col, cell.row)"
         :style="{
-          left: `${cell.col * CELL_SIZE}px`,
-          top: `${cell.row * CELL_SIZE}px`,
-          width: `${CELL_SIZE}px`,
-          height: `${CELL_SIZE}px`
+          left: `${cell.col * cellSize}px`,
+          top: `${cell.row * cellSize}px`,
+          width: `${cellSize}px`,
+          height: `${cellSize}px`
         }"
       />
 
@@ -205,7 +240,7 @@ defineExpose({ findFreeSlot })
         v-for="p in gridPlacements"
         :key="p.subResourceId"
         :placement="p"
-        :cell-size="CELL_SIZE"
+        :cell-size="cellSize"
         :dimmed="dragState?.source.item.subResourceId === p.subResourceId"
         :class="{ 'ring-1 ring-amber-500/60': conflictIds.has(p.subResourceId) }"
         @dragstart="onItemDragStart"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
-import { useInventoryGrid } from '../composables/useInventoryGrid'
+import { useInventoryGrid, CATALOG_COLS, CATALOG_ROWS } from '../composables/useInventoryGrid'
 import { ITEMS, resolveItemMeta, getItemSize } from '../data/items'
 import {
   Dialog,
@@ -15,17 +15,39 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { useItemIcons } from '../composables/useItemIcons'
 
-const props = defineProps<{
-  open: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    target?: 'inventory' | 'catalog'
+  }>(),
+  { target: 'inventory' }
+)
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const { addItem } = useSaveEditor()
-const { findFreeSlot } = useInventoryGrid()
+const { addItem, addCatalogItem, catalogItems } = useSaveEditor()
+const { findFreeSlot: findInventorySlot } = useInventoryGrid()
+const { findFreeSlot: findCatalogSlot } = useInventoryGrid({
+  items: catalogItems,
+  cols: CATALOG_COLS,
+  rows: CATALOG_ROWS
+})
 const { getCachedIcon, loadIcon } = useItemIcons()
+
+const isCatalog = computed(() => props.target === 'catalog')
+const dialogTitle = computed(() => (isCatalog.value ? 'Add Furniture' : 'Add Item'))
+const searchPlaceholder = computed(() =>
+  isCatalog.value ? 'Search furniture...' : 'Search items...'
+)
+type ItemsArray = typeof ITEMS
+const visibleItems = computed<ItemsArray>(
+  () =>
+    (isCatalog.value
+      ? ITEMS.filter((i) => i.category === 'Furniture')
+      : ITEMS.filter((i) => i.category !== 'Furniture')) as ItemsArray
+)
 
 const iconTick = ref(0)
 
@@ -38,7 +60,7 @@ watch(
   () => props.open,
   async (open) => {
     if (!open) return
-    const toLoad = ITEMS.filter((i) => i.iconFile && !getCachedIcon(i.iconFile))
+    const toLoad = visibleItems.value.filter((i) => i.iconFile && !getCachedIcon(i.iconFile))
     if (!toLoad.length) return
     await Promise.all(toLoad.map((i) => loadIcon(i.iconFile!)))
     iconTick.value++
@@ -55,12 +77,12 @@ const addError = ref<string | null>(null)
 
 const categories = computed(() => {
   const cats = new Set<string>()
-  for (const item of ITEMS) cats.add(item.category)
+  for (const item of visibleItems.value) cats.add(item.category)
   return [...cats].sort()
 })
 
 const filteredItems = computed(() => {
-  let result = ITEMS as typeof ITEMS
+  let result = visibleItems.value
   if (selectedCategory.value) {
     result = result.filter((i) => i.category === selectedCategory.value)
   }
@@ -127,10 +149,13 @@ function confirm(): void {
   if (!selectedItem.value || !selectedMeta.value) return
 
   const size = getItemSize(selectedItem.value)
+  const findFreeSlot = isCatalog.value ? findCatalogSlot : findInventorySlot
   const slot = findFreeSlot(size.w, size.h)
 
   if (!slot) {
-    addError.value = 'No space available in inventory grid'
+    addError.value = isCatalog.value
+      ? 'No space available in furniture grid'
+      : 'No space available in inventory grid'
     return
   }
 
@@ -148,7 +173,8 @@ function confirm(): void {
 
   if (selectedMeta.value.showCondition) opts.condition = condition.value
   if (selectedMeta.value.showAmount) opts.amount = amount.value
-  addItem(selectedItem.value.resourcePath, opts)
+  const addFn = isCatalog.value ? addCatalogItem : addItem
+  addFn(selectedItem.value.resourcePath, opts)
   addError.value = null
   reset()
   emit('update:open', false)
@@ -176,18 +202,18 @@ function reset(): void {
   >
     <DialogContent class="max-w-lg h-[80vh] flex flex-col">
       <DialogHeader>
-        <DialogTitle>Add Item</DialogTitle>
+        <DialogTitle>{{ dialogTitle }}</DialogTitle>
       </DialogHeader>
 
       <div class="flex flex-col gap-3 flex-1 min-h-0">
         <Input
           v-model="search"
-          placeholder="Search items..."
+          :placeholder="searchPlaceholder"
           class="h-8 text-sm"
           @keydown="onKeydown"
         />
 
-        <div class="flex flex-wrap gap-1">
+        <div v-if="categories.length > 1" class="flex flex-wrap gap-1">
           <Badge
             v-for="cat in categories"
             :key="cat"

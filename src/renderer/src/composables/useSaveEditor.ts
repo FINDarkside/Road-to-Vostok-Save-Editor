@@ -133,6 +133,16 @@ const equipment = computed<SlotItem[]>(() => {
     .map((s) => subResourceToSlotItem(tres, s))
 })
 
+const catalogItems = computed<SlotItem[]>(() => {
+  if (!tresFile.value) return []
+  const tres = tresFile.value
+  const ids = getSubResourceIds(tres, 'catalog')
+  return ids
+    .map((id) => tres.subResources.find((s) => s.id === id))
+    .filter((s): s is SubResource => !!s)
+    .map((s) => subResourceToSlotItem(tres, s))
+})
+
 const stats = computed<CharacterStats>(() => {
   if (!tresFile.value) return { health: 0, energy: 0, hydration: 0, temperature: 0, mental: 0 }
   const res = tresFile.value.resource
@@ -276,6 +286,14 @@ export function useSaveEditor() {
       )
     }
 
+    // Remove from catalog array
+    const catProp = tres.resource.find((p) => p.key === 'catalog')
+    if (catProp && catProp.value.kind === 'typed_array') {
+      catProp.value.elements = catProp.value.elements.filter(
+        (el) => !(el.kind === 'sub_resource' && el.id === subResourceId)
+      )
+    }
+
     // Remove the sub_resource itself
     tres.subResources = tres.subResources.filter((s) => s.id !== subResourceId)
 
@@ -373,6 +391,103 @@ export function useSaveEditor() {
     const invProp = tres.resource.find((p) => p.key === 'inventory')
     if (invProp && invProp.value.kind === 'typed_array') {
       invProp.value.elements.push({ kind: 'sub_resource', id: subId })
+    }
+
+    updateLoadSteps(tres)
+
+    isDirty.value = true
+    tresFile.value = { ...tres }
+  }
+
+  function addCatalogItem(
+    resourcePath: string,
+    opts: {
+      condition?: number
+      amount?: number
+      gridCol?: number
+      gridRow?: number
+      gridRotated?: boolean
+    } = {}
+  ): void {
+    if (!tresFile.value) return
+    const tres = tresFile.value
+
+    // Find or create ext_resource for this item path
+    let extId = tres.extResources.find((e) => e.path === resourcePath)?.id
+    if (!extId) {
+      extId = String(Math.max(0, ...tres.extResources.map((e) => parseInt(e.id, 10))) + 1)
+      const newExt: ExtResource = {
+        id: extId,
+        type: 'Resource',
+        path: resourcePath,
+        raw: `[ext_resource type="Resource" path="${resourcePath}" id="${extId}"]`
+      }
+      tres.extResources.push(newExt)
+    }
+
+    const slotDataExt = tres.extResources.find((e) => e.path.endsWith('SlotData.gd'))
+    const slotDataId = slotDataExt?.id ?? '1'
+    const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
+    const itemDataId = itemDataExt?.id ?? '3'
+
+    let subId: string
+    do {
+      subId = 'Resource_' + randomAlphanumeric(5)
+    } while (tres.subResources.some((s) => s.id === subId))
+
+    const meta = ITEMS_META.get(resourcePath)
+    const condition = opts.condition ?? meta?.defaultCondition ?? 0
+    const amount = opts.amount ?? meta?.defaultAmount ?? 0
+
+    const newSub: SubResource = {
+      id: subId,
+      type: 'Resource',
+      properties: [
+        { key: 'script', value: { kind: 'ext_resource', id: slotDataId } },
+        { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
+        {
+          key: 'nested',
+          value: { kind: 'typed_array', elementType: `ExtResource("${itemDataId}")`, elements: [] }
+        },
+        {
+          key: 'storage',
+          value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
+        },
+        { key: 'condition', value: { kind: 'int', value: condition, raw: String(condition) } },
+        { key: 'amount', value: { kind: 'int', value: amount, raw: String(amount) } },
+        { key: 'position', value: { kind: 'int', value: 0, raw: '0' } },
+        { key: 'mode', value: { kind: 'int', value: 1, raw: '1' } },
+        { key: 'zoom', value: { kind: 'int', value: 1, raw: '1' } },
+        { key: 'chamber', value: { kind: 'bool', value: false } },
+        { key: 'casing', value: { kind: 'bool', value: false } },
+        { key: 'state', value: { kind: 'string', value: '' } },
+        {
+          key: 'gridPosition',
+          value: {
+            kind: 'vector2',
+            x: (opts.gridCol ?? 0) * 64,
+            y: (opts.gridRow ?? 0) * 64,
+            raw: `Vector2(${(opts.gridCol ?? 0) * 64}, ${(opts.gridRow ?? 0) * 64})`
+          }
+        },
+        { key: 'gridRotated', value: { kind: 'bool', value: opts.gridRotated ?? false } },
+        { key: 'slot', value: { kind: 'string', value: '' } }
+      ]
+    }
+
+    tres.subResources.push(newSub)
+
+    // Add to catalog array (create if missing)
+    let catProp = tres.resource.find((p) => p.key === 'catalog')
+    if (!catProp) {
+      catProp = {
+        key: 'catalog',
+        value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
+      }
+      tres.resource.push(catProp)
+    }
+    if (catProp.value.kind === 'typed_array') {
+      catProp.value.elements.push({ kind: 'sub_resource', id: subId })
     }
 
     updateLoadSteps(tres)
@@ -807,6 +922,7 @@ export function useSaveEditor() {
     currentFile,
     items,
     equipment,
+    catalogItems,
     stats,
     statusEffects,
     catStatus,
@@ -825,6 +941,7 @@ export function useSaveEditor() {
     init,
     saveFile,
     addItem,
+    addCatalogItem,
     addEquipmentItem,
     removeItem,
     setWeaponNested,

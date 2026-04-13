@@ -328,6 +328,7 @@ export const ITEMS = [
     nameInventory: 'Mag.',
     sizeW: 1,
     sizeH: 2,
+    iconFile: 'Icon_AKS-74U_Magazine.png-d554abd98d5f1b062844913131fa9476.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
     maxAmount: 30
@@ -1494,6 +1495,391 @@ export const ITEMS = [
     displayName: 'Roach',
     resourcePath: 'res://Items/Fishing/Roach/Roach.tres',
     iconFile: 'Icon_Roach.png-f9cec5d0630ea01a7042ae9acb6fc102.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Bed_Civilian_F',
+    displayName: 'Bed (Civilian)',
+    resourcePath: 'res://Assets/Bed_Civilian/Bed_Civilian_F.tres',
+    sizeW: 8,
+    sizeH: 3,
+    iconFile: 'Icon_Bed_Civilian.png-7083e516ef86cd08dba3764833382fac.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Bed_Nomad_F',
+    displayName: 'Bed (Nomad)',
+    resourcePath: 'res://Assets/Bed_Nomad/Bed_Nomad_F.tres',
+    sizeW: 7,
+    sizeH: 2,
+    iconFile: 'Icon_Bed_Nomad.png-5cb9a18123f8fc25cb1925cf9323a6e4.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Cabinet_Medical_F',
+    displayName: 'Cabinet (Medical)',
+    resourcePath: 'res://Assets/Cabinet_Medical/Cabinet_Medical_F.tres',
+    sizeW: 2,
+    sizeH: 2,
+    iconFile: 'Icon_Cabinet_Medical.png-3a84f5ea50e2b861d3e64023d7ad8271.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Cabinet_Office_F',
+    displayName: 'Cabinet (Office)',
+    resourcePath: 'res://Assets/Cabinet_Office/Cabinet_Office_F.tres',
+    sizeW: 2,
+    sizeH: 2,
+    iconFile: 'Icon_Cabinet_Office.png-478b825fdfe6104a98668cbf3ad60fe1.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Cabinet_Wood_F',
+    displayName: 'Cabinet (Wood)',
+    resourcePath: 'res://Assets/Cabinet_Wood/Cabinet_Wood_F.tres',
+    sizeW: 3,
+    sizeH: 3,
+    iconFile: 'Icon_Cabinet_Wood.png-e198ea9655ca2f8f6b5a9f8cf95612b8.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Carpet_Persian_F',
+    displayName: 'Carpet (Persian)',
+    resourcePath: 'res://Assets/Carpet/Carpet_Persian_F.tres',
+    nameRotated: 'Carpet P.',
+    sizeW: 4,
+    sizeH: 1,
+    iconFile: 'Icon_Carpet_Persian.png-f475ae3b8fcfa2fcdc63475ebde4ed88.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Carpet_Rag_F',
+    displayName: 'Carpet (Rag)',
+    resourcePath: 'res://Assets/Carpet/Carpet_Rag_F.tres',
+    nameRotated: 'Carpet R.',
+    sizeW: 4,
+    sizeH: 1,
+    iconFile: 'Icon_Carpet_Rag.png-827dc2fdc23a8040c586c322a1a63660.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Chair_Office_F',
+    displayName: 'Chair (Office)',
+    resourcePath: 'res://Assets/Chair_Office/Chair_Office_F.tres',
+    sizeW: 2,
+    sizeH: 3,
+    iconFile: 'Icon_Chair_Office.png-e354e3090a474aed8432392d33099a3f.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Chair_School_F',
+    displayName: 'Chair (School)',
+    resourcePath: 'res://Assets/Chair_School/Chair_School_F.tres',
+    sizeW: 2,
+    sizeH: 3,
+    iconFile: 'Icon_Chair_School.png-2f6ff2e7da94cdeacbe802299dbf1861.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Crate_Military_F',
+    displayName: 'Crate (Military)',
+    resourcePath: 'res://Assets/Crate_Military/Crate_Military_F.tres',
+    sizeW: 3,
+    sizeH: 2,
+    iconFile: 'Icon_Crate_Military.png-4910f86309d366c9c4e2c55e911536ed.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Crate_Special_F',
+    displayName: 'Crate (Special)',
+    resourcePath: 'res://Assets/Crate_Special/Crate_Special_F.tres',
+    sizeW: 4,
+    sizeH: 4,
+    iconFile: 'Icon_Crate_Special.png-9d030fee5dcbe4ce0af8392b2926ea5b.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Cupboard_F',
+    displayName: 'Cupboard',
+    resourcePath: 'res://Assets/Cupboard/Cupboard_F.tres',
+    sizeW: 2,
+    sizeH: 3,
+    iconFile: 'Icon_Cupboard.png-38c9b115d9b51d3890cbe93ce1d278cd.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Curtain_Long_F',
+    displayName: 'Curtain (Long)',
+    resourcePath: 'res://Assets/Curtains/Curtain_Long_F.tres',
+    nameRotated: 'Curtain L.',
+    sizeW: 8,
+    sizeH: 1,
+    iconFile: 'Icon_Curtain_Long.png-231334051a0593f336ec9512077e7f5f.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Curtain_Mini_F',
+    displayName: 'Curtain (Mini)',
+    resourcePath: 'res://Assets/Curtains/Curtain_Mini_F.tres',
+    nameRotated: 'Curtain M.',
+    sizeW: 5,
+    sizeH: 1,
+    iconFile: 'Icon_Curtain_Mini.png-afea71aa56fdf01fc2b890fc2cfa2a21.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Dartboard_F',
+    displayName: 'Dartboard',
+    resourcePath: 'res://Assets/Dartboard/Dartboard_F.tres',
+    sizeW: 3,
+    sizeH: 4,
+    iconFile: 'Icon_Dartboard.png-b85f80054f1c536d995523633669b7fa.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Freezer_F',
+    displayName: 'Freezer',
+    resourcePath: 'res://Assets/Freezer/Freezer_F.tres',
+    sizeW: 5,
+    sizeH: 4,
+    iconFile: 'Icon_Freezer.png-2e12fc34e7e5f830c4a9bfa67810604b.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Fridge_F',
+    displayName: 'Fridge',
+    resourcePath: 'res://Assets/Fridge/Fridge_F.tres',
+    sizeW: 2,
+    sizeH: 3,
+    iconFile: 'Icon_Fridge.png-b6a1148e0356945bdf7eeea79ef2b4b8.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Locker_F',
+    displayName: 'Locker',
+    resourcePath: 'res://Assets/Locker/Locker_F.tres',
+    sizeW: 4,
+    sizeH: 7,
+    iconFile: 'Icon_Locker.png-1ba714ef638fbfc1084cd9e828f568e4.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Nightstand_F',
+    displayName: 'Nightstand',
+    resourcePath: 'res://Assets/Nightstand/Nightstand_F.tres',
+    sizeW: 2,
+    sizeH: 2,
+    iconFile: 'Icon_Nightstand.png-e9ad64f7476638076652f38ef41539f7.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Painting_Lake_F',
+    displayName: 'Painting (Lake)',
+    resourcePath: 'res://Assets/Painting/Painting_Lake_F.tres',
+    sizeW: 3,
+    sizeH: 2,
+    iconFile: 'Icon_Painting_Lake.png-fa250c56abe09cea86df8f3437ff38df.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Pallet_F',
+    displayName: 'Pallet',
+    resourcePath: 'res://Assets/Pallet/Pallet_F.tres',
+    sizeW: 4,
+    sizeH: 2,
+    iconFile: 'Icon_Pallet.png-a80eb64a2c0a8ff0d52ff683248e7a09.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Poster_Posture_F',
+    displayName: 'Poster (Posture)',
+    resourcePath: 'res://Assets/Posters/Poster_Posture_F.tres',
+    sizeW: 2,
+    sizeH: 2,
+    iconFile: 'Icon_Poster_Posture.png-89c146b4663c6cd6245f19cadd5e0a93.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Rack_Coat_F',
+    displayName: 'Rack (Coat)',
+    resourcePath: 'res://Assets/Rack_Coat/Rack_Coat_F.tres',
+    nameRotated: 'Rack C.',
+    sizeW: 2,
+    sizeH: 1,
+    iconFile: 'Icon_Rack_Coat.png-f6c264639fc95894f0eb4ed9836bf81d.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Rya_Maria_F',
+    displayName: 'Rya (Maria)',
+    resourcePath: 'res://Assets/Rya/Rya_Maria_F.tres',
+    nameRotated: 'Rya M.',
+    sizeW: 6,
+    sizeH: 1,
+    iconFile: 'Icon_Rya_Maria.png-4a0eebd40a899496fb10f20c9b1ab7dc.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Shelf_Metal_F',
+    displayName: 'Shelf (Metal)',
+    resourcePath: 'res://Assets/Shelf_Metal/Shelf_Metal_F.tres',
+    sizeW: 4,
+    sizeH: 7,
+    iconFile: 'Icon_Shelf_Metal.png-bcf249632238b7ca7b774b62dd3a03e3.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Shelf_Wall_F',
+    displayName: 'Shelf (Wall)',
+    resourcePath: 'res://Assets/Shelf_Wall/Shelf_Wall_F.tres',
+    nameRotated: 'Shelf W.',
+    sizeW: 3,
+    sizeH: 1,
+    iconFile: 'Icon_Shelf_Wall.png-e73033694edebfcf634850ccb6231524.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Shelf_Wood_F',
+    displayName: 'Shelf (Wood)',
+    resourcePath: 'res://Assets/Shelf_Wood/Shelf_Wood_F.tres',
+    sizeW: 4,
+    sizeH: 7,
+    iconFile: 'Icon_Shelf_Wood.png-8ebbd1502ee9e47aa54efe33e8b017e4.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Sign_Border_Zone_F',
+    displayName: 'Sign (Border Zone)',
+    resourcePath: 'res://Assets/Sign_Border_Zone/Sign_Border_Zone_F.tres',
+    sizeW: 2,
+    sizeH: 3,
+    iconFile: 'Icon_Sign_Border_Zone.png-180bea1b476a8d4366fa6dd89fd48335.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Sofa_Leather_F',
+    displayName: 'Sofa (Leather)',
+    resourcePath: 'res://Assets/Sofa_Leather/Sofa_Leather_F.tres',
+    sizeW: 7,
+    sizeH: 4,
+    iconFile: 'Icon_Sofa_Leather.png-27b4484d1c0b793ea6872fb662c5a6cf.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Stool_Military_F',
+    displayName: 'Stool (Military)',
+    resourcePath: 'res://Assets/Stool_Military/Stool_Military_F.tres',
+    sizeW: 2,
+    sizeH: 2,
+    iconFile: 'Icon_Stool_Military.png-ebca8dbbbbbb6fe134d527d9a0875768.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Stool_Padded_F',
+    displayName: 'Stool (Padded)',
+    resourcePath: 'res://Assets/Stool_Padded/Stool_Padded_F.tres',
+    sizeW: 2,
+    sizeH: 2,
+    iconFile: 'Icon_Stool_Padded.png-5617fd5d3bdaaf5aafa340dfbf706ae3.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Stove_F',
+    displayName: 'Stove',
+    resourcePath: 'res://Assets/Stove/Stove_F.tres',
+    sizeW: 3,
+    sizeH: 3,
+    iconFile: 'Icon_Stove.png-865cfaa8eca1d41d9acde6128dda3e77.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Chair_Sun',
+    displayName: 'Sun Chair',
+    resourcePath: 'res://Assets/Chair_Sun/Chair_Sun.tres',
+    sizeW: 3,
+    sizeH: 4,
+    iconFile: 'Icon_Chair_Sun.png-814940abaf19c590346df2ceae40d7e0.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Table_Cabin_F',
+    displayName: 'Table (Cabin)',
+    resourcePath: 'res://Assets/Table_Cabin/Table_Cabin_F.tres',
+    sizeW: 8,
+    sizeH: 4,
+    iconFile: 'Icon_Table_Cabin.png-59d6b4dd67aeccbff7f80e3ba4fb2b5e.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Table_Canteen_F',
+    displayName: 'Table (Canteen)',
+    resourcePath: 'res://Assets/Table_Canteen/Table_Canteen_F.tres',
+    sizeW: 7,
+    sizeH: 3,
+    iconFile: 'Icon_Table_Canteen.png-dff7e2f1c764fb64fe45e0412b6c221a.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Table_Kitchen_F',
+    displayName: 'Table (Kitchen)',
+    resourcePath: 'res://Assets/Table_Kitchen/Table_Kitchen_F.tres',
+    sizeW: 4,
+    sizeH: 4,
+    iconFile: 'Icon_Table_Kitchen.png-f228e3b848b3ad0eb5a6bf0af4827bc7.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Table_Office_F',
+    displayName: 'Table (Office)',
+    resourcePath: 'res://Assets/Table_Office/Table_Office_F.tres',
+    sizeW: 6,
+    sizeH: 3,
+    iconFile: 'Icon_Table_Office.png-4dc485d9121e122a2da987c8ccaa6f94.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Target_Stand_F',
+    displayName: 'Target Stand',
+    resourcePath: 'res://Assets/Target_Stand/Target_Stand_F.tres',
+    sizeW: 4,
+    sizeH: 6,
+    iconFile: 'Icon_Target_Stand.png-09b40f433d47b907ae5ad937662d0398.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Television_F',
+    displayName: 'Television',
+    resourcePath: 'res://Assets/Television/Television_F.tres',
+    sizeW: 2,
+    sizeH: 2,
+    iconFile: 'Icon_Television.png-9776ac3dea6e0caae2c7f55722a372f6.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Trolley_Short_F',
+    displayName: 'Trolley (Short)',
+    resourcePath: 'res://Assets/Trolley/Trolley_Short_F.tres',
+    sizeW: 3,
+    sizeH: 4,
+    iconFile: 'Icon_Trolley_Short.png-33762705d9c4e3c9475903bac362482c.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Trolley_Tall_F',
+    displayName: 'Trolley (Tall)',
+    resourcePath: 'res://Assets/Trolley/Trolley_Tall_F.tres',
+    sizeW: 3,
+    sizeH: 6,
+    iconFile: 'Icon_Trolley_Tall.png-645ad2600d9066afda51e61c539bbcb5.s3tc.ctex'
+  },
+  {
+    category: 'Furniture',
+    id: 'Weapon_Display_F',
+    displayName: 'Weapon Display',
+    resourcePath: 'res://Assets/Weapon_Display/Weapon_Display_F.tres',
+    sizeW: 8,
+    sizeH: 8,
+    iconFile: 'Icon_Weapon_Display.png-6d52e0e096a03becb815747f1edfe6e8.s3tc.ctex'
   },
   {
     category: 'Grenades',

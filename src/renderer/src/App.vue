@@ -4,6 +4,7 @@ import { useSaveEditor } from './composables/useSaveEditor'
 import TitleBar from './components/TitleBar.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import InventoryPanel from './components/InventoryPanel.vue'
+import FurniturePanel from './components/FurniturePanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import BackupsPanel from './components/BackupsPanel.vue'
 import CatPanel from './components/CatPanel.vue'
@@ -19,9 +20,20 @@ import type { SlotItem } from './lib/types'
 const { tresFile, worldFile, tradersFile, isLoading, loadError, init } = useSaveEditor()
 
 const addDialogOpen = ref(false)
+const addDialogTarget = ref<'inventory' | 'catalog'>('inventory')
 const workbenchOpen = ref(false)
 const workbenchWeapon = ref<SlotItem | null>(null)
 const defaultTab = computed(() => (loadError.value ? 'backups' : 'inventory'))
+
+function openInventoryAddDialog() {
+  addDialogTarget.value = 'inventory'
+  addDialogOpen.value = true
+}
+
+function openFurnitureAddDialog() {
+  addDialogTarget.value = 'catalog'
+  addDialogOpen.value = true
+}
 
 provide('openWorkbench', (weapon: SlotItem) => {
   workbenchWeapon.value = weapon
@@ -50,6 +62,7 @@ onMounted(() => {
         <TabsList class="bg-transparent h-full p-0">
           <TabsTrigger value="character" :disabled="!!loadError">Character</TabsTrigger>
           <TabsTrigger value="inventory" :disabled="!!loadError">Inventory</TabsTrigger>
+          <TabsTrigger value="furniture" :disabled="!!loadError">Furniture</TabsTrigger>
           <TabsTrigger value="cat" :disabled="!!loadError">Cat</TabsTrigger>
           <TabsTrigger value="world" :disabled="!!loadError || !worldFile">World</TabsTrigger>
           <TabsTrigger value="quests" :disabled="!!loadError || !tradersFile">Quests</TabsTrigger>
@@ -66,7 +79,12 @@ onMounted(() => {
 
       <TabsContent v-if="loadError" value="inventory" class="flex-1 min-h-0 p-4 mt-0" />
       <TabsContent v-else value="inventory" class="flex-1 min-h-0 p-4 mt-0">
-        <InventoryPanel @open-add-dialog="addDialogOpen = true" />
+        <InventoryPanel @open-add-dialog="openInventoryAddDialog" />
+      </TabsContent>
+
+      <TabsContent v-if="loadError" value="furniture" class="flex-1 min-h-0 p-4 mt-0" />
+      <TabsContent v-else value="furniture" class="flex-1 min-h-0 p-4 mt-0">
+        <FurniturePanel @open-add-dialog="openFurnitureAddDialog" />
       </TabsContent>
 
       <TabsContent v-if="loadError" value="cat" class="flex-1 min-h-0 p-4 mt-0" />
@@ -98,7 +116,7 @@ onMounted(() => {
     </Tabs>
 
     <IconStatusBanner />
-    <AddItemDialog v-model:open="addDialogOpen" />
+    <AddItemDialog v-model:open="addDialogOpen" :target="addDialogTarget" />
     <WeaponWorkbench v-model:open="workbenchOpen" :weapon="workbenchWeapon" />
     <ToastContainer />
   </div>

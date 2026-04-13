@@ -1,19 +1,34 @@
-import { computed } from 'vue'
+import { computed, type Ref } from 'vue'
 import { useSaveEditor } from './useSaveEditor'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
-import type { GridItemPlacement } from '../lib/types'
+import type { GridItemPlacement, SlotItem } from '../lib/types'
 
 export const GRID_COLS = 8
 export const GRID_ROWS = 13
+export const CATALOG_COLS = 24
+export const CATALOG_ROWS = 39
 export const GAME_CELL_SIZE = 64
-/** UI cell size in pixels (used by grid, equipment panel, drag ghost) */
+/** UI cell size in pixels for the inventory grid */
 export const CELL_SIZE = 56
+/** UI cell size in pixels for the catalog grid (smaller because furniture is large) */
+export const CATALOG_CELL_SIZE = 32
 
-export function useInventoryGrid() {
-  const { items } = useSaveEditor()
+export interface UseInventoryGridOptions {
+  items?: Ref<SlotItem[]>
+  cols?: number
+  rows?: number
+  cellSize?: number
+}
+
+export function useInventoryGrid(opts: UseInventoryGridOptions = {}) {
+  const { items: defaultItems } = useSaveEditor()
+  const sourceItems = opts.items ?? defaultItems
+  const cols = opts.cols ?? GRID_COLS
+  const rows = opts.rows ?? GRID_ROWS
+  const cellSize = opts.cellSize ?? CELL_SIZE
 
   const gridPlacements = computed<GridItemPlacement[]>(() => {
-    return items.value.map((item) => {
+    return sourceItems.value.map((item) => {
       const catalogItem = ITEMS_BY_PATH.get(item.itemPath)
       const baseSize = catalogItem ? getItemSize(catalogItem) : { w: 1, h: 1 }
       const w = item.gridRotated ? baseSize.h : baseSize.w
@@ -56,7 +71,7 @@ export function useInventoryGrid() {
   })
 
   function canPlace(col: number, row: number, w: number, h: number, excludeId?: string): boolean {
-    if (col < 0 || row < 0 || col + w > GRID_COLS || row + h > GRID_ROWS) return false
+    if (col < 0 || row < 0 || col + w > cols || row + h > rows) return false
     for (let r = row; r < row + h; r++) {
       for (let c = col; c < col + w; c++) {
         const occupant = occupancyMap.value.get(`${c},${r}`)
@@ -72,15 +87,15 @@ export function useInventoryGrid() {
     excludeId?: string
   ): { col: number; row: number; rotated: boolean } | null {
     // Try normal orientation
-    for (let row = 0; row <= GRID_ROWS - h; row++) {
-      for (let col = 0; col <= GRID_COLS - w; col++) {
+    for (let row = 0; row <= rows - h; row++) {
+      for (let col = 0; col <= cols - w; col++) {
         if (canPlace(col, row, w, h, excludeId)) return { col, row, rotated: false }
       }
     }
     // Try rotated orientation (only if dimensions differ)
     if (w !== h) {
-      for (let row = 0; row <= GRID_ROWS - w; row++) {
-        for (let col = 0; col <= GRID_COLS - h; col++) {
+      for (let row = 0; row <= rows - w; row++) {
+        for (let col = 0; col <= cols - h; col++) {
           if (canPlace(col, row, h, w, excludeId)) return { col, row, rotated: true }
         }
       }
@@ -94,7 +109,7 @@ export function useInventoryGrid() {
 
     for (const p of gridPlacements.value) {
       // Out of bounds check
-      if (p.col < 0 || p.row < 0 || p.col + p.w > GRID_COLS || p.row + p.h > GRID_ROWS) {
+      if (p.col < 0 || p.row < 0 || p.col + p.w > cols || p.row + p.h > rows) {
         conflicts.add(p.subResourceId)
         continue
       }
@@ -117,6 +132,9 @@ export function useInventoryGrid() {
   }
 
   return {
+    cols,
+    rows,
+    cellSize,
     gridPlacements,
     occupancyMap,
     canPlace,

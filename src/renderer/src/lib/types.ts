@@ -13,6 +13,7 @@ export type ItemCategory =
   | 'Consumables'
   | 'Electronics'
   | 'Fishing'
+  | 'Furniture'
   | 'Grenades'
   | 'Helmets'
   | 'Instruments'
@@ -157,6 +158,8 @@ export interface DragDropState {
   ghostW: number
   ghostH: number
   ghostRotated: boolean
+  /** UI cell size used to render the ghost */
+  ghostCellSize: number
   /** Grab offset for ghost rendering */
   offsetX: number
   offsetY: number

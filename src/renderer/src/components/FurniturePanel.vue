@@ -4,10 +4,9 @@ import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
 import { Button } from '../components/ui/button'
 import { Trash2 } from 'lucide-vue-next'
-import EquipmentPanel from './EquipmentPanel.vue'
 import InventoryGrid from './InventoryGrid.vue'
 import InventoryGridItem from './InventoryGridItem.vue'
-const { items } = useSaveEditor()
+const { catalogItems } = useSaveEditor()
 const { dragState, enterDeleteZone, leaveDeleteZone } = useDragDrop()
 
 const ghostPlacement = computed(() => {
@@ -41,20 +40,19 @@ defineEmits<{
 <template>
   <div class="flex flex-col h-full">
     <div class="flex items-center gap-2 mb-2">
-      <h2 class="text-sm font-semibold">Inventory ({{ items.length }})</h2>
+      <h2 class="text-sm font-semibold">Furniture ({{ catalogItems.length }})</h2>
       <Button size="sm" class="ml-auto h-7 text-xs" @click="$emit('openAddDialog')">
-        + Add Item
+        + Add Furniture
       </Button>
     </div>
 
     <div class="flex gap-4 flex-1 min-h-0 overflow-auto">
-      <EquipmentPanel />
-      <InventoryGrid ref="gridRef" />
+      <InventoryGrid mode="catalog" />
 
       <!-- Delete zone: visible during drag, fills remaining space -->
       <div
         v-if="dragState"
-        class="flex items-center justify-center flex-1 mr-2 rounded border-2 border-dashed transition-colors"
+        class="sticky top-0 flex items-center justify-center flex-1 mr-2 rounded border-2 border-dashed transition-colors self-start h-20"
         :class="
           dragState.deleteHover
             ? 'border-red-500 bg-red-500/15 text-red-400'
