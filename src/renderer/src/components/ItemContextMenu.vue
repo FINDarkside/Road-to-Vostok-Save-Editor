@@ -7,8 +7,9 @@ withDefaults(
     x: number
     y: number
     showEditLoadout?: boolean
+    canDuplicate?: boolean
   }>(),
-  { showEditLoadout: false }
+  { showEditLoadout: false, canDuplicate: true }
 )
 
 const emit = defineEmits<{
@@ -57,8 +58,10 @@ onUnmounted(() => {
         Edit Loadout
       </button>
       <button
-        class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-        @click="emit('duplicate')"
+        class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-inherit"
+        :disabled="!canDuplicate"
+        :title="canDuplicate ? undefined : 'Cannot duplicate modded items'"
+        @click="canDuplicate && emit('duplicate')"
       >
         <Copy class="h-3.5 w-3.5" />
         Duplicate

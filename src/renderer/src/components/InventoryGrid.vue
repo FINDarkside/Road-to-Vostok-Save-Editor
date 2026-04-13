@@ -31,6 +31,11 @@ const showEditLoadout = computed(() => {
   return p.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(p.itemPath)
 })
 
+const canDuplicate = computed(() => {
+  if (!contextMenu.value) return false
+  return contextMenu.value.placement.itemPath !== ''
+})
+
 function handleEditLoadout() {
   if (!contextMenu.value) return
   const item = allItems.value.find(
@@ -47,6 +52,7 @@ function onItemContextMenu(placement: GridItemPlacement, event: MouseEvent) {
 function handleDuplicate() {
   if (!contextMenu.value) return
   const p = contextMenu.value.placement
+  if (p.itemPath === '') return
   const original = allItems.value.find((i) => i.subResourceId === p.subResourceId)
   if (!original) return
   const catalogItem = ITEMS_BY_PATH.get(original.itemPath)
@@ -212,6 +218,7 @@ defineExpose({ findFreeSlot })
       :x="contextMenu.x"
       :y="contextMenu.y"
       :show-edit-loadout="showEditLoadout"
+      :can-duplicate="canDuplicate"
       @edit-loadout="handleEditLoadout"
       @duplicate="handleDuplicate"
       @delete="handleDelete"

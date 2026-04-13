@@ -66,6 +66,11 @@ const showEditLoadout = computed(() => {
   return item.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(item.itemPath)
 })
 
+const canDuplicate = computed(() => {
+  if (!contextMenu.value) return false
+  return contextMenu.value.item.itemPath !== ''
+})
+
 function handleEditLoadout() {
   if (!contextMenu.value) return
   openWorkbench?.(contextMenu.value.item)
@@ -82,6 +87,7 @@ function onSlotContextMenu(slot: SlotDef, event: MouseEvent) {
 function handleDuplicate() {
   if (!contextMenu.value) return
   const item = contextMenu.value.item
+  if (item.itemPath === '') return
   const catalogItem = ITEMS_BY_PATH.get(item.itemPath)
   const w = catalogItem?.sizeW ?? 1
   const h = catalogItem?.sizeH ?? 1
@@ -372,6 +378,7 @@ const gridHeight = ROWS * CELL_SIZE
       :x="contextMenu.x"
       :y="contextMenu.y"
       :show-edit-loadout="showEditLoadout"
+      :can-duplicate="canDuplicate"
       @edit-loadout="handleEditLoadout"
       @duplicate="handleDuplicate"
       @delete="handleDelete"
