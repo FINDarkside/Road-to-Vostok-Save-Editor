@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Copy, ShieldX, Trash2, Wrench } from 'lucide-vue-next'
+import { Copy, Hammer, ShieldX, Trash2, Unplug, Wrench } from 'lucide-vue-next'
 import type { AttachmentRemoveOption } from '../lib/types'
 
 withDefaults(
@@ -11,6 +11,7 @@ withDefaults(
     editLoadoutLabel?: string
     removePlateLabel?: string
     removeAttachmentOptions?: AttachmentRemoveOption[]
+    showFullCondition?: boolean
     canDuplicate?: boolean
   }>(),
   {
@@ -18,6 +19,7 @@ withDefaults(
     editLoadoutLabel: 'Edit Loadout',
     removePlateLabel: '',
     removeAttachmentOptions: () => [],
+    showFullCondition: false,
     canDuplicate: true
   }
 )
@@ -28,6 +30,7 @@ const emit = defineEmits<{
   editLoadout: []
   removePlate: []
   removeAttachment: [path: string]
+  fullCondition: []
   close: []
 }>()
 
@@ -58,9 +61,17 @@ onUnmounted(() => {
   <Teleport to="body">
     <div
       ref="menuRef"
-      class="fixed z-50 min-w-[140px] rounded-md border border-border bg-popover p-1 shadow-md"
+      class="fixed z-50 min-w-[170px] rounded-md border border-border bg-popover p-1 shadow-md"
       :style="{ left: `${x}px`, top: `${y}px` }"
     >
+      <button
+        v-if="showFullCondition"
+        class="flex w-full items-center gap-2 whitespace-nowrap rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+        @click="emit('fullCondition')"
+      >
+        <Hammer class="h-3.5 w-3.5" />
+        Set Full Condition
+      </button>
       <button
         v-if="showEditLoadout"
         class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
@@ -83,7 +94,7 @@ onUnmounted(() => {
         class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
         @click="emit('removeAttachment', option.path)"
       >
-        <Wrench class="h-3.5 w-3.5" />
+        <Unplug class="h-3.5 w-3.5" />
         {{ option.label }}
       </button>
       <button

@@ -53,6 +53,7 @@ const slots: SlotDef[] = [
 
 const {
   equipment,
+  updateItem,
   removeItem,
   addItem,
   addEquipmentItem,
@@ -115,6 +116,11 @@ const removeAttachmentOptions = computed<AttachmentRemoveOption[]>(() => {
 const canDuplicate = computed(() => {
   if (!contextMenu.value) return false
   return contextMenu.value.item.itemPath !== ''
+})
+
+const showFullCondition = computed(() => {
+  const item = contextMenu.value?.item
+  return !!item?.showCondition && item.condition < 100
 })
 
 function handleEditLoadout() {
@@ -194,6 +200,12 @@ function handleRemoveAttachment(path: string) {
   if (!removeWeaponAttachment(weapon.subResourceId, path, slot)) {
     toast.show('Failed to remove attachment')
   }
+  contextMenu.value = null
+}
+
+function handleFullCondition() {
+  if (!contextMenu.value) return
+  updateItem(contextMenu.value.item.subResourceId, { condition: 100 })
   contextMenu.value = null
 }
 
@@ -514,7 +526,9 @@ const gridHeight = ROWS * CELL_SIZE
       :edit-loadout-label="editLoadoutLabel"
       :remove-plate-label="removePlateLabel"
       :remove-attachment-options="removeAttachmentOptions"
+      :show-full-condition="showFullCondition"
       :can-duplicate="canDuplicate"
+      @full-condition="handleFullCondition"
       @edit-loadout="handleEditLoadout"
       @remove-plate="handleRemovePlate"
       @remove-attachment="handleRemoveAttachment"

@@ -28,6 +28,7 @@ const props = withDefaults(
 
 const {
   updateItemGridPosition,
+  updateItem,
   removeItem,
   addItem,
   addCatalogItem,
@@ -104,6 +105,11 @@ const removeAttachmentOptions = computed<AttachmentRemoveOption[]>(() => {
 const canDuplicate = computed(() => {
   if (!contextMenu.value) return false
   return contextMenu.value.placement.itemPath !== ''
+})
+
+const showFullCondition = computed(() => {
+  const placement = contextMenu.value?.placement
+  return !!placement?.showCondition && placement.condition < 100
 })
 
 function handleEditLoadout() {
@@ -189,6 +195,12 @@ function handleRemoveAttachment(path: string) {
   if (!removeWeaponAttachment(weapon.subResourceId, path, slot)) {
     toast.show('Failed to remove attachment')
   }
+  contextMenu.value = null
+}
+
+function handleFullCondition() {
+  if (!contextMenu.value) return
+  updateItem(contextMenu.value.placement.subResourceId, { condition: 100 })
   contextMenu.value = null
 }
 
@@ -385,7 +397,9 @@ defineExpose({ findFreeSlot })
       :edit-loadout-label="editLoadoutLabel"
       :remove-plate-label="removePlateLabel"
       :remove-attachment-options="removeAttachmentOptions"
+      :show-full-condition="showFullCondition"
       :can-duplicate="canDuplicate"
+      @full-condition="handleFullCondition"
       @edit-loadout="handleEditLoadout"
       @remove-plate="handleRemovePlate"
       @remove-attachment="handleRemoveAttachment"
