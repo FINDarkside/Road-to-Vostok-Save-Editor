@@ -1,11 +1,5 @@
 import { ref, computed } from 'vue'
-import type {
-  TresFile,
-  ExtResource,
-  SubResource,
-  Property,
-  TresTypedArray
-} from '../lib/tres/types'
+import type { TresFile, SubResource, Property, TresTypedArray } from '../lib/tres/types'
 import type {
   SlotItem,
   CharacterStats,
@@ -332,89 +326,8 @@ export function useSaveEditor() {
   ): void {
     if (!tresFile.value) return
     const tres = tresFile.value
-
-    // Find or create ext_resource for this item path
-    let extId = tres.extResources.find((e) => e.path === resourcePath)?.id
-    if (!extId) {
-      extId = String(Math.max(0, ...tres.extResources.map((e) => parseInt(e.id, 10))) + 1)
-      const newExt: ExtResource = {
-        id: extId,
-        type: 'Resource',
-        path: resourcePath,
-        raw: `[ext_resource type="Resource" path="${resourcePath}" id="${extId}"]`
-      }
-      tres.extResources.push(newExt)
-    }
-
-    // Find the SlotData script ext_resource id
-    const slotDataExt = tres.extResources.find((e) => e.path.endsWith('SlotData.gd'))
-    const slotDataId = slotDataExt?.id ?? '1'
-
-    // Find the ItemData script ext_resource id (for typed arrays)
-    const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
-    const itemDataId = itemDataExt?.id ?? '3'
-
-    // Generate unique sub_resource ID
-    let subId: string
-    do {
-      subId = 'Resource_' + randomAlphanumeric(5)
-    } while (tres.subResources.some((s) => s.id === subId))
-
-    const meta = ITEMS_META.get(resourcePath)
-    const condition = opts.condition ?? meta?.defaultCondition ?? 0
-    const amount = opts.amount ?? meta?.defaultAmount ?? 0
-    const nestedExtIds = ensureExtResourceIds(tres, opts.nestedPaths ?? [])
-
-    const newSub: SubResource = {
-      id: subId,
-      type: 'Resource',
-      properties: [
-        { key: 'script', value: { kind: 'ext_resource', id: slotDataId } },
-        { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
-        {
-          key: 'nested',
-          value: {
-            kind: 'typed_array',
-            elementType: `ExtResource("${itemDataId}")`,
-            elements: nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
-          }
-        },
-        {
-          key: 'storage',
-          value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
-        },
-        { key: 'condition', value: { kind: 'int', value: condition, raw: String(condition) } },
-        { key: 'amount', value: { kind: 'int', value: amount, raw: String(amount) } },
-        { key: 'position', value: { kind: 'int', value: 0, raw: '0' } },
-        { key: 'mode', value: { kind: 'int', value: 1, raw: '1' } },
-        { key: 'zoom', value: { kind: 'int', value: 1, raw: '1' } },
-        { key: 'chamber', value: { kind: 'bool', value: false } },
-        { key: 'casing', value: { kind: 'bool', value: false } },
-        { key: 'state', value: { kind: 'string', value: '' } },
-        {
-          key: 'gridPosition',
-          value: {
-            kind: 'vector2',
-            x: (opts.gridCol ?? 0) * 64,
-            y: (opts.gridRow ?? 0) * 64,
-            raw: `Vector2(${(opts.gridCol ?? 0) * 64}, ${(opts.gridRow ?? 0) * 64})`
-          }
-        },
-        { key: 'gridRotated', value: { kind: 'bool', value: opts.gridRotated ?? false } },
-        { key: 'slot', value: { kind: 'string', value: '' } }
-      ]
-    }
-
-    tres.subResources.push(newSub)
-
-    // Add to inventory array
-    const invProp = tres.resource.find((p) => p.key === 'inventory')
-    if (invProp && invProp.value.kind === 'typed_array') {
-      invProp.value.elements.push({ kind: 'sub_resource', id: subId })
-    }
-
+    addSlotItem(tres, 'inventory', resourcePath, opts)
     updateLoadSteps(tres)
-
     isDirty.value = true
     tresFile.value = { ...tres }
   }
@@ -432,92 +345,8 @@ export function useSaveEditor() {
   ): void {
     if (!tresFile.value) return
     const tres = tresFile.value
-
-    // Find or create ext_resource for this item path
-    let extId = tres.extResources.find((e) => e.path === resourcePath)?.id
-    if (!extId) {
-      extId = String(Math.max(0, ...tres.extResources.map((e) => parseInt(e.id, 10))) + 1)
-      const newExt: ExtResource = {
-        id: extId,
-        type: 'Resource',
-        path: resourcePath,
-        raw: `[ext_resource type="Resource" path="${resourcePath}" id="${extId}"]`
-      }
-      tres.extResources.push(newExt)
-    }
-
-    const slotDataExt = tres.extResources.find((e) => e.path.endsWith('SlotData.gd'))
-    const slotDataId = slotDataExt?.id ?? '1'
-    const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
-    const itemDataId = itemDataExt?.id ?? '3'
-
-    let subId: string
-    do {
-      subId = 'Resource_' + randomAlphanumeric(5)
-    } while (tres.subResources.some((s) => s.id === subId))
-
-    const meta = ITEMS_META.get(resourcePath)
-    const condition = opts.condition ?? meta?.defaultCondition ?? 0
-    const amount = opts.amount ?? meta?.defaultAmount ?? 0
-    const nestedExtIds = ensureExtResourceIds(tres, opts.nestedPaths ?? [])
-
-    const newSub: SubResource = {
-      id: subId,
-      type: 'Resource',
-      properties: [
-        { key: 'script', value: { kind: 'ext_resource', id: slotDataId } },
-        { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
-        {
-          key: 'nested',
-          value: {
-            kind: 'typed_array',
-            elementType: `ExtResource("${itemDataId}")`,
-            elements: nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
-          }
-        },
-        {
-          key: 'storage',
-          value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
-        },
-        { key: 'condition', value: { kind: 'int', value: condition, raw: String(condition) } },
-        { key: 'amount', value: { kind: 'int', value: amount, raw: String(amount) } },
-        { key: 'position', value: { kind: 'int', value: 0, raw: '0' } },
-        { key: 'mode', value: { kind: 'int', value: 1, raw: '1' } },
-        { key: 'zoom', value: { kind: 'int', value: 1, raw: '1' } },
-        { key: 'chamber', value: { kind: 'bool', value: false } },
-        { key: 'casing', value: { kind: 'bool', value: false } },
-        { key: 'state', value: { kind: 'string', value: '' } },
-        {
-          key: 'gridPosition',
-          value: {
-            kind: 'vector2',
-            x: (opts.gridCol ?? 0) * 64,
-            y: (opts.gridRow ?? 0) * 64,
-            raw: `Vector2(${(opts.gridCol ?? 0) * 64}, ${(opts.gridRow ?? 0) * 64})`
-          }
-        },
-        { key: 'gridRotated', value: { kind: 'bool', value: opts.gridRotated ?? false } },
-        { key: 'slot', value: { kind: 'string', value: '' } }
-      ]
-    }
-
-    tres.subResources.push(newSub)
-
-    // Add to catalog array (create if missing)
-    let catProp = tres.resource.find((p) => p.key === 'catalog')
-    if (!catProp) {
-      catProp = {
-        key: 'catalog',
-        value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
-      }
-      tres.resource.push(catProp)
-    }
-    if (catProp.value.kind === 'typed_array') {
-      catProp.value.elements.push({ kind: 'sub_resource', id: subId })
-    }
-
+    addSlotItem(tres, 'catalog', resourcePath, opts)
     updateLoadSteps(tres)
-
     isDirty.value = true
     tresFile.value = { ...tres }
   }
@@ -529,80 +358,8 @@ export function useSaveEditor() {
   ): void {
     if (!tresFile.value) return
     const tres = tresFile.value
-
-    // Find or create ext_resource for this item path
-    let extId = tres.extResources.find((e) => e.path === resourcePath)?.id
-    if (!extId) {
-      extId = String(Math.max(0, ...tres.extResources.map((e) => parseInt(e.id, 10))) + 1)
-      const newExt: ExtResource = {
-        id: extId,
-        type: 'Resource',
-        path: resourcePath,
-        raw: `[ext_resource type="Resource" path="${resourcePath}" id="${extId}"]`
-      }
-      tres.extResources.push(newExt)
-    }
-
-    const slotDataExt = tres.extResources.find((e) => e.path.endsWith('SlotData.gd'))
-    const slotDataId = slotDataExt?.id ?? '1'
-    const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
-    const itemDataId = itemDataExt?.id ?? '3'
-
-    let subId: string
-    do {
-      subId = 'Resource_' + randomAlphanumeric(5)
-    } while (tres.subResources.some((s) => s.id === subId))
-
-    const meta = ITEMS_META.get(resourcePath)
-    const condition = opts.condition ?? meta?.defaultCondition ?? 0
-    const amount = opts.amount ?? meta?.defaultAmount ?? 0
-    const nestedExtIds = ensureExtResourceIds(tres, opts.nestedPaths ?? [])
-
-    const newSub: SubResource = {
-      id: subId,
-      type: 'Resource',
-      properties: [
-        { key: 'script', value: { kind: 'ext_resource', id: slotDataId } },
-        { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
-        {
-          key: 'nested',
-          value: {
-            kind: 'typed_array',
-            elementType: `ExtResource("${itemDataId}")`,
-            elements: nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
-          }
-        },
-        {
-          key: 'storage',
-          value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
-        },
-        { key: 'condition', value: { kind: 'int', value: condition, raw: String(condition) } },
-        { key: 'amount', value: { kind: 'int', value: amount, raw: String(amount) } },
-        { key: 'position', value: { kind: 'int', value: 0, raw: '0' } },
-        { key: 'mode', value: { kind: 'int', value: 1, raw: '1' } },
-        { key: 'zoom', value: { kind: 'int', value: 1, raw: '1' } },
-        { key: 'chamber', value: { kind: 'bool', value: false } },
-        { key: 'casing', value: { kind: 'bool', value: false } },
-        { key: 'state', value: { kind: 'string', value: '' } },
-        {
-          key: 'gridPosition',
-          value: { kind: 'vector2', x: 0, y: 0, raw: 'Vector2(0, 0)' }
-        },
-        { key: 'gridRotated', value: { kind: 'bool', value: false } },
-        { key: 'slot', value: { kind: 'string', value: slotName } }
-      ]
-    }
-
-    tres.subResources.push(newSub)
-
-    // Add to equipment array
-    const eqProp = tres.resource.find((p) => p.key === 'equipment')
-    if (eqProp && eqProp.value.kind === 'typed_array') {
-      eqProp.value.elements.push({ kind: 'sub_resource', id: subId })
-    }
-
+    addSlotItem(tres, 'equipment', resourcePath, { ...opts, slot: slotName })
     updateLoadSteps(tres)
-
     isDirty.value = true
     tresFile.value = { ...tres }
   }
@@ -687,7 +444,7 @@ export function useSaveEditor() {
     const looseAttachmentAmount = getNumberProp(attachmentSub.properties, 'amount')
 
     if (ejectedPath && ejectedSlot) {
-      createInventorySubResource(tres, ejectedPath, {
+      addSlotItem(tres, 'inventory', ejectedPath, {
         amount: subtype === 'Magazine' ? oldWeaponAmount : undefined,
         gridCol: ejectedSlot.col,
         gridRow: ejectedSlot.row,
@@ -723,7 +480,7 @@ export function useSaveEditor() {
     const subtype = ATTACHMENT_SUBTYPE.get(attachmentPath)
     const amount =
       subtype === 'Magazine' ? getNumberProp(weaponSub.properties, 'amount') : undefined
-    createInventorySubResource(tres, attachmentPath, {
+    addSlotItem(tres, 'inventory', attachmentPath, {
       amount,
       gridCol: slot.col,
       gridRow: slot.row,
@@ -1063,8 +820,11 @@ function updateLoadSteps(tres: TresFile): void {
   }
 }
 
-function createInventorySubResource(
+type SlotItemTarget = 'inventory' | 'catalog' | 'equipment'
+
+function addSlotItem(
   tres: TresFile,
+  target: SlotItemTarget,
   resourcePath: string,
   opts: {
     condition?: number
@@ -1073,6 +833,8 @@ function createInventorySubResource(
     gridRow?: number
     gridRotated?: boolean
     nestedPaths?: string[]
+    /** Equipment slot name; defaults to ''. Only meaningful when target is 'equipment'. */
+    slot?: string
   } = {}
 ): string {
   const extId = ensureExtResourceIds(tres, [resourcePath])[0]
@@ -1090,6 +852,8 @@ function createInventorySubResource(
   const meta = ITEMS_META.get(resourcePath)
   const condition = opts.condition ?? meta?.defaultCondition ?? 0
   const amount = opts.amount ?? meta?.defaultAmount ?? 0
+  const gridCol = opts.gridCol ?? 0
+  const gridRow = opts.gridRow ?? 0
 
   const newSub: SubResource = {
     id: subId,
@@ -1121,21 +885,28 @@ function createInventorySubResource(
         key: 'gridPosition',
         value: {
           kind: 'vector2',
-          x: (opts.gridCol ?? 0) * 64,
-          y: (opts.gridRow ?? 0) * 64,
-          raw: `Vector2(${(opts.gridCol ?? 0) * 64}, ${(opts.gridRow ?? 0) * 64})`
+          x: gridCol * 64,
+          y: gridRow * 64,
+          raw: `Vector2(${gridCol * 64}, ${gridRow * 64})`
         }
       },
       { key: 'gridRotated', value: { kind: 'bool', value: opts.gridRotated ?? false } },
-      { key: 'slot', value: { kind: 'string', value: '' } }
+      { key: 'slot', value: { kind: 'string', value: opts.slot ?? '' } }
     ]
   }
 
   tres.subResources.push(newSub)
 
-  const invProp = tres.resource.find((p) => p.key === 'inventory')
-  if (invProp && invProp.value.kind === 'typed_array') {
-    invProp.value.elements.push({ kind: 'sub_resource', id: subId })
+  let arrayProp = tres.resource.find((p) => p.key === target)
+  if (!arrayProp && target === 'catalog') {
+    arrayProp = {
+      key: 'catalog',
+      value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
+    }
+    tres.resource.push(arrayProp)
+  }
+  if (arrayProp && arrayProp.value.kind === 'typed_array') {
+    arrayProp.value.elements.push({ kind: 'sub_resource', id: subId })
   }
 
   return subId
