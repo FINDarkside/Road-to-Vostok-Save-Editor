@@ -1,5 +1,11 @@
 import { ref, computed } from 'vue'
-import type { TresFile, ExtResource, SubResource, Property } from '../lib/tres/types'
+import type {
+  TresFile,
+  ExtResource,
+  SubResource,
+  Property,
+  TresTypedArray
+} from '../lib/tres/types'
 import type {
   SlotItem,
   CharacterStats,
@@ -24,23 +30,23 @@ const loadError = ref<string | null>(null)
 const worldLoadError = ref<string | null>(null)
 const tradersLoadError = ref<string | null>(null)
 
-function getStringProp(props: Property[], key: string): string {
+function getStringProp(props: Property[], key: string, fallback = ''): string {
   const prop = props.find((p) => p.key === key)
-  if (!prop) return ''
-  return prop.value.kind === 'string' ? prop.value.value : ''
+  if (!prop) return fallback
+  return prop.value.kind === 'string' ? prop.value.value : fallback
 }
 
-function getNumberProp(props: Property[], key: string): number {
+function getNumberProp(props: Property[], key: string, fallback = 0): number {
   const prop = props.find((p) => p.key === key)
-  if (!prop) return 0
+  if (!prop) return fallback
   if (prop.value.kind === 'int' || prop.value.kind === 'float') return prop.value.value
-  return 0
+  return fallback
 }
 
-function getBoolProp(props: Property[], key: string): boolean {
+function getBoolProp(props: Property[], key: string, fallback = false): boolean {
   const prop = props.find((p) => p.key === key)
-  if (!prop) return false
-  return prop.value.kind === 'bool' ? prop.value.value : false
+  if (!prop) return fallback
+  return prop.value.kind === 'bool' ? prop.value.value : fallback
 }
 
 function resolveItemPath(tres: TresFile, sub: SubResource): string {
@@ -66,6 +72,7 @@ function resolveNestedPaths(tres: TresFile, sub: SubResource): string[] {
 function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
   const itemPath = resolveItemPath(tres, sub)
   const catalogItem = ITEMS_BY_PATH.get(itemPath)
+  const itemMeta = ITEMS_META.get(itemPath)
   const nested = resolveNestedPaths(tres, sub)
   const armorPlatePath = nested.find((path) => ITEMS_BY_PATH.get(path)?.plate) ?? ''
   const armorPlate = armorPlatePath ? ITEMS_BY_PATH.get(armorPlatePath) : undefined
@@ -88,10 +95,10 @@ function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
       catalogItem?.displayName ??
       'Unknown',
     category: catalogItem?.category ?? '',
-    condition: getNumberProp(sub.properties, 'condition'),
-    showCondition: (ITEMS_META.get(itemPath)?.showCondition ?? false) || isPlatedRig,
-    amount: getNumberProp(sub.properties, 'amount'),
-    showAmount: ITEMS_META.get(itemPath)?.showAmount ?? false,
+    condition: getNumberProp(sub.properties, 'condition', itemMeta?.defaultCondition ?? 0),
+    showCondition: (itemMeta?.showCondition ?? false) || isPlatedRig,
+    amount: getNumberProp(sub.properties, 'amount', itemMeta?.defaultAmount ?? 0),
+    showAmount: itemMeta?.showAmount ?? false,
     chamber: getBoolProp(sub.properties, 'chamber'),
     gridPosition: {
       x: getVector2Prop(sub.properties, 'gridPosition')?.x ?? 0,
@@ -154,11 +161,11 @@ const stats = computed<CharacterStats>(() => {
   if (!tresFile.value) return { health: 0, energy: 0, hydration: 0, temperature: 0, mental: 0 }
   const res = tresFile.value.resource
   return {
-    health: getNumberProp(res, 'health'),
-    energy: getNumberProp(res, 'energy'),
-    hydration: getNumberProp(res, 'hydration'),
-    temperature: getNumberProp(res, 'temperature'),
-    mental: getNumberProp(res, 'mental')
+    health: getNumberProp(res, 'health', 100),
+    energy: getNumberProp(res, 'energy', 100),
+    hydration: getNumberProp(res, 'hydration', 100),
+    temperature: getNumberProp(res, 'temperature', 100),
+    mental: getNumberProp(res, 'mental', 100)
   }
 })
 
@@ -193,7 +200,7 @@ const catStatus = computed<CatStatus>(() => {
   if (!tresFile.value) return { cat: 0, catFound: false, catDead: false }
   const res = tresFile.value.resource
   return {
-    cat: getNumberProp(res, 'cat'),
+    cat: getNumberProp(res, 'cat', 100),
     catFound: getBoolProp(res, 'catFound'),
     catDead: getBoolProp(res, 'catDead')
   }
@@ -203,10 +210,10 @@ const worldState = computed<WorldState>(() => {
   if (!worldFile.value) return { difficulty: 1, season: 1, day: 1, weather: 'Neutral' }
   const res = worldFile.value.resource
   return {
-    difficulty: getNumberProp(res, 'difficulty'),
-    season: getNumberProp(res, 'season'),
-    day: getNumberProp(res, 'day'),
-    weather: getStringProp(res, 'weather')
+    difficulty: getNumberProp(res, 'difficulty', 1),
+    season: getNumberProp(res, 'season', 1),
+    day: getNumberProp(res, 'day', 1),
+    weather: getStringProp(res, 'weather', 'Neutral')
   }
 })
 
@@ -786,54 +793,36 @@ export function useSaveEditor() {
 
   function updateStat(key: keyof CharacterStats, value: number): void {
     if (!tresFile.value) return
-    const prop = tresFile.value.resource.find((p) => p.key === key)
-    if (prop && (prop.value.kind === 'float' || prop.value.kind === 'int')) {
-      prop.value = { kind: 'float', value, raw: String(value) }
-      isDirty.value = true
-      tresFile.value = { ...tresFile.value }
-    }
+    setResourceNumberProperty(tresFile.value.resource, key, value)
+    isDirty.value = true
+    tresFile.value = { ...tresFile.value }
   }
 
   function updateStatusEffect(key: keyof StatusEffects, value: boolean): void {
     if (!tresFile.value) return
-    const prop = tresFile.value.resource.find((p) => p.key === key)
-    if (prop && prop.value.kind === 'bool') {
-      prop.value = { kind: 'bool', value }
-      isDirty.value = true
-      tresFile.value = { ...tresFile.value }
-    }
+    setResourceBoolProperty(tresFile.value.resource, key, value)
+    isDirty.value = true
+    tresFile.value = { ...tresFile.value }
   }
 
   function updateCatHealth(value: number): void {
     if (!tresFile.value) return
-    const prop = tresFile.value.resource.find((p) => p.key === 'cat')
-    if (prop && (prop.value.kind === 'float' || prop.value.kind === 'int')) {
-      prop.value = { kind: 'float', value, raw: String(value) }
-      isDirty.value = true
-      tresFile.value = { ...tresFile.value }
-    }
+    setResourceNumberProperty(tresFile.value.resource, 'cat', value)
+    isDirty.value = true
+    tresFile.value = { ...tresFile.value }
   }
 
   function reviveCat(): void {
     if (!tresFile.value) return
-    const deadProp = tresFile.value.resource.find((p) => p.key === 'catDead')
-    if (deadProp && deadProp.value.kind === 'bool') {
-      deadProp.value = { kind: 'bool', value: false }
-    }
-    const healthProp = tresFile.value.resource.find((p) => p.key === 'cat')
-    if (healthProp && (healthProp.value.kind === 'float' || healthProp.value.kind === 'int')) {
-      healthProp.value = { kind: 'float', value: 100, raw: '100' }
-    }
+    setResourceBoolProperty(tresFile.value.resource, 'catDead', false)
+    setResourceNumberProperty(tresFile.value.resource, 'cat', 100)
     isDirty.value = true
     tresFile.value = { ...tresFile.value }
   }
 
   function killCat(): void {
     if (!tresFile.value) return
-    const deadProp = tresFile.value.resource.find((p) => p.key === 'catDead')
-    if (deadProp && deadProp.value.kind === 'bool') {
-      deadProp.value = { kind: 'bool', value: true }
-    }
+    setResourceBoolProperty(tresFile.value.resource, 'catDead', true)
     isDirty.value = true
     tresFile.value = { ...tresFile.value }
   }
@@ -841,8 +830,7 @@ export function useSaveEditor() {
   function toggleQuestCompletion(traderKey: TraderKey, questName: string): void {
     if (!tradersFile.value) return
     const tres = tradersFile.value
-    const prop = tres.resource.find((p) => p.key === traderKey)
-    if (!prop || prop.value.kind !== 'typed_array') return
+    const prop = ensureStringArrayProperty(tres.resource, traderKey)
 
     const idx = prop.value.elements.findIndex(
       (el) => el.kind === 'string' && el.value === questName
@@ -863,8 +851,7 @@ export function useSaveEditor() {
   ): void {
     if (!tradersFile.value) return
     const tres = tradersFile.value
-    const prop = tres.resource.find((p) => p.key === traderKey)
-    if (!prop || prop.value.kind !== 'typed_array') return
+    const prop = ensureStringArrayProperty(tres.resource, traderKey)
 
     if (completed) {
       const existing = new Set(
@@ -889,19 +876,16 @@ export function useSaveEditor() {
 
   function updateWorldProp(key: keyof WorldState, value: number | string): void {
     if (!worldFile.value) return
-    const prop = worldFile.value.resource.find((p) => p.key === key)
-    if (!prop) return
     if (typeof value === 'string') {
-      prop.value = { kind: 'string', value }
+      setResourceStringProperty(worldFile.value.resource, key, value)
     } else {
-      prop.value = { kind: 'int', value, raw: String(value) }
+      setResourceNumberProperty(worldFile.value.resource, key, value, 'int')
     }
     isDirty.value = true
     worldFile.value = { ...worldFile.value }
   }
 
   function maxAllStats(): void {
-    if (!tresFile.value) return
     const keys: (keyof CharacterStats)[] = [
       'health',
       'energy',
@@ -910,13 +894,8 @@ export function useSaveEditor() {
       'mental'
     ]
     for (const key of keys) {
-      const prop = tresFile.value.resource.find((p) => p.key === key)
-      if (prop && (prop.value.kind === 'float' || prop.value.kind === 'int')) {
-        prop.value = { kind: 'float', value: 100, raw: '100' }
-      }
+      updateStat(key, 100)
     }
-    isDirty.value = true
-    tresFile.value = { ...tresFile.value }
   }
 
   function updateItemGridPosition(
@@ -950,24 +929,10 @@ export function useSaveEditor() {
     if (!sub) return
 
     if (updates.condition !== undefined) {
-      const prop = sub.properties.find((p) => p.key === 'condition')
-      if (prop) {
-        prop.value = {
-          kind: 'int',
-          value: updates.condition,
-          raw: String(updates.condition)
-        }
-      }
+      setNumberProperty(sub, 'condition', updates.condition)
     }
     if (updates.amount !== undefined) {
-      const prop = sub.properties.find((p) => p.key === 'amount')
-      if (prop) {
-        prop.value = {
-          kind: 'int',
-          value: updates.amount,
-          raw: String(updates.amount)
-        }
-      }
+      setNumberProperty(sub, 'amount', updates.amount)
     }
 
     isDirty.value = true
@@ -1205,6 +1170,59 @@ function setNestedPaths(tres: TresFile, sub: SubResource, nestedPaths: string[])
     elementType: `ExtResource("${itemDataId}")`,
     elements: extIds.map((id) => ({ kind: 'ext_resource' as const, id }))
   }
+}
+
+function setResourceNumberProperty(
+  props: Property[],
+  key: string,
+  value: number,
+  numberKind: 'float' | 'int' = 'float'
+): void {
+  const prop = props.find((p) => p.key === key)
+  const raw = String(value)
+  if (prop) {
+    prop.value = { kind: numberKind, value, raw }
+  } else {
+    props.push({ key, value: { kind: numberKind, value, raw } })
+  }
+}
+
+function setResourceStringProperty(props: Property[], key: string, value: string): void {
+  const prop = props.find((p) => p.key === key)
+  if (prop) {
+    prop.value = { kind: 'string', value }
+  } else {
+    props.push({ key, value: { kind: 'string', value } })
+  }
+}
+
+function setResourceBoolProperty(props: Property[], key: string, value: boolean): void {
+  const prop = props.find((p) => p.key === key)
+  if (prop) {
+    prop.value = { kind: 'bool', value }
+  } else {
+    props.push({ key, value: { kind: 'bool', value } })
+  }
+}
+
+function ensureStringArrayProperty(
+  props: Property[],
+  key: string
+): Property & { value: TresTypedArray } {
+  const existing = props.find((p) => p.key === key)
+  if (existing?.value.kind === 'typed_array') {
+    return existing as Property & { value: TresTypedArray }
+  }
+
+  const value: TresTypedArray = { kind: 'typed_array', elementType: 'String', elements: [] }
+  if (existing) {
+    existing.value = value
+    return existing as Property & { value: TresTypedArray }
+  }
+
+  const prop: Property & { value: TresTypedArray } = { key, value }
+  props.push(prop)
+  return prop
 }
 
 function ensureExtResourceIds(tres: TresFile, resourcePaths: string[]): string[] {
