@@ -53,7 +53,10 @@ export function useInventoryGrid(opts: UseInventoryGridOptions = {}) {
         w,
         h,
         rotated: item.gridRotated,
-        nested: item.nested
+        nested: item.nested,
+        armorRating: item.armorRating,
+        carrier: item.carrier,
+        armorPlatePath: item.armorPlatePath
       }
     })
   })

@@ -3,6 +3,7 @@ import { computed, inject, ref } from 'vue'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useInventoryGrid, CELL_SIZE } from '../composables/useInventoryGrid'
+import { useToast } from '../composables/useToast'
 import { ITEMS_BY_PATH } from '../data/items'
 import { ITEMS_BY_SLOT } from '../data/equipment-slots'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
@@ -49,10 +50,19 @@ const slots: SlotDef[] = [
   { name: 'Player', col: 5, row: 7, w: 1, h: 1 }
 ]
 
-const { equipment, removeItem, addItem, addEquipmentItem } = useSaveEditor()
-const { dragState, startDragFromEquipment, enterEquipmentSlot, leaveEquipmentSlot } = useDragDrop()
+const { equipment, removeItem, addItem, addEquipmentItem, setRigArmorPlate } = useSaveEditor()
+const {
+  dragState,
+  startDragFromEquipment,
+  enterEquipmentSlot,
+  leaveEquipmentSlot,
+  enterPlateTarget,
+  leavePlateTarget
+} = useDragDrop()
 const { findFreeSlot } = useInventoryGrid()
+const toast = useToast()
 const openWorkbench = inject<(weapon: SlotItem) => void>('openWorkbench')
+const openRigArmorWorkbench = inject<(rig: SlotItem) => void>('openRigArmorWorkbench')
 
 const contextMenu = ref<{ item: SlotItem; x: number; y: number } | null>(null)
 const openPopover = ref<string | null>(null)
@@ -63,7 +73,21 @@ const DRAG_THRESHOLD = 5
 const showEditLoadout = computed(() => {
   if (!contextMenu.value) return false
   const item = contextMenu.value.item
-  return item.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(item.itemPath)
+  return (
+    (item.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(item.itemPath)) || item.carrier
+  )
+})
+
+const editLoadoutLabel = computed(() => {
+  if (!contextMenu.value) return 'Edit Loadout'
+  return contextMenu.value.item.carrier ? 'Edit Armor' : 'Edit Loadout'
+})
+
+const removePlateLabel = computed(() => {
+  const platePath = contextMenu.value?.item.armorPlatePath
+  if (!platePath) return ''
+  const plate = ITEMS_BY_PATH.get(platePath)
+  return `Remove ${plate?.armorRating ? `${plate.armorRating} plate` : (plate?.displayName ?? 'plate')}`
 })
 
 const canDuplicate = computed(() => {
@@ -73,7 +97,11 @@ const canDuplicate = computed(() => {
 
 function handleEditLoadout() {
   if (!contextMenu.value) return
-  openWorkbench?.(contextMenu.value.item)
+  if (contextMenu.value.item.carrier) {
+    openRigArmorWorkbench?.(contextMenu.value.item)
+  } else {
+    openWorkbench?.(contextMenu.value.item)
+  }
   contextMenu.value = null
 }
 
@@ -98,8 +126,33 @@ function handleDuplicate() {
     amount: item.amount,
     gridCol: slot.col,
     gridRow: slot.row,
+    gridRotated: slot.rotated,
+    nestedPaths: item.nested
+  })
+  contextMenu.value = null
+}
+
+function handleRemovePlate() {
+  if (!contextMenu.value) return
+  const rig = contextMenu.value.item
+  if (!rig.armorPlatePath) return
+
+  const plate = ITEMS_BY_PATH.get(rig.armorPlatePath)
+  const size = plate ? { w: plate.sizeW ?? 1, h: plate.sizeH ?? 1 } : { w: 1, h: 1 }
+  const slot = findFreeSlot(size.w, size.h)
+  if (!slot) {
+    toast.show('No inventory space for removed armor plate')
+    contextMenu.value = null
+    return
+  }
+
+  addItem(rig.armorPlatePath, {
+    condition: rig.condition,
+    gridCol: slot.col,
+    gridRow: slot.row,
     gridRotated: slot.rotated
   })
+  setRigArmorPlate(rig.subResourceId, null)
   contextMenu.value = null
 }
 
@@ -163,7 +216,7 @@ function onSlotPointerDown(slot: SlotDef, event: PointerEvent) {
   function onMove(e: PointerEvent) {
     if (Math.abs(e.clientX - startX) + Math.abs(e.clientY - startY) > DRAG_THRESHOLD) {
       teardown()
-      startDragFromEquipment(item, slot.name, event)
+      startDragFromEquipment(item, slot.name, e)
     }
   }
 
@@ -197,10 +250,17 @@ function selectEquipmentItem(slotName: string, item: GameItem | null) {
 
 function onSlotPointerEnter(slot: SlotDef) {
   if (!dragState.value) return
+  const item = equipmentBySlot.value.get(slot.name)
+  if (item?.carrier && ITEMS_BY_PATH.get(dragState.value.source.item.itemPath)?.plate) {
+    enterPlateTarget(item)
+    return
+  }
   enterEquipmentSlot(slot.name)
 }
 
 function onSlotPointerLeave(slot: SlotDef) {
+  const item = equipmentBySlot.value.get(slot.name)
+  if (item) leavePlateTarget(item.subResourceId)
   leaveEquipmentSlot(slot.name)
 }
 
@@ -212,11 +272,21 @@ function isSlotDragging(slot: SlotDef): boolean {
 
 function isSlotHovered(slot: SlotDef): boolean {
   if (!dragState.value) return false
+  const item = equipmentBySlot.value.get(slot.name)
+  if (item && dragState.value.plateHover?.targetSubResourceId === item.subResourceId) return true
   return (
     dragState.value.equipmentHover?.slotName === slot.name &&
     dragState.value.source.item.subResourceId !==
       equipmentBySlot.value.get(slot.name)?.subResourceId
   )
+}
+
+function isSlotHoverValid(slot: SlotDef): boolean {
+  const item = equipmentBySlot.value.get(slot.name)
+  if (item && dragState.value?.plateHover?.targetSubResourceId === item.subResourceId) {
+    return dragState.value.plateHover.isValid
+  }
+  return dragState.value?.equipmentHover?.isValid ?? false
 }
 
 const gridWidth = COLS * CELL_SIZE
@@ -241,7 +311,7 @@ const gridHeight = ROWS * CELL_SIZE
           :class="[
             openPopover === slot.name ? 'z-20' : 'z-10',
             isSlotHovered(slot)
-              ? dragState?.equipmentHover?.isValid
+              ? isSlotHoverValid(slot)
                 ? 'border-green-500 bg-green-500/10'
                 : 'border-red-500 bg-red-500/10'
               : openPopover === slot.name
@@ -304,6 +374,12 @@ const gridHeight = ROWS * CELL_SIZE
               class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
             >
               {{ equipmentBySlot.get(slot.name)!.amount }}
+            </span>
+            <span
+              v-else-if="equipmentBySlot.get(slot.name)!.armorRating"
+              class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+            >
+              {{ equipmentBySlot.get(slot.name)!.armorRating }}
             </span>
             <!-- Item name label -->
             <span
@@ -378,8 +454,11 @@ const gridHeight = ROWS * CELL_SIZE
       :x="contextMenu.x"
       :y="contextMenu.y"
       :show-edit-loadout="showEditLoadout"
+      :edit-loadout-label="editLoadoutLabel"
+      :remove-plate-label="removePlateLabel"
       :can-duplicate="canDuplicate"
       @edit-loadout="handleEditLoadout"
+      @remove-plate="handleRemovePlate"
       @duplicate="handleDuplicate"
       @delete="handleDelete"
       @close="contextMenu = null"

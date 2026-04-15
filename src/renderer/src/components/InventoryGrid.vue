@@ -11,6 +11,7 @@ import {
 } from '../composables/useInventoryGrid'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useSaveEditor } from '../composables/useSaveEditor'
+import { useToast } from '../composables/useToast'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import InventoryGridItem from './InventoryGridItem.vue'
@@ -29,9 +30,11 @@ const {
   removeItem,
   addItem,
   addCatalogItem,
+  setRigArmorPlate,
   items: inventoryItems,
   catalogItems
 } = useSaveEditor()
+const toast = useToast()
 
 const sourceItems = props.mode === 'catalog' ? catalogItems : inventoryItems
 const gridCols = props.mode === 'catalog' ? CATALOG_COLS : GRID_COLS
@@ -53,17 +56,32 @@ const {
   setGridContainer,
   enterGrid,
   leaveGrid,
+  enterPlateTarget,
+  leavePlateTarget,
   onKeyDown,
   cancelDrag
 } = useDragDrop()
 const openWorkbench = inject<(weapon: SlotItem) => void>('openWorkbench')
+const openRigArmorWorkbench = inject<(rig: SlotItem) => void>('openRigArmorWorkbench')
 
 const contextMenu = ref<{ placement: GridItemPlacement; x: number; y: number } | null>(null)
 
 const showEditLoadout = computed(() => {
   if (!contextMenu.value) return false
   const p = contextMenu.value.placement
-  return p.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(p.itemPath)
+  return (p.category === 'Weapons' && WEAPON_ATTACHMENT_LAYOUTS.has(p.itemPath)) || p.carrier
+})
+
+const editLoadoutLabel = computed(() => {
+  if (!contextMenu.value) return 'Edit Loadout'
+  return contextMenu.value.placement.carrier ? 'Edit Armor' : 'Edit Loadout'
+})
+
+const removePlateLabel = computed(() => {
+  const platePath = contextMenu.value?.placement.armorPlatePath
+  if (!platePath) return ''
+  const plate = ITEMS_BY_PATH.get(platePath)
+  return `Remove ${plate?.armorRating ? `${plate.armorRating} plate` : (plate?.displayName ?? 'plate')}`
 })
 
 const canDuplicate = computed(() => {
@@ -76,7 +94,11 @@ function handleEditLoadout() {
   const item = sourceItems.value.find(
     (i) => i.subResourceId === contextMenu.value!.placement.subResourceId
   )
-  if (item) openWorkbench?.(item)
+  if (item?.carrier) {
+    openRigArmorWorkbench?.(item)
+  } else if (item) {
+    openWorkbench?.(item)
+  }
   contextMenu.value = null
 }
 
@@ -99,8 +121,35 @@ function handleDuplicate() {
     amount: original.amount,
     gridCol: slot.col,
     gridRow: slot.row,
+    gridRotated: slot.rotated,
+    nestedPaths: original.nested
+  })
+  contextMenu.value = null
+}
+
+function handleRemovePlate() {
+  if (!contextMenu.value) return
+  const rig = sourceItems.value.find(
+    (i) => i.subResourceId === contextMenu.value!.placement.subResourceId
+  )
+  if (!rig?.armorPlatePath) return
+
+  const plate = ITEMS_BY_PATH.get(rig.armorPlatePath)
+  const size = plate ? getItemSize(plate) : { w: 1, h: 1 }
+  const slot = findFreeSlot(size.w, size.h)
+  if (!slot) {
+    toast.show('No inventory space for removed armor plate')
+    contextMenu.value = null
+    return
+  }
+
+  addItem(rig.armorPlatePath, {
+    condition: rig.condition,
+    gridCol: slot.col,
+    gridRow: slot.row,
     gridRotated: slot.rotated
   })
+  setRigArmorPlate(rig.subResourceId, null)
   contextMenu.value = null
 }
 
@@ -128,17 +177,32 @@ function autoFixConflicts(): void {
 }
 
 function onItemDragStart(placement: GridItemPlacement, event: PointerEvent): void {
+  setGridContainer(containerRef.value, gridInstance)
   startDragFromGrid(placement, event)
 }
 
-function handleGridEnter(): void {
+function handleGridEnter(event: PointerEvent): void {
   if (dragState.value) {
+    dragState.value.clientX = event.clientX
+    dragState.value.clientY = event.clientY
+    setGridContainer(containerRef.value, gridInstance)
     enterGrid(canPlace)
   }
 }
 
 function handleGridLeave(): void {
   leaveGrid()
+}
+
+function handleItemPointerEnter(placement: GridItemPlacement): void {
+  if (!dragState.value) return
+  if (!ITEMS_BY_PATH.get(dragState.value.source.item.itemPath)?.plate) return
+  if (!placement.carrier) return
+  enterPlateTarget(placement)
+}
+
+function handleItemPointerLeave(placement: GridItemPlacement): void {
+  leavePlateTarget(placement.subResourceId)
 }
 
 function handleKeyDown(event: KeyboardEvent): void {
@@ -168,6 +232,7 @@ watch(
         ds.clientY >= rect.top &&
         ds.clientY <= rect.bottom
       ) {
+        setGridContainer(containerRef.value, gridInstance)
         enterGrid(canPlace)
       }
     }
@@ -179,6 +244,7 @@ const gridHeight = gridRows * cellSize
 
 // Build cell classes for drag highlighting
 function cellHighlight(col: number, row: number): string {
+  if (dragState.value?.plateHover) return ''
   const snap = dragState.value?.gridSnap
   if (!snap) return ''
   if (col >= snap.col && col < snap.col + snap.w && row >= snap.row && row < snap.row + snap.h) {
@@ -242,8 +308,18 @@ defineExpose({ findFreeSlot })
         :placement="p"
         :cell-size="cellSize"
         :dimmed="dragState?.source.item.subResourceId === p.subResourceId"
-        :class="{ 'ring-1 ring-amber-500/60': conflictIds.has(p.subResourceId) }"
+        :class="{
+          'ring-1 ring-amber-500/60': conflictIds.has(p.subResourceId),
+          'ring-2 ring-green-500':
+            dragState?.plateHover?.targetSubResourceId === p.subResourceId &&
+            dragState.plateHover.isValid,
+          'ring-2 ring-red-500':
+            dragState?.plateHover?.targetSubResourceId === p.subResourceId &&
+            !dragState.plateHover.isValid
+        }"
         @dragstart="onItemDragStart"
+        @pointerenter="handleItemPointerEnter"
+        @pointerleave="handleItemPointerLeave"
         @contextmenu="onItemContextMenu"
       />
     </div>
@@ -253,8 +329,11 @@ defineExpose({ findFreeSlot })
       :x="contextMenu.x"
       :y="contextMenu.y"
       :show-edit-loadout="showEditLoadout"
+      :edit-loadout-label="editLoadoutLabel"
+      :remove-plate-label="removePlateLabel"
       :can-duplicate="canDuplicate"
       @edit-loadout="handleEditLoadout"
+      @remove-plate="handleRemovePlate"
       @duplicate="handleDuplicate"
       @delete="handleDelete"
       @close="contextMenu = null"

@@ -1,21 +1,29 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Copy, Trash2, Wrench } from 'lucide-vue-next'
+import { Copy, ShieldX, Trash2, Wrench } from 'lucide-vue-next'
 
 withDefaults(
   defineProps<{
     x: number
     y: number
     showEditLoadout?: boolean
+    editLoadoutLabel?: string
+    removePlateLabel?: string
     canDuplicate?: boolean
   }>(),
-  { showEditLoadout: false, canDuplicate: true }
+  {
+    showEditLoadout: false,
+    editLoadoutLabel: 'Edit Loadout',
+    removePlateLabel: '',
+    canDuplicate: true
+  }
 )
 
 const emit = defineEmits<{
   duplicate: []
   delete: []
   editLoadout: []
+  removePlate: []
   close: []
 }>()
 
@@ -55,7 +63,15 @@ onUnmounted(() => {
         @click="emit('editLoadout')"
       >
         <Wrench class="h-3.5 w-3.5" />
-        Edit Loadout
+        {{ editLoadoutLabel }}
+      </button>
+      <button
+        v-if="removePlateLabel"
+        class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+        @click="emit('removePlate')"
+      >
+        <ShieldX class="h-3.5 w-3.5" />
+        {{ removePlateLabel }}
       </button>
       <button
         class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-inherit"

@@ -136,7 +136,9 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_II.png-290798a3a516b1a63c9a4e53d3e57b12.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    plate: true,
+    armorRating: 'II'
   },
   {
     category: 'Armor',
@@ -147,7 +149,9 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_III.png-9d7396211b6e9c64537ac8a2e45b1922.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    plate: true,
+    armorRating: 'III'
   },
   {
     category: 'Armor',
@@ -158,7 +162,9 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_III+.png-3d30d15d1417bf58d89fe08efd395da8.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    plate: true,
+    armorRating: 'III+'
   },
   {
     category: 'Armor',
@@ -169,7 +175,9 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_IIIA.png-76bd30f0bf8dee18cf4c42ea1f6f4f4d.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    plate: true,
+    armorRating: 'IIIA'
   },
   {
     category: 'Armor',
@@ -180,7 +188,9 @@ export const ITEMS = [
     sizeW: 2,
     sizeH: 2,
     iconFile: 'Icon_Armor_Plate_IV.png-035a4349b919225880d3b3e2f5fc69ab.s3tc.ctex',
-    showCondition: true
+    showCondition: true,
+    plate: true,
+    armorRating: 'IV'
   },
   {
     category: 'Attachments',
@@ -207,7 +217,8 @@ export const ITEMS = [
     iconFile: 'Icon_Colt_1911_Magazine.png-702935f6f1110dd2bf662e4d9bfdc918.s3tc.ctex',
     showAmount: true,
     defaultAmount: 8,
-    maxAmount: 8
+    maxAmount: 8,
+    compatible: ['res://Items/Ammo/Ammo_45ACP/Ammo_45ACP.tres']
   },
   {
     category: 'Attachments',
@@ -225,7 +236,8 @@ export const ITEMS = [
     iconFile: 'Icon_Glock_17_Magazine.png-52def777377b5d0c63edbefdfe0fe715.s3tc.ctex',
     showAmount: true,
     defaultAmount: 17,
-    maxAmount: 17
+    maxAmount: 17,
+    compatible: ['res://Items/Ammo/Ammo_9x19/Ammo_9x19.tres']
   },
   {
     category: 'Attachments',
@@ -256,7 +268,8 @@ export const ITEMS = [
     iconFile: 'Icon_AK-12_Magazine.png-275794d7c58a311b4ff64d44ede762b1.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_545x39/Ammo_545x39.tres']
   },
   {
     category: 'Attachments',
@@ -269,7 +282,8 @@ export const ITEMS = [
     iconFile: 'Icon_AKM_Magazine.png-b5a19e4491743e94ed4d0efce530765d.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_762x39/Ammo_762x39.tres']
   },
   {
     category: 'Attachments',
@@ -294,7 +308,8 @@ export const ITEMS = [
     iconFile: 'Icon_KAR-21_223_Magazine.png-5da62272bac5e8acc531bd1181ae71ac.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_223/Ammo_223.tres']
   },
   {
     category: 'Attachments',
@@ -307,7 +322,8 @@ export const ITEMS = [
     iconFile: 'Icon_KAR-21_308_Magazine.png-3306f94c160533470aa0a7010b3361fb.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_308/Ammo_308.tres']
   },
   {
     category: 'Attachments',
@@ -318,7 +334,8 @@ export const ITEMS = [
     iconFile: 'Icon_Makarov_Magazine.png-bd8312f92543e0aaa309c6a4bd583e21.s3tc.ctex',
     showAmount: true,
     defaultAmount: 8,
-    maxAmount: 8
+    maxAmount: 8,
+    compatible: ['res://Items/Ammo/Ammo_9x18/Ammo_9x18.tres']
   },
   {
     category: 'Attachments',
@@ -331,7 +348,8 @@ export const ITEMS = [
     iconFile: 'Icon_AKS-74U_Magazine.png-d554abd98d5f1b062844913131fa9476.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_545x39/Ammo_545x39.tres']
   },
   {
     category: 'Attachments',
@@ -352,7 +370,8 @@ export const ITEMS = [
     iconFile: 'Icon_KP-31_Drum_Front.png-d29119589f121a44130873ffadb5c150.s3tc.ctex',
     showAmount: true,
     defaultAmount: 72,
-    maxAmount: 72
+    maxAmount: 72,
+    compatible: ['res://Items/Ammo/Ammo_9x19/Ammo_9x19.tres']
   },
   {
     category: 'Attachments',
@@ -374,7 +393,8 @@ export const ITEMS = [
     iconFile: 'Icon_M78_Magazine.png-4a931050e62e6f7fa320db123adc76be.s3tc.ctex',
     showAmount: true,
     defaultAmount: 20,
-    maxAmount: 20
+    maxAmount: 20,
+    compatible: ['res://Items/Ammo/Ammo_308/Ammo_308.tres']
   },
   {
     category: 'Attachments',
@@ -403,7 +423,8 @@ export const ITEMS = [
     iconFile: 'Icon_MP7_Magazine.png-c253d868515a3f78cfa34774a1c8677c.s3tc.ctex',
     showAmount: true,
     defaultAmount: 40,
-    maxAmount: 40
+    maxAmount: 40,
+    compatible: ['res://Items/Ammo/Ammo_46x30/Ammo_46x30.tres']
   },
   {
     category: 'Attachments',
@@ -439,7 +460,8 @@ export const ITEMS = [
     iconFile: 'Icon_P320_Magazine.png-b7e8a5f5364791f255ca810e23b28e93.s3tc.ctex',
     showAmount: true,
     defaultAmount: 15,
-    maxAmount: 15
+    maxAmount: 15,
+    compatible: ['res://Items/Ammo/Ammo_9x19/Ammo_9x19.tres']
   },
   {
     category: 'Attachments',
@@ -461,7 +483,8 @@ export const ITEMS = [
     iconFile: 'Icon_MP5_Magazine.png-4e794211934c3d2db436d7c64830a99c.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_9x19/Ammo_9x19.tres']
   },
   {
     category: 'Attachments',
@@ -519,7 +542,8 @@ export const ITEMS = [
     iconFile: 'Icon_RK_Magazine.png-48b510c37ff6b4e2624ad2ead443be9b.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_762x39/Ammo_762x39.tres']
   },
   {
     category: 'Attachments',
@@ -562,7 +586,8 @@ export const ITEMS = [
     iconFile: 'Icon_VSS_Magazine.png-7575a4a9ebce3df75246840b580b3375.s3tc.ctex',
     showAmount: true,
     defaultAmount: 20,
-    maxAmount: 20
+    maxAmount: 20,
+    compatible: ['res://Items/Ammo/Ammo_9x39/Ammo_9x39.tres']
   },
   {
     category: 'Attachments',
@@ -575,7 +600,8 @@ export const ITEMS = [
     iconFile: 'Icon_M4A1_Magazine.png-e1d82d525caeb3f649da50804de753b2.s3tc.ctex',
     showAmount: true,
     defaultAmount: 30,
-    maxAmount: 30
+    maxAmount: 30,
+    compatible: ['res://Items/Ammo/Ammo_223/Ammo_223.tres']
   },
   {
     category: 'Attachments',
@@ -604,7 +630,8 @@ export const ITEMS = [
     iconFile: 'Icon_SVD_Magazine.png-966132db3894cf89893838552a96f52d.s3tc.ctex',
     showAmount: true,
     defaultAmount: 10,
-    maxAmount: 10
+    maxAmount: 10,
+    compatible: ['res://Items/Ammo/Ammo_762x54R/Ammo_762x54R.tres']
   },
   {
     category: 'Backpacks',
@@ -1384,7 +1411,8 @@ export const ITEMS = [
     nameInventory: 'C. Player',
     iconFile: 'Icon_Casette_Player.png-c3e6f03e451e324bdaae9d8cd08f612c.s3tc.ctex',
     showCondition: true,
-    slots: ['Player']
+    slots: ['Player'],
+    compatible: ['res://Items/Electronics/Batteries/Batteries.tres', 'res://Items/Electronics/Casette_Electrofolk/Casette_Electrofolk.tres', 'res://Items/Electronics/Casette_Symphony/Casette_Symphony.tres', 'res://Items/Electronics/Casette_OST/Casette_OST.tres', 'res://Items/Electronics/Casette_Radio/Casette_Radio.tres']
   },
   {
     category: 'Electronics',
@@ -1429,7 +1457,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Electronics/Narva/Narva.tres',
     iconFile: 'Icon_Narva.png-0217ce0e5d98c97f42e44fa028d10d89.s3tc.ctex',
     showCondition: true,
-    slots: ['Light']
+    slots: ['Light'],
+    compatible: ['res://Items/Electronics/Batteries/Batteries.tres']
   },
   {
     category: 'Electronics',
@@ -1438,7 +1467,8 @@ export const ITEMS = [
     resourcePath: 'res://Items/Electronics/Polaris/Polaris.tres',
     iconFile: 'Icon_Polaris.png-aeef0acef687114b2dbdb100dd45ed54.s3tc.ctex',
     showCondition: true,
-    slots: ['Light']
+    slots: ['Light'],
+    compatible: ['res://Items/Electronics/Batteries/Batteries.tres']
   },
   {
     category: 'Electronics',
@@ -1449,7 +1479,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_PV7.png-cdedefa2a266b1bc039c7918d4fbea9f.s3tc.ctex',
     showCondition: true,
-    slots: ['NVG']
+    slots: ['NVG'],
+    compatible: ['res://Items/Electronics/Batteries/Batteries.tres']
   },
   {
     category: 'Fishing',
@@ -1521,7 +1552,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Cabinet_Medical/Cabinet_Medical_F.tres',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Cabinet_Medical.png-3a84f5ea50e2b861d3e64023d7ad8271.s3tc.ctex'
+    iconFile: 'Icon_Cabinet_Medical.png-3a84f5ea50e2b861d3e64023d7ad8271.s3tc.ctex',
+    containerSize: { w: 4, h: 4 }
   },
   {
     category: 'Furniture',
@@ -1530,7 +1562,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Cabinet_Office/Cabinet_Office_F.tres',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Cabinet_Office.png-478b825fdfe6104a98668cbf3ad60fe1.s3tc.ctex'
+    iconFile: 'Icon_Cabinet_Office.png-478b825fdfe6104a98668cbf3ad60fe1.s3tc.ctex',
+    containerSize: { w: 4, h: 4 }
   },
   {
     category: 'Furniture',
@@ -1539,7 +1572,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Cabinet_Wood/Cabinet_Wood_F.tres',
     sizeW: 3,
     sizeH: 3,
-    iconFile: 'Icon_Cabinet_Wood.png-e198ea9655ca2f8f6b5a9f8cf95612b8.s3tc.ctex'
+    iconFile: 'Icon_Cabinet_Wood.png-e198ea9655ca2f8f6b5a9f8cf95612b8.s3tc.ctex',
+    containerSize: { w: 6, h: 8 }
   },
   {
     category: 'Furniture',
@@ -1586,7 +1620,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Crate_Military/Crate_Military_F.tres',
     sizeW: 3,
     sizeH: 2,
-    iconFile: 'Icon_Crate_Military.png-4910f86309d366c9c4e2c55e911536ed.s3tc.ctex'
+    iconFile: 'Icon_Crate_Military.png-4910f86309d366c9c4e2c55e911536ed.s3tc.ctex',
+    containerSize: { w: 8, h: 6 }
   },
   {
     category: 'Furniture',
@@ -1595,7 +1630,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Crate_Special/Crate_Special_F.tres',
     sizeW: 4,
     sizeH: 4,
-    iconFile: 'Icon_Crate_Special.png-9d030fee5dcbe4ce0af8392b2926ea5b.s3tc.ctex'
+    iconFile: 'Icon_Crate_Special.png-9d030fee5dcbe4ce0af8392b2926ea5b.s3tc.ctex',
+    containerSize: { w: 8, h: 13 }
   },
   {
     category: 'Furniture',
@@ -1642,7 +1678,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Freezer/Freezer_F.tres',
     sizeW: 5,
     sizeH: 4,
-    iconFile: 'Icon_Freezer.png-2e12fc34e7e5f830c4a9bfa67810604b.s3tc.ctex'
+    iconFile: 'Icon_Freezer.png-2e12fc34e7e5f830c4a9bfa67810604b.s3tc.ctex',
+    containerSize: { w: 8, h: 13 }
   },
   {
     category: 'Furniture',
@@ -1651,7 +1688,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Fridge/Fridge_F.tres',
     sizeW: 2,
     sizeH: 3,
-    iconFile: 'Icon_Fridge.png-b6a1148e0356945bdf7eeea79ef2b4b8.s3tc.ctex'
+    iconFile: 'Icon_Fridge.png-b6a1148e0356945bdf7eeea79ef2b4b8.s3tc.ctex',
+    containerSize: { w: 4, h: 6 }
   },
   {
     category: 'Furniture',
@@ -1660,7 +1698,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Locker/Locker_F.tres',
     sizeW: 4,
     sizeH: 7,
-    iconFile: 'Icon_Locker.png-1ba714ef638fbfc1084cd9e828f568e4.s3tc.ctex'
+    iconFile: 'Icon_Locker.png-1ba714ef638fbfc1084cd9e828f568e4.s3tc.ctex',
+    containerSize: { w: 8, h: 13 }
   },
   {
     category: 'Furniture',
@@ -1669,7 +1708,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Nightstand/Nightstand_F.tres',
     sizeW: 2,
     sizeH: 2,
-    iconFile: 'Icon_Nightstand.png-e9ad64f7476638076652f38ef41539f7.s3tc.ctex'
+    iconFile: 'Icon_Nightstand.png-e9ad64f7476638076652f38ef41539f7.s3tc.ctex',
+    containerSize: { w: 4, h: 3 }
   },
   {
     category: 'Furniture',
@@ -1789,7 +1829,8 @@ export const ITEMS = [
     resourcePath: 'res://Assets/Stove/Stove_F.tres',
     sizeW: 3,
     sizeH: 3,
-    iconFile: 'Icon_Stove.png-865cfaa8eca1d41d9acde6128dda3e77.s3tc.ctex'
+    iconFile: 'Icon_Stove.png-865cfaa8eca1d41d9acde6128dda3e77.s3tc.ctex',
+    containerSize: { w: 5, h: 5 }
   },
   {
     category: 'Furniture',
@@ -1924,7 +1965,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_Helmet_Police.png-08476abc1799bee433c7696350d70eea.s3tc.ctex',
     showCondition: true,
-    slots: ['Helmet']
+    slots: ['Helmet'],
+    armorRating: 'IIIA'
   },
   {
     category: 'Helmets',
@@ -1936,7 +1978,8 @@ export const ITEMS = [
     sizeH: 2,
     iconFile: 'Icon_SSh-39.png-1116cea93367083ece65f5d9352675e0.s3tc.ctex',
     showCondition: true,
-    slots: ['Helmet']
+    slots: ['Helmet'],
+    armorRating: 'II'
   },
   {
     category: 'Instruments',
@@ -2489,7 +2532,9 @@ export const ITEMS = [
     sizeW: 3,
     sizeH: 3,
     iconFile: 'Icon_K19.png-1b3ef164b2bb5e574270863cac9387da.s3tc.ctex',
-    slots: ['Rig']
+    slots: ['Rig'],
+    compatible: ['res://Items/Armor/Armor_Plate_II.tres', 'res://Items/Armor/Armor_Plate_IIIA.tres', 'res://Items/Armor/Armor_Plate_III.tres', 'res://Items/Armor/Armor_Plate_III+.tres', 'res://Items/Armor/Armor_Plate_IV.tres'],
+    carrier: true
   },
   {
     category: 'Rigs',
@@ -2500,7 +2545,9 @@ export const ITEMS = [
     sizeW: 3,
     sizeH: 3,
     iconFile: 'Icon_LVPC_Green.png-66ac4a5a9f4f8ba78ec884e9ddc9e60e.s3tc.ctex',
-    slots: ['Rig']
+    slots: ['Rig'],
+    compatible: ['res://Items/Armor/Armor_Plate_II.tres', 'res://Items/Armor/Armor_Plate_IIIA.tres', 'res://Items/Armor/Armor_Plate_III.tres', 'res://Items/Armor/Armor_Plate_III+.tres', 'res://Items/Armor/Armor_Plate_IV.tres'],
+    carrier: true
   },
   {
     category: 'Rigs',
@@ -2511,7 +2558,9 @@ export const ITEMS = [
     sizeW: 3,
     sizeH: 3,
     iconFile: 'Icon_LVPC_M05.png-dd28b4ec476a3f4d2e694a81420f108b.s3tc.ctex',
-    slots: ['Rig']
+    slots: ['Rig'],
+    compatible: ['res://Items/Armor/Armor_Plate_II.tres', 'res://Items/Armor/Armor_Plate_IIIA.tres', 'res://Items/Armor/Armor_Plate_III.tres', 'res://Items/Armor/Armor_Plate_III+.tres', 'res://Items/Armor/Armor_Plate_IV.tres'],
+    carrier: true
   },
   {
     category: 'Rigs',
@@ -2522,7 +2571,9 @@ export const ITEMS = [
     sizeW: 3,
     sizeH: 3,
     iconFile: 'Icon_LVPC_Winter.png-1bd29dba8d05bb46b9266bbe2f57607c.s3tc.ctex',
-    slots: ['Rig']
+    slots: ['Rig'],
+    compatible: ['res://Items/Armor/Armor_Plate_II.tres', 'res://Items/Armor/Armor_Plate_IIIA.tres', 'res://Items/Armor/Armor_Plate_III.tres', 'res://Items/Armor/Armor_Plate_III+.tres', 'res://Items/Armor/Armor_Plate_IV.tres'],
+    carrier: true
   },
   {
     category: 'Weapons',
@@ -2534,7 +2585,8 @@ export const ITEMS = [
     iconFile: 'Icon_Colt_1911.png-d04198a346b1bf2e2406bfe0766c0f56.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/Colt_1911/Colt_1911_Magazine.tres', 'res://Items/Attachments/Rider/Rider.tres']
   },
   {
     category: 'Weapons',
@@ -2546,7 +2598,8 @@ export const ITEMS = [
     iconFile: 'Icon_Glock_17.png-56de74b8c1ae3841be73c1a7256538d4.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/Glock_17/Glock_17_Magazine.tres', 'res://Items/Attachments/Rider/Rider.tres', 'res://Items/Attachments/RMR/RMR.tres', 'res://Items/Attachments/SRO/SRO.tres']
   },
   {
     category: 'Weapons',
@@ -2558,7 +2611,8 @@ export const ITEMS = [
     iconFile: 'Icon_HK416.png-4af939f2e96952d3b967f5948e8f0212.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/M4A1/STANAG_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2570,7 +2624,8 @@ export const ITEMS = [
     iconFile: 'Icon_AK-12.png-2d442005495c142c784901b2332a26ca.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/AK-12/AK-12_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PBS/PBS.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/PTN/PTN.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2582,7 +2637,8 @@ export const ITEMS = [
     iconFile: 'Icon_AKM.png-a5e5b075e6186ca91a04f3db4ba2b70e.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/AKM/AKM_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/PBS/PBS.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/PTN/PTN.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2594,7 +2650,8 @@ export const ITEMS = [
     iconFile: 'Icon_KAR-21_223.png-3a8cb87927e2206be77557170961a9d0.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/KAR-21/KAR-21_223_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2606,7 +2663,8 @@ export const ITEMS = [
     iconFile: 'Icon_KAR-21_308.png-3b47b9accf38892a3cd333650ebde20b.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/KAR-21/KAR-21_308_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2618,7 +2676,8 @@ export const ITEMS = [
     iconFile: 'Icon_Makarov.png-405c8d50cb922dd9b3e89fd44a12eeba.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/Makarov/Makarov_Magazine.tres']
   },
   {
     category: 'Weapons',
@@ -2630,7 +2689,8 @@ export const ITEMS = [
     iconFile: 'Icon_AKS-74U.png-90e5a268906203cd2c1313134363c019.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/AKS-74U/AKS-74U_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/PBS/PBS.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/PTN/PTN.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2642,7 +2702,8 @@ export const ITEMS = [
     iconFile: 'Icon_MK18.png-b08c5d7af5d1eab4a25b1c10f680d02f.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/M4A1/STANAG_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2654,7 +2715,8 @@ export const ITEMS = [
     iconFile: 'Icon_KP-31.png-630bf263af6357252671f11a1df403d5.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/KP-31/KP-31_Drum.tres']
   },
   {
     category: 'Weapons',
@@ -2666,7 +2728,8 @@ export const ITEMS = [
     iconFile: 'Icon_M4A1.png-0db8c30d05ccbfd4c639d3eabc130058.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/M4A1/STANAG_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2678,7 +2741,8 @@ export const ITEMS = [
     iconFile: 'Icon_M78.png-b211a43aabebb5a8a022b3bdc2fee3eb.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/M78/M78_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2691,7 +2755,8 @@ export const ITEMS = [
     showCondition: true,
     maxAmount: 5,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Attachments/PU/PU.tres']
   },
   {
     category: 'Weapons',
@@ -2703,7 +2768,8 @@ export const ITEMS = [
     iconFile: 'Icon_P320.png-07e594e8dd9a1cfc0f80508308122330.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/P320/P320_Magazine.tres', 'res://Items/Attachments/Rider/Rider.tres', 'res://Items/Attachments/RMR/RMR.tres', 'res://Items/Attachments/SRO/SRO.tres']
   },
   {
     category: 'Weapons',
@@ -2715,7 +2781,8 @@ export const ITEMS = [
     iconFile: 'Icon_MP5.png-d3158bee1a1245fc7a9b517243d74b11.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/MP5/MP5_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/Navy/Navy.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2727,7 +2794,8 @@ export const ITEMS = [
     iconFile: 'Icon_MP5K.png-e7939db88fbc8f75040b86db66b4983f.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/MP5/MP5_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/Navy/Navy.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2739,7 +2807,8 @@ export const ITEMS = [
     iconFile: 'Icon_MP5SD.png-202ed76f0ea183a93e58ef567ec5773c.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/MP5/MP5_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2751,7 +2820,8 @@ export const ITEMS = [
     iconFile: 'Icon_MP7.png-89d2304a0e229ba6720f93cba344672f.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary', 'Secondary']
+    slots: ['Primary', 'Secondary'],
+    compatible: ['res://Items/Weapons/MP7/MP7_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2763,7 +2833,8 @@ export const ITEMS = [
     iconFile: 'Icon_RK-62.png-0d920b8f46caa1934d34d8e564158c96.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/RK-62/RK_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2775,7 +2846,8 @@ export const ITEMS = [
     iconFile: 'Icon_RK-62M.png-b33fff579595a2a9c8699146c59dd89c.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/RK-62/RK_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/OZ5/OZ5.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres', 'res://Items/Attachments/ANPEQ/ANPEQ.tres']
   },
   {
     category: 'Weapons',
@@ -2787,7 +2859,8 @@ export const ITEMS = [
     iconFile: 'Icon_RK-95.png-784355bf7d5444962ad93ebbf54e0bba.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/RK-62/RK_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Hybrid/Hybrid.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/Monster/Monster.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/SOCOM/SOCOM.tres', 'res://Items/Attachments/Thor/Thor.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2800,7 +2873,8 @@ export const ITEMS = [
     showCondition: true,
     maxAmount: 8,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Attachments/Salvo/Salvo.tres']
   },
   {
     category: 'Weapons',
@@ -2812,7 +2886,8 @@ export const ITEMS = [
     iconFile: 'Icon_VSS.png-012df67ff9fa46d22b9bd4d563786396.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/VSS/VSS_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/POSP/POSP.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   },
   {
     category: 'Weapons',
@@ -2824,7 +2899,8 @@ export const ITEMS = [
     iconFile: 'Icon_SVD.png-8f99dac97356038d43aa0e3bad7f7087.s3tc.ctex',
     showCondition: true,
     repairs: true,
-    slots: ['Primary']
+    slots: ['Primary'],
+    compatible: ['res://Items/Weapons/SVD/SVD_Magazine.tres', 'res://Items/Attachments/ACOG/ACOG.tres', 'res://Items/Attachments/EXPS/EXPS.tres', 'res://Items/Attachments/HMR/HMR.tres', 'res://Items/Attachments/Kobra/Kobra.tres', 'res://Items/Attachments/Leopard/Leopard.tres', 'res://Items/Attachments/Micro/Micro.tres', 'res://Items/Attachments/MRO/MRO.tres', 'res://Items/Attachments/PBS/PBS.tres', 'res://Items/Attachments/POSP/POSP.tres', 'res://Items/Attachments/PRO/PRO.tres', 'res://Items/Attachments/PTN/PTN.tres', 'res://Items/Attachments/Vudu/Vudu.tres']
   }
 ] satisfies GameItem[]
 

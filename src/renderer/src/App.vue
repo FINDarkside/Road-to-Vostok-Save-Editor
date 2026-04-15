@@ -12,6 +12,7 @@ import WorldPanel from './components/WorldPanel.vue'
 import QuestsPanel from './components/QuestsPanel.vue'
 import AddItemDialog from './components/AddItemDialog.vue'
 import WeaponWorkbench from './components/WeaponWorkbench.vue'
+import RigArmorWorkbench from './components/RigArmorWorkbench.vue'
 import IconStatusBanner from './components/IconStatusBanner.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
@@ -23,6 +24,8 @@ const addDialogOpen = ref(false)
 const addDialogTarget = ref<'inventory' | 'catalog'>('inventory')
 const workbenchOpen = ref(false)
 const workbenchWeapon = ref<SlotItem | null>(null)
+const rigArmorWorkbenchOpen = ref(false)
+const rigArmorWorkbenchRig = ref<SlotItem | null>(null)
 const defaultTab = computed(() => (loadError.value ? 'backups' : 'inventory'))
 
 function openInventoryAddDialog() {
@@ -38,6 +41,11 @@ function openFurnitureAddDialog() {
 provide('openWorkbench', (weapon: SlotItem) => {
   workbenchWeapon.value = weapon
   workbenchOpen.value = true
+})
+
+provide('openRigArmorWorkbench', (rig: SlotItem) => {
+  rigArmorWorkbenchRig.value = rig
+  rigArmorWorkbenchOpen.value = true
 })
 
 onMounted(() => {
@@ -118,6 +126,7 @@ onMounted(() => {
     <IconStatusBanner />
     <AddItemDialog v-model:open="addDialogOpen" :target="addDialogTarget" />
     <WeaponWorkbench v-model:open="workbenchOpen" :weapon="workbenchWeapon" />
+    <RigArmorWorkbench v-model:open="rigArmorWorkbenchOpen" :rig="rigArmorWorkbenchRig" />
     <ToastContainer />
   </div>
 </template>

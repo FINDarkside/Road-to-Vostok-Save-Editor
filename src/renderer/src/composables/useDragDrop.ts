@@ -49,7 +49,10 @@ function buildPlacementFromSlotItem(item: SlotItem): GridItemPlacement {
     w: baseSize.w,
     h: baseSize.h,
     rotated: false,
-    nested: item.nested
+    nested: item.nested,
+    armorRating: item.armorRating,
+    carrier: item.carrier,
+    armorPlatePath: item.armorPlatePath
   }
 }
 
@@ -115,6 +118,40 @@ function updateGridValidity() {
     !!findSwapTarget(snap, dragState.value.source)
 }
 
+function canDropPlateIntoRig(plate: GridItemPlacement, rig: GridItemPlacement | SlotItem): boolean {
+  if (plate.subResourceId === rig.subResourceId) return false
+  if (rig.armorPlatePath) return false
+
+  const plateMeta = ITEMS_BY_PATH.get(plate.itemPath)
+  const rigMeta = ITEMS_BY_PATH.get(rig.itemPath)
+  return !!plateMeta?.plate && rig.carrier && !!rigMeta?.compatible?.includes(plate.itemPath)
+}
+
+function activateGridSnap(
+  canPlace: (col: number, row: number, w: number, h: number, excludeId?: string) => boolean
+) {
+  if (!dragState.value) return
+
+  const cellSize = getActiveCellSize()
+  canPlaceFn = canPlace
+  // Use last known ghost dimensions (preserves R-key rotations across grid re-entry)
+  dragState.value.gridSnap = {
+    col: 0,
+    row: 0,
+    w: dragState.value.ghostW,
+    h: dragState.value.ghostH,
+    rotated: dragState.value.ghostRotated,
+    isValid: false
+  }
+
+  dragState.value.ghostCellSize = cellSize
+  dragState.value.offsetX = (dragState.value.ghostW * cellSize) / 2
+  dragState.value.offsetY = (dragState.value.ghostH * cellSize) / 2
+
+  snapToGrid(dragState.value)
+  updateGridValidity()
+}
+
 function onDocumentPointerMove(event: PointerEvent) {
   if (!dragState.value) return
   dragState.value.clientX = event.clientX
@@ -128,12 +165,28 @@ function onDocumentPointerMove(event: PointerEvent) {
 
 function onDocumentPointerUp() {
   if (!dragState.value) return
-
   const ds = dragState.value
-  const { updateItemGridPosition, moveToInventory, moveToEquipment, equipment, removeItem } =
-    useSaveEditor()
+  const {
+    updateItemGridPosition,
+    moveToInventory,
+    moveToEquipment,
+    equipment,
+    removeItem,
+    setRigArmorPlate
+  } = useSaveEditor()
 
   if (ds.deleteHover) {
+    removeItem(ds.source.item.subResourceId)
+    cleanup()
+    return
+  }
+
+  if (ds.plateHover?.isValid) {
+    setRigArmorPlate(
+      ds.plateHover.targetSubResourceId,
+      ds.source.item.itemPath,
+      ds.source.item.condition
+    )
     removeItem(ds.source.item.subResourceId)
     cleanup()
     return
@@ -273,6 +326,7 @@ export function useDragDrop() {
       clientY: event.clientY,
       gridSnap: null,
       equipmentHover: null,
+      plateHover: null,
       deleteHover: false,
       ghostW: placement.w,
       ghostH: placement.h,
@@ -298,6 +352,7 @@ export function useDragDrop() {
       clientY: event.clientY,
       gridSnap: null,
       equipmentHover: null,
+      plateHover: null,
       deleteHover: false,
       ghostW: placement.w,
       ghostH: placement.h,
@@ -319,26 +374,7 @@ export function useDragDrop() {
   function enterGrid(
     canPlace: (col: number, row: number, w: number, h: number, excludeId?: string) => boolean
   ) {
-    if (!dragState.value) return
-
-    const cellSize = getActiveCellSize()
-    canPlaceFn = canPlace
-    // Use last known ghost dimensions (preserves R-key rotations across grid re-entry)
-    dragState.value.gridSnap = {
-      col: 0,
-      row: 0,
-      w: dragState.value.ghostW,
-      h: dragState.value.ghostH,
-      rotated: dragState.value.ghostRotated,
-      isValid: false
-    }
-
-    dragState.value.ghostCellSize = cellSize
-    dragState.value.offsetX = (dragState.value.ghostW * cellSize) / 2
-    dragState.value.offsetY = (dragState.value.ghostH * cellSize) / 2
-
-    snapToGrid(dragState.value)
-    updateGridValidity()
+    activateGridSnap(canPlace)
   }
 
   function leaveGrid() {
@@ -375,6 +411,22 @@ export function useDragDrop() {
     if (!dragState.value) return
     if (dragState.value.equipmentHover?.slotName === slotName) {
       dragState.value.equipmentHover = null
+    }
+  }
+
+  function enterPlateTarget(target: GridItemPlacement | SlotItem) {
+    if (!dragState.value) return
+    dragState.value.equipmentHover = null
+    dragState.value.plateHover = {
+      targetSubResourceId: target.subResourceId,
+      isValid: canDropPlateIntoRig(dragState.value.source.item, target)
+    }
+  }
+
+  function leavePlateTarget(subResourceId: string) {
+    if (!dragState.value) return
+    if (dragState.value.plateHover?.targetSubResourceId === subResourceId) {
+      dragState.value.plateHover = null
     }
   }
 
@@ -431,6 +483,8 @@ export function useDragDrop() {
     leaveGrid,
     enterEquipmentSlot,
     leaveEquipmentSlot,
+    enterPlateTarget,
+    leavePlateTarget,
     enterDeleteZone,
     leaveDeleteZone,
     onKeyDown,

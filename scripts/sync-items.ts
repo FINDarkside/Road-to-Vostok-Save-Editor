@@ -227,6 +227,19 @@ function parseStringArray(raw: string | undefined): string[] {
   return result
 }
 
+function parseExtResourceArrayPaths(
+  raw: string | undefined,
+  extResources: Map<string, string>
+): string[] {
+  if (!raw) return []
+  const paths: string[] = []
+  for (const match of raw.matchAll(/ExtResource\("([^"]+)"\)/g)) {
+    const path = extResources.get(match[1])
+    if (path) paths.push(path)
+  }
+  return paths
+}
+
 function parseNumber(raw: string | undefined): number {
   if (!raw) return 0
   const n = Number(raw)
@@ -417,6 +430,41 @@ interface ItemEntry {
   maxAmount: number
   repairs: boolean
   slots: string[]
+  compatible: string[]
+  plate: boolean
+  carrier: boolean
+  armorRating: string
+  /** Storage container grid size — set for furniture whose `_F.tscn` attaches LootContainer */
+  containerSize: { w: number; h: number } | null
+}
+
+/**
+ * For a furniture `_F.tres`, read the sibling `_F.tscn` and extract `containerSize`
+ * for storage furniture (lockers, cabinets, fridge, etc.).
+ *
+ * A scene is a container iff it attaches `LootContainer.gd` as a script. Container
+ * scenes that don't override the property fall back to the GDScript default
+ * `Vector2(8, 13)` — Godot only serializes overridden export values.
+ *
+ * Returns null for non-container furniture, or if the scene is missing.
+ */
+async function readContainerSize(tresPath: string): Promise<{ w: number; h: number } | null> {
+  const tscnPath = tresPath.replace(/\.tres$/, '.tscn')
+  let content: string
+  try {
+    content = await readFile(tscnPath, 'utf-8')
+  } catch {
+    return null
+  }
+  // Must attach LootContainer.gd somewhere — otherwise it's not a storage container.
+  if (!/path="res:\/\/Scripts\/LootContainer\.gd"/.test(content)) return null
+  const m = content.match(/^containerSize\s*=\s*(Vector2\([^)]+\))/m)
+  if (m) {
+    const v = parseVector2(m[1])
+    if (v) return { w: v.x, h: v.y }
+  }
+  // GDScript default from LootContainer.gd: `@export var containerSize = Vector2(8, 13)`
+  return { w: 8, h: 13 }
 }
 
 async function main() {
@@ -455,6 +503,8 @@ async function main() {
 
     const size = parseVector2(fields.size) ?? { x: 1, y: 1 }
     const iconFile = await resolveIconFile(content, fields)
+    const containerSize = category === 'Furniture' ? await readContainerSize(filePath) : null
+    const extResources = parseExtResources(content)
 
     items.push({
       category,
@@ -473,7 +523,12 @@ async function main() {
       defaultAmount: parseNumber(fields.defaultAmount),
       maxAmount: parseNumber(fields.maxAmount),
       repairs: parseBool(fields.repairs),
-      slots: parseStringArray(fields.slots)
+      slots: parseStringArray(fields.slots),
+      compatible: parseExtResourceArrayPaths(fields.compatible, extResources),
+      plate: parseBool(fields.plate),
+      carrier: parseBool(fields.carrier),
+      armorRating: parseString(fields.rating),
+      containerSize
     })
   }
 
@@ -536,6 +591,15 @@ async function main() {
     if (item.repairs) props.push('    repairs: true')
     if (item.slots.length > 0) {
       props.push(`    slots: [${item.slots.map((s) => `'${s}'`).join(', ')}]`)
+    }
+    if (item.compatible.length > 0) {
+      props.push(`    compatible: [${item.compatible.map((s) => `'${s}'`).join(', ')}]`)
+    }
+    if (item.plate) props.push('    plate: true')
+    if (item.carrier) props.push('    carrier: true')
+    if (item.armorRating) props.push(`    armorRating: '${item.armorRating.replace(/'/g, "\\'")}'`)
+    if (item.containerSize) {
+      props.push(`    containerSize: { w: ${item.containerSize.w}, h: ${item.containerSize.h} }`)
     }
     itemLines.push(`  {\n${props.join(',\n')}\n  }`)
   }

@@ -56,6 +56,16 @@ export interface GameItem {
   repairs?: boolean
   /** Equipment slots this item can be placed in (e.g. ["Primary", "Secondary"]) */
   slots?: string[]
+  /** Resource paths this item accepts through the game's combine/nested system */
+  compatible?: string[]
+  /** Armor plate item usable inside compatible carrier rigs */
+  plate?: boolean
+  /** Rig that can contain one armor plate */
+  carrier?: boolean
+  /** Armor rating label shown by the game, e.g. "III+" */
+  armorRating?: string
+  /** Storage container grid size for storage furniture (lockers, cabinets, fridge, etc.) */
+  containerSize?: { w: number; h: number }
 }
 
 export interface ResolvedItemMeta {
@@ -97,6 +107,12 @@ export interface SlotItem {
   slot: string
   /** Resource paths of nested items (magazine, attachments) */
   nested: string[]
+  /** Armor rating label for plates or plated rigs */
+  armorRating: string
+  /** Whether this item is a rig that can contain an armor plate */
+  carrier: boolean
+  /** Nested armor plate path, when this item is a plated rig */
+  armorPlatePath: string
 }
 
 export interface GridItemPlacement {
@@ -120,6 +136,12 @@ export interface GridItemPlacement {
   rotated: boolean
   /** Resource paths of nested items (magazine, attachments) */
   nested: string[]
+  /** Armor rating label for plates or plated rigs */
+  armorRating: string
+  /** Whether this item is a rig that can contain an armor plate */
+  carrier: boolean
+  /** Nested armor plate path, when this item is a plated rig */
+  armorPlatePath: string
 }
 
 export interface DragSource {
@@ -143,6 +165,11 @@ export interface EquipmentHoverState {
   isValid: boolean
 }
 
+export interface PlateHoverState {
+  targetSubResourceId: string
+  isValid: boolean
+}
+
 export interface DragDropState {
   source: DragSource
   /** Mouse position in document (client) coordinates */
@@ -152,6 +179,8 @@ export interface DragDropState {
   gridSnap: GridSnapState | null
   /** Equipment slot hover — set when pointer is over an equipment slot */
   equipmentHover: EquipmentHoverState | null
+  /** Rig hover — set when dragging an armor plate over a compatible carrier rig */
+  plateHover: PlateHoverState | null
   /** Whether the pointer is over the delete zone */
   deleteHover: boolean
   /** Current ghost dimensions (updated by grid snap / rotation) */

@@ -3,7 +3,7 @@ import { useDragDrop } from '../composables/useDragDrop'
 import CompositeIcon from './CompositeIcon.vue'
 import type { GridItemPlacement } from '../lib/types'
 
-const props = defineProps<{
+defineProps<{
   placement: GridItemPlacement
   cellSize: number
   ghost?: boolean
@@ -13,6 +13,8 @@ const props = defineProps<{
 defineEmits<{
   dragstart: [placement: GridItemPlacement, event: PointerEvent]
   contextmenu: [placement: GridItemPlacement, event: MouseEvent]
+  pointerenter: [placement: GridItemPlacement]
+  pointerleave: [placement: GridItemPlacement]
 }>()
 
 const { dragState } = useDragDrop()
@@ -32,8 +34,10 @@ const { dragState } = useDragDrop()
       width: `${placement.w * cellSize}px`,
       height: `${placement.h * cellSize}px`
     }"
-    :title="`${placement.itemName}${placement.condition ? ` (${Math.round(placement.condition)}%)` : ''}`"
+    :title="`${placement.itemName}${placement.showCondition ? ` (${Math.round(placement.condition)}%)` : ''}`"
     @pointerdown.prevent="!ghost && $event.button === 0 && $emit('dragstart', placement, $event)"
+    @pointerenter="!ghost && $emit('pointerenter', placement)"
+    @pointerleave="!ghost && $emit('pointerleave', placement)"
     @contextmenu.prevent="!ghost && $emit('contextmenu', placement, $event)"
   >
     <div
@@ -82,6 +86,12 @@ const { dragState } = useDragDrop()
         class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
       >
         {{ placement.amount }}
+      </span>
+      <span
+        v-else-if="!ghost && placement.armorRating"
+        class="absolute bottom-0 right-0 text-[10px] leading-none font-medium text-green-500 px-[3px] pb-[4px] z-10"
+      >
+        {{ placement.armorRating }}
       </span>
       <!-- Item name label -->
       <span

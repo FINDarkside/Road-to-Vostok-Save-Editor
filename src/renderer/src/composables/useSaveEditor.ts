@@ -66,6 +66,10 @@ function resolveNestedPaths(tres: TresFile, sub: SubResource): string[] {
 function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
   const itemPath = resolveItemPath(tres, sub)
   const catalogItem = ITEMS_BY_PATH.get(itemPath)
+  const nested = resolveNestedPaths(tres, sub)
+  const armorPlatePath = nested.find((path) => ITEMS_BY_PATH.get(path)?.plate) ?? ''
+  const armorPlate = armorPlatePath ? ITEMS_BY_PATH.get(armorPlatePath) : undefined
+  const isPlatedRig = catalogItem?.carrier === true && !!armorPlate
 
   return {
     subResourceId: sub.id,
@@ -85,7 +89,7 @@ function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
       'Unknown',
     category: catalogItem?.category ?? '',
     condition: getNumberProp(sub.properties, 'condition'),
-    showCondition: ITEMS_META.get(itemPath)?.showCondition ?? false,
+    showCondition: (ITEMS_META.get(itemPath)?.showCondition ?? false) || isPlatedRig,
     amount: getNumberProp(sub.properties, 'amount'),
     showAmount: ITEMS_META.get(itemPath)?.showAmount ?? false,
     chamber: getBoolProp(sub.properties, 'chamber'),
@@ -95,7 +99,10 @@ function subResourceToSlotItem(tres: TresFile, sub: SubResource): SlotItem {
     },
     gridRotated: getBoolProp(sub.properties, 'gridRotated'),
     slot: getStringProp(sub.properties, 'slot'),
-    nested: resolveNestedPaths(tres, sub)
+    nested,
+    armorRating: armorPlate?.armorRating ?? catalogItem?.armorRating ?? '',
+    carrier: catalogItem?.carrier ?? false,
+    armorPlatePath
   }
 }
 
@@ -313,6 +320,7 @@ export function useSaveEditor() {
       gridCol?: number
       gridRow?: number
       gridRotated?: boolean
+      nestedPaths?: string[]
     } = {}
   ): void {
     if (!tresFile.value) return
@@ -348,6 +356,7 @@ export function useSaveEditor() {
     const meta = ITEMS_META.get(resourcePath)
     const condition = opts.condition ?? meta?.defaultCondition ?? 0
     const amount = opts.amount ?? meta?.defaultAmount ?? 0
+    const nestedExtIds = ensureExtResourceIds(tres, opts.nestedPaths ?? [])
 
     const newSub: SubResource = {
       id: subId,
@@ -357,7 +366,11 @@ export function useSaveEditor() {
         { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
         {
           key: 'nested',
-          value: { kind: 'typed_array', elementType: `ExtResource("${itemDataId}")`, elements: [] }
+          value: {
+            kind: 'typed_array',
+            elementType: `ExtResource("${itemDataId}")`,
+            elements: nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
+          }
         },
         {
           key: 'storage',
@@ -407,6 +420,7 @@ export function useSaveEditor() {
       gridCol?: number
       gridRow?: number
       gridRotated?: boolean
+      nestedPaths?: string[]
     } = {}
   ): void {
     if (!tresFile.value) return
@@ -438,6 +452,7 @@ export function useSaveEditor() {
     const meta = ITEMS_META.get(resourcePath)
     const condition = opts.condition ?? meta?.defaultCondition ?? 0
     const amount = opts.amount ?? meta?.defaultAmount ?? 0
+    const nestedExtIds = ensureExtResourceIds(tres, opts.nestedPaths ?? [])
 
     const newSub: SubResource = {
       id: subId,
@@ -447,7 +462,11 @@ export function useSaveEditor() {
         { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
         {
           key: 'nested',
-          value: { kind: 'typed_array', elementType: `ExtResource("${itemDataId}")`, elements: [] }
+          value: {
+            kind: 'typed_array',
+            elementType: `ExtResource("${itemDataId}")`,
+            elements: nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
+          }
         },
         {
           key: 'storage',
@@ -499,7 +518,7 @@ export function useSaveEditor() {
   function addEquipmentItem(
     resourcePath: string,
     slotName: string,
-    opts: { condition?: number; amount?: number } = {}
+    opts: { condition?: number; amount?: number; nestedPaths?: string[] } = {}
   ): void {
     if (!tresFile.value) return
     const tres = tresFile.value
@@ -530,6 +549,7 @@ export function useSaveEditor() {
     const meta = ITEMS_META.get(resourcePath)
     const condition = opts.condition ?? meta?.defaultCondition ?? 0
     const amount = opts.amount ?? meta?.defaultAmount ?? 0
+    const nestedExtIds = ensureExtResourceIds(tres, opts.nestedPaths ?? [])
 
     const newSub: SubResource = {
       id: subId,
@@ -539,7 +559,11 @@ export function useSaveEditor() {
         { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
         {
           key: 'nested',
-          value: { kind: 'typed_array', elementType: `ExtResource("${itemDataId}")`, elements: [] }
+          value: {
+            kind: 'typed_array',
+            elementType: `ExtResource("${itemDataId}")`,
+            elements: nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
+          }
         },
         {
           key: 'storage',
@@ -618,6 +642,54 @@ export function useSaveEditor() {
         amountProp.value = { kind: 'int', value: newAmount, raw: String(newAmount) }
       }
     }
+
+    updateLoadSteps(tres)
+    isDirty.value = true
+    tresFile.value = { ...tres }
+  }
+
+  function setRigArmorPlate(
+    subResourceId: string,
+    platePath: string | null,
+    condition?: number
+  ): void {
+    if (!tresFile.value) return
+    const tres = tresFile.value
+    const sub = tres.subResources.find((s) => s.id === subResourceId)
+    if (!sub) return
+
+    const slotDataExt = tres.extResources.find((e) => e.path.endsWith('SlotData.gd'))
+    const slotDataId = slotDataExt?.id ?? '1'
+    const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
+    const itemDataId = itemDataExt?.id ?? '3'
+    const nestedExtIds = platePath ? ensureExtResourceIds(tres, [platePath]) : []
+
+    let nestedProp = sub.properties.find((p) => p.key === 'nested')
+    if (!nestedProp) {
+      nestedProp = {
+        key: 'nested',
+        value: { kind: 'typed_array', elementType: `ExtResource("${itemDataId}")`, elements: [] }
+      }
+      sub.properties.splice(Math.min(2, sub.properties.length), 0, nestedProp)
+    }
+    if (nestedProp.value.kind === 'typed_array') {
+      nestedProp.value.elementType = `ExtResource("${itemDataId}")`
+      nestedProp.value.elements = nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
+    }
+
+    let storageProp = sub.properties.find((p) => p.key === 'storage')
+    if (!storageProp) {
+      storageProp = {
+        key: 'storage',
+        value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
+      }
+      sub.properties.splice(Math.min(3, sub.properties.length), 0, storageProp)
+    }
+
+    const nextCondition = platePath
+      ? (condition ?? getNumberProp(sub.properties, 'condition'))
+      : 100
+    setNumberProperty(sub, 'condition', nextCondition)
 
     updateLoadSteps(tres)
     isDirty.value = true
@@ -773,20 +845,8 @@ export function useSaveEditor() {
     const pixelX = col * 64
     const pixelY = row * 64
 
-    const posProp = sub.properties.find((p) => p.key === 'gridPosition')
-    if (posProp) {
-      posProp.value = {
-        kind: 'vector2',
-        x: pixelX,
-        y: pixelY,
-        raw: `Vector2(${pixelX}, ${pixelY})`
-      }
-    }
-
-    const rotProp = sub.properties.find((p) => p.key === 'gridRotated')
-    if (rotProp) {
-      rotProp.value = { kind: 'bool', value: gridRotated }
-    }
+    setVector2Property(sub, 'gridPosition', pixelX, pixelY)
+    setBoolProperty(sub, 'gridRotated', gridRotated)
 
     isDirty.value = true
     tresFile.value = { ...tres }
@@ -852,27 +912,13 @@ export function useSaveEditor() {
     }
 
     // Clear slot
-    const slotProp = sub.properties.find((p) => p.key === 'slot')
-    if (slotProp) {
-      slotProp.value = { kind: 'string', value: '' }
-    }
+    setStringProperty(sub, 'slot', '')
 
     // Set grid position
     const pixelX = col * 64
     const pixelY = row * 64
-    const posProp = sub.properties.find((p) => p.key === 'gridPosition')
-    if (posProp) {
-      posProp.value = {
-        kind: 'vector2',
-        x: pixelX,
-        y: pixelY,
-        raw: `Vector2(${pixelX}, ${pixelY})`
-      }
-    }
-    const rotProp = sub.properties.find((p) => p.key === 'gridRotated')
-    if (rotProp) {
-      rotProp.value = { kind: 'bool', value: rotated }
-    }
+    setVector2Property(sub, 'gridPosition', pixelX, pixelY)
+    setBoolProperty(sub, 'gridRotated', rotated)
 
     isDirty.value = true
     tresFile.value = { ...tres }
@@ -899,20 +945,11 @@ export function useSaveEditor() {
     }
 
     // Set slot
-    const slotProp = sub.properties.find((p) => p.key === 'slot')
-    if (slotProp) {
-      slotProp.value = { kind: 'string', value: slotName }
-    }
+    setStringProperty(sub, 'slot', slotName)
 
     // Clear grid position
-    const posProp = sub.properties.find((p) => p.key === 'gridPosition')
-    if (posProp) {
-      posProp.value = { kind: 'vector2', x: 0, y: 0, raw: 'Vector2(0, 0)' }
-    }
-    const rotProp = sub.properties.find((p) => p.key === 'gridRotated')
-    if (rotProp) {
-      rotProp.value = { kind: 'bool', value: false }
-    }
+    setVector2Property(sub, 'gridPosition', 0, 0)
+    setBoolProperty(sub, 'gridRotated', false)
 
     isDirty.value = true
     tresFile.value = { ...tres }
@@ -945,6 +982,7 @@ export function useSaveEditor() {
     addEquipmentItem,
     removeItem,
     setWeaponNested,
+    setRigArmorPlate,
     updateStat,
     maxAllStats,
     updateStatusEffect,
@@ -967,6 +1005,63 @@ function updateLoadSteps(tres: TresFile): void {
       /load_steps=\d+/,
       `load_steps=${tres.header.loadSteps}`
     )
+  }
+}
+
+function ensureExtResourceIds(tres: TresFile, resourcePaths: string[]): string[] {
+  return resourcePaths.map((path) => {
+    let extId = tres.extResources.find((e) => e.path === path)?.id
+    if (extId) return extId
+
+    extId = String(Math.max(0, ...tres.extResources.map((e) => parseInt(e.id, 10))) + 1)
+    tres.extResources.push({
+      id: extId,
+      type: 'Resource',
+      path,
+      raw: `[ext_resource type="Resource" path="${path}" id="${extId}"]`
+    })
+    return extId
+  })
+}
+
+function setNumberProperty(sub: SubResource, key: string, value: number): void {
+  const prop = sub.properties.find((p) => p.key === key)
+  const raw = String(value)
+  if (prop) {
+    prop.value = { kind: Number.isInteger(value) ? 'int' : 'float', value, raw }
+  } else {
+    sub.properties.push({
+      key,
+      value: { kind: Number.isInteger(value) ? 'int' : 'float', value, raw }
+    })
+  }
+}
+
+function setStringProperty(sub: SubResource, key: string, value: string): void {
+  const prop = sub.properties.find((p) => p.key === key)
+  if (prop) {
+    prop.value = { kind: 'string', value }
+  } else {
+    sub.properties.push({ key, value: { kind: 'string', value } })
+  }
+}
+
+function setBoolProperty(sub: SubResource, key: string, value: boolean): void {
+  const prop = sub.properties.find((p) => p.key === key)
+  if (prop) {
+    prop.value = { kind: 'bool', value }
+  } else {
+    sub.properties.push({ key, value: { kind: 'bool', value } })
+  }
+}
+
+function setVector2Property(sub: SubResource, key: string, x: number, y: number): void {
+  const raw = `Vector2(${x}, ${y})`
+  const prop = sub.properties.find((p) => p.key === key)
+  if (prop) {
+    prop.value = { kind: 'vector2', x, y, raw }
+  } else {
+    sub.properties.push({ key, value: { kind: 'vector2', x, y, raw } })
   }
 }
 
