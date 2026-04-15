@@ -13,10 +13,11 @@ import { useDragDrop } from '../composables/useDragDrop'
 import { useSaveEditor } from '../composables/useSaveEditor'
 import { useToast } from '../composables/useToast'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
+import { ATTACHMENT_SUBTYPE } from '../data/attachment-subtypes'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import InventoryGridItem from './InventoryGridItem.vue'
 import ItemContextMenu from './ItemContextMenu.vue'
-import type { GridItemPlacement, SlotItem } from '../lib/types'
+import type { AttachmentRemoveOption, GridItemPlacement, SlotItem } from '../lib/types'
 
 const props = withDefaults(
   defineProps<{
@@ -31,6 +32,7 @@ const {
   addItem,
   addCatalogItem,
   setRigArmorPlate,
+  removeWeaponAttachment,
   items: inventoryItems,
   catalogItems
 } = useSaveEditor()
@@ -58,6 +60,8 @@ const {
   leaveGrid,
   enterPlateTarget,
   leavePlateTarget,
+  enterAttachmentTarget,
+  leaveAttachmentTarget,
   onKeyDown,
   cancelDrag
 } = useDragDrop()
@@ -82,6 +86,19 @@ const removePlateLabel = computed(() => {
   if (!platePath) return ''
   const plate = ITEMS_BY_PATH.get(platePath)
   return `Remove ${plate?.armorRating ? `${plate.armorRating} plate` : (plate?.displayName ?? 'plate')}`
+})
+
+const removeAttachmentOptions = computed<AttachmentRemoveOption[]>(() => {
+  if (!contextMenu.value || props.mode !== 'inventory') return []
+  const placement = contextMenu.value.placement
+  if (placement.category !== 'Weapons') return []
+
+  return placement.nested
+    .filter((path) => ATTACHMENT_SUBTYPE.has(path))
+    .map((path) => ({
+      path,
+      label: `Remove ${ITEMS_BY_PATH.get(path)?.displayName ?? path.split('/').pop()?.replace('.tres', '') ?? 'attachment'}`
+    }))
 })
 
 const canDuplicate = computed(() => {
@@ -153,6 +170,28 @@ function handleRemovePlate() {
   contextMenu.value = null
 }
 
+function handleRemoveAttachment(path: string) {
+  if (!contextMenu.value) return
+  const weapon = sourceItems.value.find(
+    (i) => i.subResourceId === contextMenu.value!.placement.subResourceId
+  )
+  if (!weapon) return
+
+  const attachment = ITEMS_BY_PATH.get(path)
+  const size = attachment ? getItemSize(attachment) : { w: 1, h: 1 }
+  const slot = findFreeSlot(size.w, size.h)
+  if (!slot) {
+    toast.show('No inventory space for removed attachment')
+    contextMenu.value = null
+    return
+  }
+
+  if (!removeWeaponAttachment(weapon.subResourceId, path, slot)) {
+    toast.show('Failed to remove attachment')
+  }
+  contextMenu.value = null
+}
+
 function handleDelete() {
   if (!contextMenu.value) return
   removeItem(contextMenu.value.placement.subResourceId)
@@ -178,7 +217,7 @@ function autoFixConflicts(): void {
 
 function onItemDragStart(placement: GridItemPlacement, event: PointerEvent): void {
   setGridContainer(containerRef.value, gridInstance)
-  startDragFromGrid(placement, event)
+  startDragFromGrid(placement, event, props.mode)
 }
 
 function handleGridEnter(event: PointerEvent): void {
@@ -196,13 +235,23 @@ function handleGridLeave(): void {
 
 function handleItemPointerEnter(placement: GridItemPlacement): void {
   if (!dragState.value) return
-  if (!ITEMS_BY_PATH.get(dragState.value.source.item.itemPath)?.plate) return
-  if (!placement.carrier) return
-  enterPlateTarget(placement)
+  const draggedPath = dragState.value.source.item.itemPath
+  if (ITEMS_BY_PATH.get(draggedPath)?.plate && placement.carrier) {
+    enterPlateTarget(placement)
+    return
+  }
+  if (
+    props.mode === 'inventory' &&
+    ATTACHMENT_SUBTYPE.has(draggedPath) &&
+    placement.category === 'Weapons'
+  ) {
+    enterAttachmentTarget(placement)
+  }
 }
 
 function handleItemPointerLeave(placement: GridItemPlacement): void {
   leavePlateTarget(placement.subResourceId)
+  leaveAttachmentTarget(placement.subResourceId)
 }
 
 function handleKeyDown(event: KeyboardEvent): void {
@@ -244,7 +293,7 @@ const gridHeight = gridRows * cellSize
 
 // Build cell classes for drag highlighting
 function cellHighlight(col: number, row: number): string {
-  if (dragState.value?.plateHover) return ''
+  if (dragState.value?.plateHover || dragState.value?.attachmentHover) return ''
   const snap = dragState.value?.gridSnap
   if (!snap) return ''
   if (col >= snap.col && col < snap.col + snap.w && row >= snap.row && row < snap.row + snap.h) {
@@ -311,11 +360,15 @@ defineExpose({ findFreeSlot })
         :class="{
           'ring-1 ring-amber-500/60': conflictIds.has(p.subResourceId),
           'ring-2 ring-green-500':
-            dragState?.plateHover?.targetSubResourceId === p.subResourceId &&
-            dragState.plateHover.isValid,
+            (dragState?.plateHover?.targetSubResourceId === p.subResourceId &&
+              dragState.plateHover.isValid) ||
+            (dragState?.attachmentHover?.targetSubResourceId === p.subResourceId &&
+              dragState.attachmentHover.isValid),
           'ring-2 ring-red-500':
-            dragState?.plateHover?.targetSubResourceId === p.subResourceId &&
-            !dragState.plateHover.isValid
+            (dragState?.plateHover?.targetSubResourceId === p.subResourceId &&
+              !dragState.plateHover.isValid) ||
+            (dragState?.attachmentHover?.targetSubResourceId === p.subResourceId &&
+              !dragState.attachmentHover.isValid)
         }"
         @dragstart="onItemDragStart"
         @pointerenter="handleItemPointerEnter"
@@ -331,9 +384,11 @@ defineExpose({ findFreeSlot })
       :show-edit-loadout="showEditLoadout"
       :edit-loadout-label="editLoadoutLabel"
       :remove-plate-label="removePlateLabel"
+      :remove-attachment-options="removeAttachmentOptions"
       :can-duplicate="canDuplicate"
       @edit-loadout="handleEditLoadout"
       @remove-plate="handleRemovePlate"
+      @remove-attachment="handleRemoveAttachment"
       @duplicate="handleDuplicate"
       @delete="handleDelete"
       @close="contextMenu = null"

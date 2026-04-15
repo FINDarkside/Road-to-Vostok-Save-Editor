@@ -11,7 +11,7 @@ import type {
 import { parseTresFile } from '../lib/tres/parser'
 import { serializeTresFile } from '../lib/tres/serializer'
 import { ITEMS_BY_PATH, ITEMS_META } from '../data/items'
-import { ATTACHMENT_SUBTYPE } from '../data/attachment-subtypes'
+import { ATTACHMENT_SUBTYPE, getWeaponSlots } from '../data/attachment-subtypes'
 import type { TraderKey } from '../data/quests'
 
 const currentFile = ref<SaveFileInfo | null>(null)
@@ -648,6 +648,94 @@ export function useSaveEditor() {
     tresFile.value = { ...tres }
   }
 
+  function installWeaponAttachment(
+    weaponSubResourceId: string,
+    attachmentSubResourceId: string,
+    ejectedSlot?: { col: number; row: number; rotated: boolean } | null
+  ): boolean {
+    if (!tresFile.value) return false
+    const tres = tresFile.value
+    const weaponSub = tres.subResources.find((s) => s.id === weaponSubResourceId)
+    const attachmentSub = tres.subResources.find((s) => s.id === attachmentSubResourceId)
+    if (!weaponSub || !attachmentSub) return false
+
+    const weaponPath = resolveItemPath(tres, weaponSub)
+    const attachmentPath = resolveItemPath(tres, attachmentSub)
+    const subtype = ATTACHMENT_SUBTYPE.get(attachmentPath)
+    if (!subtype) return false
+
+    const compatible = getWeaponSlots(weaponPath)
+      .get(subtype)
+      ?.some((o) => o.itemPath === attachmentPath)
+    if (!compatible) return false
+
+    const oldNested = resolveNestedPaths(tres, weaponSub)
+    const ejectedPath = oldNested.find((path) => ATTACHMENT_SUBTYPE.get(path) === subtype)
+    if (ejectedPath && !ejectedSlot) return false
+
+    const nextNested = oldNested.filter((path) => ATTACHMENT_SUBTYPE.get(path) !== subtype)
+    nextNested.push(attachmentPath)
+
+    const oldWeaponAmount = getNumberProp(weaponSub.properties, 'amount')
+    const looseAttachmentAmount = getNumberProp(attachmentSub.properties, 'amount')
+
+    if (ejectedPath && ejectedSlot) {
+      createInventorySubResource(tres, ejectedPath, {
+        amount: subtype === 'Magazine' ? oldWeaponAmount : undefined,
+        gridCol: ejectedSlot.col,
+        gridRow: ejectedSlot.row,
+        gridRotated: ejectedSlot.rotated
+      })
+    }
+
+    setNestedPaths(tres, weaponSub, nextNested)
+    if (subtype === 'Magazine') {
+      setNumberProperty(weaponSub, 'amount', looseAttachmentAmount)
+    }
+    removeSubResource(tres, attachmentSubResourceId)
+
+    updateLoadSteps(tres)
+    isDirty.value = true
+    tresFile.value = { ...tres }
+    return true
+  }
+
+  function removeWeaponAttachment(
+    weaponSubResourceId: string,
+    attachmentPath: string,
+    slot: { col: number; row: number; rotated: boolean }
+  ): boolean {
+    if (!tresFile.value) return false
+    const tres = tresFile.value
+    const weaponSub = tres.subResources.find((s) => s.id === weaponSubResourceId)
+    if (!weaponSub) return false
+
+    const oldNested = resolveNestedPaths(tres, weaponSub)
+    if (!oldNested.includes(attachmentPath)) return false
+
+    const subtype = ATTACHMENT_SUBTYPE.get(attachmentPath)
+    const amount =
+      subtype === 'Magazine' ? getNumberProp(weaponSub.properties, 'amount') : undefined
+    createInventorySubResource(tres, attachmentPath, {
+      amount,
+      gridCol: slot.col,
+      gridRow: slot.row,
+      gridRotated: slot.rotated
+    })
+
+    const nextNested = [...oldNested]
+    nextNested.splice(nextNested.indexOf(attachmentPath), 1)
+    setNestedPaths(tres, weaponSub, nextNested)
+    if (subtype === 'Magazine') {
+      setNumberProperty(weaponSub, 'amount', 0)
+    }
+
+    updateLoadSteps(tres)
+    isDirty.value = true
+    tresFile.value = { ...tres }
+    return true
+  }
+
   function setRigArmorPlate(
     subResourceId: string,
     platePath: string | null,
@@ -982,6 +1070,8 @@ export function useSaveEditor() {
     addEquipmentItem,
     removeItem,
     setWeaponNested,
+    installWeaponAttachment,
+    removeWeaponAttachment,
     setRigArmorPlate,
     updateStat,
     maxAllStats,
@@ -1005,6 +1095,115 @@ function updateLoadSteps(tres: TresFile): void {
       /load_steps=\d+/,
       `load_steps=${tres.header.loadSteps}`
     )
+  }
+}
+
+function createInventorySubResource(
+  tres: TresFile,
+  resourcePath: string,
+  opts: {
+    condition?: number
+    amount?: number
+    gridCol?: number
+    gridRow?: number
+    gridRotated?: boolean
+    nestedPaths?: string[]
+  } = {}
+): string {
+  const extId = ensureExtResourceIds(tres, [resourcePath])[0]
+  const slotDataExt = tres.extResources.find((e) => e.path.endsWith('SlotData.gd'))
+  const slotDataId = slotDataExt?.id ?? '1'
+  const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
+  const itemDataId = itemDataExt?.id ?? '3'
+  const nestedExtIds = ensureExtResourceIds(tres, opts.nestedPaths ?? [])
+
+  let subId: string
+  do {
+    subId = 'Resource_' + randomAlphanumeric(5)
+  } while (tres.subResources.some((s) => s.id === subId))
+
+  const meta = ITEMS_META.get(resourcePath)
+  const condition = opts.condition ?? meta?.defaultCondition ?? 0
+  const amount = opts.amount ?? meta?.defaultAmount ?? 0
+
+  const newSub: SubResource = {
+    id: subId,
+    type: 'Resource',
+    properties: [
+      { key: 'script', value: { kind: 'ext_resource', id: slotDataId } },
+      { key: 'itemData', value: { kind: 'ext_resource', id: extId } },
+      {
+        key: 'nested',
+        value: {
+          kind: 'typed_array',
+          elementType: `ExtResource("${itemDataId}")`,
+          elements: nestedExtIds.map((id) => ({ kind: 'ext_resource' as const, id }))
+        }
+      },
+      {
+        key: 'storage',
+        value: { kind: 'typed_array', elementType: `ExtResource("${slotDataId}")`, elements: [] }
+      },
+      { key: 'condition', value: { kind: 'int', value: condition, raw: String(condition) } },
+      { key: 'amount', value: { kind: 'int', value: amount, raw: String(amount) } },
+      { key: 'position', value: { kind: 'int', value: 0, raw: '0' } },
+      { key: 'mode', value: { kind: 'int', value: 1, raw: '1' } },
+      { key: 'zoom', value: { kind: 'int', value: 1, raw: '1' } },
+      { key: 'chamber', value: { kind: 'bool', value: false } },
+      { key: 'casing', value: { kind: 'bool', value: false } },
+      { key: 'state', value: { kind: 'string', value: '' } },
+      {
+        key: 'gridPosition',
+        value: {
+          kind: 'vector2',
+          x: (opts.gridCol ?? 0) * 64,
+          y: (opts.gridRow ?? 0) * 64,
+          raw: `Vector2(${(opts.gridCol ?? 0) * 64}, ${(opts.gridRow ?? 0) * 64})`
+        }
+      },
+      { key: 'gridRotated', value: { kind: 'bool', value: opts.gridRotated ?? false } },
+      { key: 'slot', value: { kind: 'string', value: '' } }
+    ]
+  }
+
+  tres.subResources.push(newSub)
+
+  const invProp = tres.resource.find((p) => p.key === 'inventory')
+  if (invProp && invProp.value.kind === 'typed_array') {
+    invProp.value.elements.push({ kind: 'sub_resource', id: subId })
+  }
+
+  return subId
+}
+
+function removeSubResource(tres: TresFile, subResourceId: string): void {
+  for (const key of ['inventory', 'equipment', 'catalog']) {
+    const prop = tres.resource.find((p) => p.key === key)
+    if (prop?.value.kind === 'typed_array') {
+      prop.value.elements = prop.value.elements.filter(
+        (el) => !(el.kind === 'sub_resource' && el.id === subResourceId)
+      )
+    }
+  }
+  tres.subResources = tres.subResources.filter((s) => s.id !== subResourceId)
+}
+
+function setNestedPaths(tres: TresFile, sub: SubResource, nestedPaths: string[]): void {
+  const itemDataExt = tres.extResources.find((e) => e.path.endsWith('ItemData.gd'))
+  const itemDataId = itemDataExt?.id ?? '3'
+  const extIds = ensureExtResourceIds(tres, nestedPaths)
+  let nestedProp = sub.properties.find((p) => p.key === 'nested')
+  if (!nestedProp) {
+    nestedProp = {
+      key: 'nested',
+      value: { kind: 'typed_array', elementType: `ExtResource("${itemDataId}")`, elements: [] }
+    }
+    sub.properties.splice(Math.min(2, sub.properties.length), 0, nestedProp)
+  }
+  nestedProp.value = {
+    kind: 'typed_array',
+    elementType: `ExtResource("${itemDataId}")`,
+    elements: extIds.map((id) => ({ kind: 'ext_resource' as const, id }))
   }
 }
 

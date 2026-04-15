@@ -147,6 +147,8 @@ export interface GridItemPlacement {
 export interface DragSource {
   origin: 'grid' | 'equipment'
   item: GridItemPlacement
+  /** Which grid the drag started from when origin is grid */
+  gridMode?: 'inventory' | 'catalog'
   /** If origin is 'equipment', the slot name the item was dragged from */
   equipmentSlot?: string
 }
@@ -170,6 +172,16 @@ export interface PlateHoverState {
   isValid: boolean
 }
 
+export interface AttachmentHoverState {
+  targetSubResourceId: string
+  isValid: boolean
+}
+
+export interface AttachmentRemoveOption {
+  path: string
+  label: string
+}
+
 export interface DragDropState {
   source: DragSource
   /** Mouse position in document (client) coordinates */
@@ -181,6 +193,8 @@ export interface DragDropState {
   equipmentHover: EquipmentHoverState | null
   /** Rig hover — set when dragging an armor plate over a compatible carrier rig */
   plateHover: PlateHoverState | null
+  /** Weapon hover — set when dragging a compatible attachment over a weapon */
+  attachmentHover: AttachmentHoverState | null
   /** Whether the pointer is over the delete zone */
   deleteHover: boolean
   /** Current ghost dimensions (updated by grid snap / rotation) */

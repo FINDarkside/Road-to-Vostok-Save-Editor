@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Copy, ShieldX, Trash2, Wrench } from 'lucide-vue-next'
+import type { AttachmentRemoveOption } from '../lib/types'
 
 withDefaults(
   defineProps<{
@@ -9,12 +10,14 @@ withDefaults(
     showEditLoadout?: boolean
     editLoadoutLabel?: string
     removePlateLabel?: string
+    removeAttachmentOptions?: AttachmentRemoveOption[]
     canDuplicate?: boolean
   }>(),
   {
     showEditLoadout: false,
     editLoadoutLabel: 'Edit Loadout',
     removePlateLabel: '',
+    removeAttachmentOptions: () => [],
     canDuplicate: true
   }
 )
@@ -24,6 +27,7 @@ const emit = defineEmits<{
   delete: []
   editLoadout: []
   removePlate: []
+  removeAttachment: [path: string]
   close: []
 }>()
 
@@ -72,6 +76,15 @@ onUnmounted(() => {
       >
         <ShieldX class="h-3.5 w-3.5" />
         {{ removePlateLabel }}
+      </button>
+      <button
+        v-for="option in removeAttachmentOptions"
+        :key="option.path"
+        class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+        @click="emit('removeAttachment', option.path)"
+      >
+        <Wrench class="h-3.5 w-3.5" />
+        {{ option.label }}
       </button>
       <button
         class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-inherit"

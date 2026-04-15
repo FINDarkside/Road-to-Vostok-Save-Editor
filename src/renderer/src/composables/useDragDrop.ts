@@ -6,11 +6,13 @@ import type {
   DragSource,
   SlotItem
 } from '../lib/types'
+import { ATTACHMENT_SUBTYPE, getWeaponSlots } from '../data/attachment-subtypes'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { CELL_SIZE, useInventoryGrid } from './useInventoryGrid'
 import { useSaveEditor } from './useSaveEditor'
 
 type ActiveGrid = ReturnType<typeof useInventoryGrid>
+type GridSlot = { col: number; row: number; rotated: boolean }
 
 const dragState = ref<DragDropState | null>(null)
 
@@ -127,6 +129,73 @@ function canDropPlateIntoRig(plate: GridItemPlacement, rig: GridItemPlacement | 
   return !!plateMeta?.plate && rig.carrier && !!rigMeta?.compatible?.includes(plate.itemPath)
 }
 
+function findAttachmentEjectSlot(ejectedPath: string, source: GridItemPlacement): GridSlot | null {
+  if (!activeGrid) return null
+  const { canPlace, findFreeSlot } = activeGrid
+  const ejectedMeta = ITEMS_BY_PATH.get(ejectedPath)
+  const ejectedSize = ejectedMeta ? getItemSize(ejectedMeta) : { w: 1, h: 1 }
+
+  if (canPlace(source.col, source.row, ejectedSize.w, ejectedSize.h, source.subResourceId)) {
+    return { col: source.col, row: source.row, rotated: false }
+  }
+
+  if (
+    ejectedSize.w !== ejectedSize.h &&
+    canPlace(source.col, source.row, ejectedSize.h, ejectedSize.w, source.subResourceId)
+  ) {
+    return { col: source.col, row: source.row, rotated: true }
+  }
+
+  return findFreeSlot(ejectedSize.w, ejectedSize.h, source.subResourceId)
+}
+
+function getExistingAttachmentPath(
+  attachmentPath: string,
+  weapon: GridItemPlacement | SlotItem
+): string | null {
+  const subtype = ATTACHMENT_SUBTYPE.get(attachmentPath)
+  if (!subtype) return null
+  return weapon.nested.find((path) => ATTACHMENT_SUBTYPE.get(path) === subtype) ?? null
+}
+
+function canDropAttachmentIntoWeapon(
+  attachment: GridItemPlacement,
+  weapon: GridItemPlacement | SlotItem
+): boolean {
+  if (attachment.subResourceId === weapon.subResourceId) return false
+  if (dragState.value?.source.origin !== 'grid') return false
+  if (dragState.value.source.gridMode !== 'inventory') return false
+  if (weapon.category !== 'Weapons') return false
+
+  const subtype = ATTACHMENT_SUBTYPE.get(attachment.itemPath)
+  if (!subtype) return false
+
+  const compatible = getWeaponSlots(weapon.itemPath)
+    .get(subtype)
+    ?.some((option) => option.itemPath === attachment.itemPath)
+  if (!compatible) return false
+
+  const ejectedPath = getExistingAttachmentPath(attachment.itemPath, weapon)
+  if (!ejectedPath) return true
+
+  return !!findAttachmentEjectSlot(ejectedPath, attachment)
+}
+
+function getAttachmentDropEjectSlot(target: GridItemPlacement | SlotItem): GridSlot | null {
+  if (!dragState.value) return null
+  const source = dragState.value.source.item
+  const ejectedPath = getExistingAttachmentPath(source.itemPath, target)
+  return ejectedPath ? findAttachmentEjectSlot(ejectedPath, source) : null
+}
+
+function findAttachmentTargetById(subResourceId: string): GridItemPlacement | SlotItem | null {
+  const gridTarget = activeGrid?.gridPlacements.value.find((p) => p.subResourceId === subResourceId)
+  if (gridTarget) return gridTarget
+
+  const { equipment } = useSaveEditor()
+  return equipment.value.find((item) => item.subResourceId === subResourceId) ?? null
+}
+
 function activateGridSnap(
   canPlace: (col: number, row: number, w: number, h: number, excludeId?: string) => boolean
 ) {
@@ -172,7 +241,8 @@ function onDocumentPointerUp() {
     moveToEquipment,
     equipment,
     removeItem,
-    setRigArmorPlate
+    setRigArmorPlate,
+    installWeaponAttachment
   } = useSaveEditor()
 
   if (ds.deleteHover) {
@@ -188,6 +258,21 @@ function onDocumentPointerUp() {
       ds.source.item.condition
     )
     removeItem(ds.source.item.subResourceId)
+    cleanup()
+    return
+  }
+
+  if (ds.attachmentHover?.isValid) {
+    const target = findAttachmentTargetById(ds.attachmentHover.targetSubResourceId)
+    const ejectedSlot = target ? getAttachmentDropEjectSlot(target) : null
+    if (target) {
+      installWeaponAttachment(target.subResourceId, ds.source.item.subResourceId, ejectedSlot)
+    }
+    cleanup()
+    return
+  }
+
+  if (ds.plateHover || ds.attachmentHover) {
     cleanup()
     return
   }
@@ -316,17 +401,22 @@ function cleanup() {
 }
 
 export function useDragDrop() {
-  function startDragFromGrid(placement: GridItemPlacement, event: PointerEvent) {
+  function startDragFromGrid(
+    placement: GridItemPlacement,
+    event: PointerEvent,
+    gridMode: 'inventory' | 'catalog' = 'inventory'
+  ) {
     event.preventDefault()
     const cellSize = getActiveCellSize()
 
     dragState.value = {
-      source: { origin: 'grid', item: placement },
+      source: { origin: 'grid', item: placement, gridMode },
       clientX: event.clientX,
       clientY: event.clientY,
       gridSnap: null,
       equipmentHover: null,
       plateHover: null,
+      attachmentHover: null,
       deleteHover: false,
       ghostW: placement.w,
       ghostH: placement.h,
@@ -353,6 +443,7 @@ export function useDragDrop() {
       gridSnap: null,
       equipmentHover: null,
       plateHover: null,
+      attachmentHover: null,
       deleteHover: false,
       ghostW: placement.w,
       ghostH: placement.h,
@@ -417,6 +508,7 @@ export function useDragDrop() {
   function enterPlateTarget(target: GridItemPlacement | SlotItem) {
     if (!dragState.value) return
     dragState.value.equipmentHover = null
+    dragState.value.attachmentHover = null
     dragState.value.plateHover = {
       targetSubResourceId: target.subResourceId,
       isValid: canDropPlateIntoRig(dragState.value.source.item, target)
@@ -427,6 +519,23 @@ export function useDragDrop() {
     if (!dragState.value) return
     if (dragState.value.plateHover?.targetSubResourceId === subResourceId) {
       dragState.value.plateHover = null
+    }
+  }
+
+  function enterAttachmentTarget(target: GridItemPlacement | SlotItem) {
+    if (!dragState.value) return
+    dragState.value.equipmentHover = null
+    dragState.value.plateHover = null
+    dragState.value.attachmentHover = {
+      targetSubResourceId: target.subResourceId,
+      isValid: canDropAttachmentIntoWeapon(dragState.value.source.item, target)
+    }
+  }
+
+  function leaveAttachmentTarget(subResourceId: string) {
+    if (!dragState.value) return
+    if (dragState.value.attachmentHover?.targetSubResourceId === subResourceId) {
+      dragState.value.attachmentHover = null
     }
   }
 
@@ -485,6 +594,8 @@ export function useDragDrop() {
     leaveEquipmentSlot,
     enterPlateTarget,
     leavePlateTarget,
+    enterAttachmentTarget,
+    leaveAttachmentTarget,
     enterDeleteZone,
     leaveDeleteZone,
     onKeyDown,

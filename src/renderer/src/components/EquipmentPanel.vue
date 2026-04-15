@@ -4,16 +4,17 @@ import { useSaveEditor } from '../composables/useSaveEditor'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useInventoryGrid, CELL_SIZE } from '../composables/useInventoryGrid'
 import { useToast } from '../composables/useToast'
-import { ITEMS_BY_PATH } from '../data/items'
+import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { ITEMS_BY_SLOT } from '../data/equipment-slots'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
+import { ATTACHMENT_SUBTYPE } from '../data/attachment-subtypes'
 import CompositeIcon from './CompositeIcon.vue'
 import ItemContextMenu from './ItemContextMenu.vue'
 import { Popover } from '../components/ui/popover'
 import { PopoverAnchor } from 'reka-ui'
 import PopoverContent from '../components/ui/popover/PopoverContent.vue'
 import { ChevronDown } from 'lucide-vue-next'
-import type { SlotItem, GameItem } from '../lib/types'
+import type { AttachmentRemoveOption, SlotItem, GameItem } from '../lib/types'
 
 const COLS = 6
 const ROWS = 8
@@ -50,14 +51,23 @@ const slots: SlotDef[] = [
   { name: 'Player', col: 5, row: 7, w: 1, h: 1 }
 ]
 
-const { equipment, removeItem, addItem, addEquipmentItem, setRigArmorPlate } = useSaveEditor()
+const {
+  equipment,
+  removeItem,
+  addItem,
+  addEquipmentItem,
+  setRigArmorPlate,
+  removeWeaponAttachment
+} = useSaveEditor()
 const {
   dragState,
   startDragFromEquipment,
   enterEquipmentSlot,
   leaveEquipmentSlot,
   enterPlateTarget,
-  leavePlateTarget
+  leavePlateTarget,
+  enterAttachmentTarget,
+  leaveAttachmentTarget
 } = useDragDrop()
 const { findFreeSlot } = useInventoryGrid()
 const toast = useToast()
@@ -88,6 +98,18 @@ const removePlateLabel = computed(() => {
   if (!platePath) return ''
   const plate = ITEMS_BY_PATH.get(platePath)
   return `Remove ${plate?.armorRating ? `${plate.armorRating} plate` : (plate?.displayName ?? 'plate')}`
+})
+
+const removeAttachmentOptions = computed<AttachmentRemoveOption[]>(() => {
+  const item = contextMenu.value?.item
+  if (!item || item.category !== 'Weapons') return []
+
+  return item.nested
+    .filter((path) => ATTACHMENT_SUBTYPE.has(path))
+    .map((path) => ({
+      path,
+      label: `Remove ${ITEMS_BY_PATH.get(path)?.displayName ?? path.split('/').pop()?.replace('.tres', '') ?? 'attachment'}`
+    }))
 })
 
 const canDuplicate = computed(() => {
@@ -153,6 +175,25 @@ function handleRemovePlate() {
     gridRotated: slot.rotated
   })
   setRigArmorPlate(rig.subResourceId, null)
+  contextMenu.value = null
+}
+
+function handleRemoveAttachment(path: string) {
+  if (!contextMenu.value) return
+  const weapon = contextMenu.value.item
+
+  const attachment = ITEMS_BY_PATH.get(path)
+  const size = attachment ? getItemSize(attachment) : { w: 1, h: 1 }
+  const slot = findFreeSlot(size.w, size.h)
+  if (!slot) {
+    toast.show('No inventory space for removed attachment')
+    contextMenu.value = null
+    return
+  }
+
+  if (!removeWeaponAttachment(weapon.subResourceId, path, slot)) {
+    toast.show('Failed to remove attachment')
+  }
   contextMenu.value = null
 }
 
@@ -251,16 +292,26 @@ function selectEquipmentItem(slotName: string, item: GameItem | null) {
 function onSlotPointerEnter(slot: SlotDef) {
   if (!dragState.value) return
   const item = equipmentBySlot.value.get(slot.name)
-  if (item?.carrier && ITEMS_BY_PATH.get(dragState.value.source.item.itemPath)?.plate) {
-    enterPlateTarget(item)
-    return
+  if (item) {
+    const draggedPath = dragState.value.source.item.itemPath
+    if (item.carrier && ITEMS_BY_PATH.get(draggedPath)?.plate) {
+      enterPlateTarget(item)
+      return
+    }
+    if (item.category === 'Weapons' && ATTACHMENT_SUBTYPE.has(draggedPath)) {
+      enterAttachmentTarget(item)
+      return
+    }
   }
   enterEquipmentSlot(slot.name)
 }
 
 function onSlotPointerLeave(slot: SlotDef) {
   const item = equipmentBySlot.value.get(slot.name)
-  if (item) leavePlateTarget(item.subResourceId)
+  if (item) {
+    leavePlateTarget(item.subResourceId)
+    leaveAttachmentTarget(item.subResourceId)
+  }
   leaveEquipmentSlot(slot.name)
 }
 
@@ -274,6 +325,9 @@ function isSlotHovered(slot: SlotDef): boolean {
   if (!dragState.value) return false
   const item = equipmentBySlot.value.get(slot.name)
   if (item && dragState.value.plateHover?.targetSubResourceId === item.subResourceId) return true
+  if (item && dragState.value.attachmentHover?.targetSubResourceId === item.subResourceId) {
+    return true
+  }
   return (
     dragState.value.equipmentHover?.slotName === slot.name &&
     dragState.value.source.item.subResourceId !==
@@ -285,6 +339,9 @@ function isSlotHoverValid(slot: SlotDef): boolean {
   const item = equipmentBySlot.value.get(slot.name)
   if (item && dragState.value?.plateHover?.targetSubResourceId === item.subResourceId) {
     return dragState.value.plateHover.isValid
+  }
+  if (item && dragState.value?.attachmentHover?.targetSubResourceId === item.subResourceId) {
+    return dragState.value.attachmentHover.isValid
   }
   return dragState.value?.equipmentHover?.isValid ?? false
 }
@@ -456,9 +513,11 @@ const gridHeight = ROWS * CELL_SIZE
       :show-edit-loadout="showEditLoadout"
       :edit-loadout-label="editLoadoutLabel"
       :remove-plate-label="removePlateLabel"
+      :remove-attachment-options="removeAttachmentOptions"
       :can-duplicate="canDuplicate"
       @edit-loadout="handleEditLoadout"
       @remove-plate="handleRemovePlate"
+      @remove-attachment="handleRemoveAttachment"
       @duplicate="handleDuplicate"
       @delete="handleDelete"
       @close="contextMenu = null"
