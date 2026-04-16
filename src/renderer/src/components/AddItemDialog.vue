@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { catalogItems } from '../composables/saveEditorState'
+import { addItem, addCatalogItem } from '../composables/useInventoryItems'
 import { useInventoryGrid, CATALOG_COLS, CATALOG_ROWS } from '../composables/useInventoryGrid'
 import { ITEMS, resolveItemMeta, getItemSize } from '../data/items'
 import {
@@ -27,7 +28,6 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const { addItem, addCatalogItem, catalogItems } = useSaveEditor()
 const { findFreeSlot: findInventorySlot } = useInventoryGrid()
 const { findFreeSlot: findCatalogSlot } = useInventoryGrid({
   items: catalogItems,

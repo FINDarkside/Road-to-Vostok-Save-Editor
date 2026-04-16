@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue'
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { equipment } from '../composables/saveEditorState'
+import { updateItem, removeItem, addItem, addEquipmentItem } from '../composables/useInventoryItems'
+import { setRigArmorPlate } from '../composables/useArmorPlates'
+import { removeWeaponAttachment } from '../composables/useWeaponAttachments'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useInventoryGrid, CELL_SIZE } from '../composables/useInventoryGrid'
 import { useToast } from '../composables/useToast'
@@ -51,15 +54,6 @@ const slots: SlotDef[] = [
   { name: 'Player', col: 5, row: 7, w: 1, h: 1 }
 ]
 
-const {
-  equipment,
-  updateItem,
-  removeItem,
-  addItem,
-  addEquipmentItem,
-  setRigArmorPlate,
-  removeWeaponAttachment
-} = useSaveEditor()
 const {
   dragState,
   startDragFromEquipment,

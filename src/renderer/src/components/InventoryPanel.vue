@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { items, equipment } from '../composables/saveEditorState'
+import { updateItem } from '../composables/useInventoryItems'
 import { useDragDrop } from '../composables/useDragDrop'
 import { Button } from '../components/ui/button'
 import { Hammer, Trash2 } from 'lucide-vue-next'
@@ -8,7 +9,6 @@ import EquipmentPanel from './EquipmentPanel.vue'
 import InventoryGrid from './InventoryGrid.vue'
 import InventoryGridItem from './InventoryGridItem.vue'
 
-const { items, equipment, updateItem } = useSaveEditor()
 const { dragState, enterDeleteZone, leaveDeleteZone } = useDragDrop()
 
 const repairableItems = computed(() =>

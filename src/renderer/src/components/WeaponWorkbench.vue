@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { setWeaponNested } from '../composables/useWeaponAttachments'
 import { useItemIcons } from '../composables/useItemIcons'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
@@ -30,7 +30,6 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const { setWeaponNested } = useSaveEditor()
 const { loadIcon, getCachedIcon, status: iconStatus } = useItemIcons()
 
 const selectedPaths = ref(new Set<string>())

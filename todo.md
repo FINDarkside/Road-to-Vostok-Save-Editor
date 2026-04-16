@@ -2,21 +2,9 @@
 
 Ordered by payoff. Do top-down — each step makes the next one easier.
 
-## 1. Split `useSaveEditor.ts` along feature seams
+## 1. ~~Split `useSaveEditor.ts` along feature seams~~ — done
 
-`src/renderer/src/composables/useSaveEditor.ts` is 662 lines (down from 1,063 after the codec refactor) but still mixes unrelated concerns: load/save glue, slot-item construction, stat mutations, quest toggling, armor plate install/remove, equipment slot binding, weapon attachment install/uninstall. No unit tests.
-
-Now that the data is typed objects (not `Property[]` plumbing), the split is much more mechanical than before.
-
-**Plan — split into feature modules that all act on the shared typed state:**
-- `useTresFileLoader` — load / save / dirty flag / error state
-- `useInventoryItems` — add / remove / move
-- `useCharacterStats`
-- `useWeaponAttachments`
-- `useArmorPlates`
-- `useQuests` — already targets `traders`, clean seam
-
-**Scope:** medium.
+Split into `saveEditorState.ts` (shared refs + helpers) and 7 feature modules: `useTresFileLoader`, `useInventoryItems`, `useCharacterStats`, `useWeaponAttachments`, `useArmorPlates`, `useQuests`, `useWorldProps`. All 17 consumers updated to import directly — no barrel re-export.
 
 ---
 

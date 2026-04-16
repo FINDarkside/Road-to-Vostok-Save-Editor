@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { world } from '../composables/saveEditorState'
+import { updateWorldProp } from '../composables/useWorldProps'
 import { Input } from '../components/ui/input'
 import {
   Select,
@@ -9,8 +10,6 @@ import {
   SelectValue
 } from '../components/ui/select'
 import { Shield, Skull, Sun, Snowflake, Calendar, Cloud } from 'lucide-vue-next'
-
-const { world, updateWorldProp } = useSaveEditor()
 
 const difficulties = [
   { value: 1, label: 'Standard', description: 'Normal starting conditions' },

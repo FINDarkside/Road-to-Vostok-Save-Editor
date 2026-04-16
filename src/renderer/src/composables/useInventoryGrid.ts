@@ -1,5 +1,5 @@
 import { computed, type Ref } from 'vue'
-import { useSaveEditor } from './useSaveEditor'
+import { items as defaultItems } from './saveEditorState'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import type { GridItemPlacement, SlotItem } from '../lib/types'
 
@@ -21,7 +21,6 @@ export interface UseInventoryGridOptions {
 }
 
 export function useInventoryGrid(opts: UseInventoryGridOptions = {}) {
-  const { items: defaultItems } = useSaveEditor()
   const sourceItems = opts.items ?? defaultItems
   const cols = opts.cols ?? GRID_COLS
   const rows = opts.rows ?? GRID_ROWS

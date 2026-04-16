@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { character } from '../composables/saveEditorState'
+import { updateCatHealth, reviveCat } from '../composables/useCharacterStats'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Slider } from '../components/ui/slider'
 import { Cat, Skull, Search } from 'lucide-vue-next'
-
-const { character, updateCatHealth, reviveCat } = useSaveEditor()
 
 function onSliderChange(value: number[] | undefined): void {
   if (value) updateCatHealth(value[0])

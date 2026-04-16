@@ -9,7 +9,17 @@ import type {
 import { ATTACHMENT_SUBTYPE, getWeaponSlots } from '../data/attachment-subtypes'
 import { ITEMS_BY_PATH, getItemSize } from '../data/items'
 import { CELL_SIZE, useInventoryGrid } from './useInventoryGrid'
-import { useSaveEditor } from './useSaveEditor'
+import { equipment } from './saveEditorState'
+import {
+  removeItem,
+  moveToInventory,
+  moveToEquipment,
+  updateItemGridPosition,
+  setEquipmentSlot,
+  swapEquipmentSlots
+} from './useInventoryItems'
+import { setRigArmorPlate } from './useArmorPlates'
+import { installWeaponAttachment } from './useWeaponAttachments'
 
 type ActiveGrid = ReturnType<typeof useInventoryGrid>
 type GridSlot = { col: number; row: number; rotated: boolean }
@@ -192,7 +202,6 @@ function findAttachmentTargetById(subResourceId: string): GridItemPlacement | Sl
   const gridTarget = activeGrid?.gridPlacements.value.find((p) => p.subResourceId === subResourceId)
   if (gridTarget) return gridTarget
 
-  const { equipment } = useSaveEditor()
   return equipment.value.find((item) => item.subResourceId === subResourceId) ?? null
 }
 
@@ -235,18 +244,6 @@ function onDocumentPointerMove(event: PointerEvent) {
 function onDocumentPointerUp() {
   if (!dragState.value) return
   const ds = dragState.value
-  const {
-    updateItemGridPosition,
-    moveToInventory,
-    moveToEquipment,
-    equipment,
-    removeItem,
-    setRigArmorPlate,
-    installWeaponAttachment,
-    setEquipmentSlot,
-    swapEquipmentSlots
-  } = useSaveEditor()
-
   if (ds.deleteHover) {
     removeItem(ds.source.item.subResourceId)
     cleanup()
@@ -448,7 +445,6 @@ export function useDragDrop() {
 
     let isValid = true
     if (dragState.value.source.origin === 'grid') {
-      const { equipment } = useSaveEditor()
       const occupant = equipment.value.find((e) => e.slot === slotName)
       if (occupant) {
         if (!activeGrid) return

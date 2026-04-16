@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { isDirty, isLoading } from '../composables/saveEditorState'
+import { saveFile, init } from '../composables/useTresFileLoader'
 import { useToast } from '../composables/useToast'
 import { Button } from '../components/ui/button'
 import { Star } from 'lucide-vue-next'
 
-const { isDirty, isLoading, saveFile, init } = useSaveEditor()
 const toast = useToast()
 
 async function handleSave() {

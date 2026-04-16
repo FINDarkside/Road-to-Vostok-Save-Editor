@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { useSaveEditor } from './useSaveEditor'
+import { init } from './useTresFileLoader'
 
 type BackupEntry = Awaited<ReturnType<typeof window.api.listBackups>>[number]
 
@@ -18,7 +18,7 @@ export function useBackups() {
 
   async function restoreBackup(folderName: string) {
     await window.api.restoreBackup(folderName)
-    await useSaveEditor().init()
+    await init()
     await loadBackups()
   }
 

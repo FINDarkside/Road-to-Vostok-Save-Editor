@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { catalogItems } from '../composables/saveEditorState'
 import { useDragDrop } from '../composables/useDragDrop'
 import { useViewMode } from '../composables/useViewMode'
 import { Button } from '../components/ui/button'
@@ -8,7 +8,6 @@ import { LayoutGrid, List, Trash2 } from 'lucide-vue-next'
 import InventoryGrid from './InventoryGrid.vue'
 import InventoryGridItem from './InventoryGridItem.vue'
 import FurnitureListView from './FurnitureListView.vue'
-const { catalogItems } = useSaveEditor()
 const { dragState, enterDeleteZone, leaveDeleteZone } = useDragDrop()
 const { viewMode } = useViewMode('furniture', 'list')
 

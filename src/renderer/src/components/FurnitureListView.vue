@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { catalogItems } from '../composables/saveEditorState'
+import { addCatalogItem, removeItem } from '../composables/useInventoryItems'
 import {
   useInventoryGrid,
   CATALOG_COLS,
@@ -18,8 +19,6 @@ import {
 } from './ui/table'
 import { Button } from './ui/button'
 import ItemIcon from './ItemIcon.vue'
-
-const { catalogItems, addCatalogItem, removeItem } = useSaveEditor()
 
 // Headless grid instance only used to find a free slot when duplicating.
 const { findFreeSlot } = useInventoryGrid({

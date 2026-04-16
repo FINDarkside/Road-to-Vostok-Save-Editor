@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { character } from '../composables/saveEditorState'
+import { updateStat, maxAllStats, updateStatusEffect } from '../composables/useCharacterStats'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Slider } from '../components/ui/slider'
 import { Heart, Zap, Droplets, Thermometer, Brain } from 'lucide-vue-next'
-
-const { character, updateStat, maxAllStats, updateStatusEffect } = useSaveEditor()
 
 const statConfigs = [
   {

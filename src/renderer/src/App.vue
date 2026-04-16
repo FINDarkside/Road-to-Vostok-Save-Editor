@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, provide, onMounted } from 'vue'
-import { useSaveEditor } from './composables/useSaveEditor'
+import { character, world, traders, isLoading, loadError } from './composables/saveEditorState'
+import { init } from './composables/useTresFileLoader'
 import TitleBar from './components/TitleBar.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import InventoryPanel from './components/InventoryPanel.vue'
@@ -17,8 +18,6 @@ import IconStatusBanner from './components/IconStatusBanner.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
 import type { SlotItem } from './lib/types'
-
-const { character, world, traders, isLoading, loadError, init } = useSaveEditor()
 
 const addDialogOpen = ref(false)
 const addDialogTarget = ref<'inventory' | 'catalog'>('inventory')

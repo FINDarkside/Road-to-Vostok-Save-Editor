@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { setRigArmorPlate } from '../composables/useArmorPlates'
 import { useItemIcons } from '../composables/useItemIcons'
 import { ITEMS_BY_PATH } from '../data/items'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog'
@@ -16,7 +16,6 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const { setRigArmorPlate } = useSaveEditor()
 const { loadIcon, getCachedIcon, status: iconStatus } = useItemIcons()
 
 const selectedPlatePath = ref<string | null>(null)

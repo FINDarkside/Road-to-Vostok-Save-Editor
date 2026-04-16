@@ -10,7 +10,16 @@ import {
   CATALOG_CELL_SIZE
 } from '../composables/useInventoryGrid'
 import { useDragDrop } from '../composables/useDragDrop'
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { items as inventoryItems, catalogItems } from '../composables/saveEditorState'
+import {
+  updateItemGridPosition,
+  updateItem,
+  removeItem,
+  addItem,
+  addCatalogItem
+} from '../composables/useInventoryItems'
+import { setRigArmorPlate } from '../composables/useArmorPlates'
+import { removeWeaponAttachment } from '../composables/useWeaponAttachments'
 import { useToast } from '../composables/useToast'
 import { WEAPON_ATTACHMENT_LAYOUTS } from '../data/weapon-attachments'
 import { ATTACHMENT_SUBTYPE } from '../data/attachment-subtypes'
@@ -26,17 +35,6 @@ const props = withDefaults(
   { mode: 'inventory' }
 )
 
-const {
-  updateItemGridPosition,
-  updateItem,
-  removeItem,
-  addItem,
-  addCatalogItem,
-  setRigArmorPlate,
-  removeWeaponAttachment,
-  items: inventoryItems,
-  catalogItems
-} = useSaveEditor()
 const toast = useToast()
 
 const sourceItems = props.mode === 'catalog' ? catalogItems : inventoryItems

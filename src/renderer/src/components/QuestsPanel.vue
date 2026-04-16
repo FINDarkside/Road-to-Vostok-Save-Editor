@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { useSaveEditor } from '../composables/useSaveEditor'
+import { traders } from '../composables/saveEditorState'
+import { toggleQuestCompletion, setAllQuestsForTrader } from '../composables/useQuests'
 import { TRADERS, QUESTS_BY_TRADER, type TraderKey, type QuestItem } from '../data/quests'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { ScrollText } from 'lucide-vue-next'
-
-const { traders, toggleQuestCompletion, setAllQuestsForTrader } = useSaveEditor()
 
 const tradersWithQuests = TRADERS.filter((t) => (QUESTS_BY_TRADER.get(t.key)?.length ?? 0) > 0)
 
