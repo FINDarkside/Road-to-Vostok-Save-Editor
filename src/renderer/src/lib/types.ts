@@ -208,35 +208,30 @@ export interface DragDropState {
   offsetY: number
 }
 
-export interface CharacterStats {
-  health: number
-  energy: number
-  hydration: number
-  temperature: number
-  mental: number
-}
+// Derived from the schema codec so these types can't drift from what's
+// actually parsed/serialized. SlotItem above stays hand-written because it's
+// a view model enriched with catalog-derived fields that aren't on disk.
 
-export interface StatusEffects {
-  starvation: boolean
-  dehydration: boolean
-  bleeding: boolean
-  fracture: boolean
-  burn: boolean
-  frostbite: boolean
-  insanity: boolean
-  rupture: boolean
-  headshot: boolean
-}
+import type { CharacterResource, WorldResource } from './tres/codec'
 
-export interface CatStatus {
-  cat: number
-  catFound: boolean
-  catDead: boolean
-}
+export type CharacterStats = Pick<
+  CharacterResource,
+  'health' | 'energy' | 'hydration' | 'temperature' | 'mental'
+>
 
-export interface WorldState {
-  difficulty: number
-  season: number
-  day: number
-  weather: string
-}
+export type StatusEffects = Pick<
+  CharacterResource,
+  | 'starvation'
+  | 'dehydration'
+  | 'bleeding'
+  | 'fracture'
+  | 'burn'
+  | 'frostbite'
+  | 'insanity'
+  | 'rupture'
+  | 'headshot'
+>
+
+export type CatStatus = Pick<CharacterResource, 'cat' | 'catFound' | 'catDead'>
+
+export type WorldState = Pick<WorldResource, 'difficulty' | 'season' | 'day' | 'weather'>

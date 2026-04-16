@@ -242,7 +242,9 @@ function onDocumentPointerUp() {
     equipment,
     removeItem,
     setRigArmorPlate,
-    installWeaponAttachment
+    installWeaponAttachment,
+    setEquipmentSlot,
+    swapEquipmentSlots
   } = useSaveEditor()
 
   if (ds.deleteHover) {
@@ -352,45 +354,12 @@ function onDocumentPointerUp() {
           slotName
         )
       } else if (!occupant) {
-        changeEquipmentSlot(ds.source.item.subResourceId, slotName)
+        setEquipmentSlot(ds.source.item.subResourceId, slotName)
       }
     }
   }
 
   cleanup()
-}
-
-function swapEquipmentSlots(id1: string, slot1: string, id2: string, slot2: string) {
-  const { tresFile, isDirty } = useSaveEditor()
-  if (!tresFile.value) return
-  const tres = tresFile.value
-
-  const sub1 = tres.subResources.find((s) => s.id === id1)
-  const sub2 = tres.subResources.find((s) => s.id === id2)
-  if (!sub1 || !sub2) return
-
-  const slotProp1 = sub1.properties.find((p) => p.key === 'slot')
-  const slotProp2 = sub2.properties.find((p) => p.key === 'slot')
-  if (slotProp1) slotProp1.value = { kind: 'string', value: slot2 }
-  if (slotProp2) slotProp2.value = { kind: 'string', value: slot1 }
-
-  isDirty.value = true
-  tresFile.value = { ...tres }
-}
-
-function changeEquipmentSlot(subResourceId: string, slotName: string) {
-  const { tresFile, isDirty } = useSaveEditor()
-  if (!tresFile.value) return
-  const tres = tresFile.value
-
-  const sub = tres.subResources.find((s) => s.id === subResourceId)
-  if (!sub) return
-
-  const slotProp = sub.properties.find((p) => p.key === 'slot')
-  if (slotProp) slotProp.value = { kind: 'string', value: slotName }
-
-  isDirty.value = true
-  tresFile.value = { ...tres }
 }
 
 function cleanup() {
