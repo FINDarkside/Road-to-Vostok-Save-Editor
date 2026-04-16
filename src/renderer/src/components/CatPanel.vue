@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button'
 import { Slider } from '../components/ui/slider'
 import { Cat, Skull, Search } from 'lucide-vue-next'
 
-const { catStatus, tresFile, updateCatHealth, reviveCat } = useSaveEditor()
+const { character, updateCatHealth, reviveCat } = useSaveEditor()
 
 function onSliderChange(value: number[] | undefined): void {
   if (value) updateCatHealth(value[0])
@@ -20,17 +20,17 @@ function onInputChange(event: Event): void {
 </script>
 
 <template>
-  <div v-if="tresFile" class="max-w-xl space-y-6">
+  <div v-if="character" class="max-w-xl space-y-6">
     <h2 class="text-lg font-semibold">Cat Companion</h2>
 
     <!-- Not found -->
-    <div v-if="!catStatus.catFound" class="flex items-center gap-3 py-12 text-muted-foreground">
+    <div v-if="!character.catFound" class="flex items-center gap-3 py-12 text-muted-foreground">
       <Search class="h-12 w-12" />
       <p class="text-sm">You haven't found the cat yet.</p>
     </div>
 
     <!-- Dead -->
-    <div v-else-if="catStatus.catDead" class="flex items-center gap-4">
+    <div v-else-if="character.catDead" class="flex items-center gap-4">
       <Skull class="h-10 w-10 text-muted-foreground" />
       <p class="text-sm text-muted-foreground">Your cat has died.</p>
       <Button variant="secondary" size="sm" @click="reviveCat">Revive Cat</Button>
@@ -48,7 +48,7 @@ function onInputChange(event: Event): void {
           <label class="text-sm font-medium flex-1">Health</label>
           <Input
             type="number"
-            :model-value="String(Math.round(catStatus.cat * 10) / 10)"
+            :model-value="String(Math.round(character.cat * 10) / 10)"
             class="h-7 w-20 text-xs text-right"
             min="0"
             max="100"
@@ -57,7 +57,7 @@ function onInputChange(event: Event): void {
           />
         </div>
         <Slider
-          :model-value="[catStatus.cat]"
+          :model-value="[character.cat]"
           :max="100"
           :step="1"
           class="[&_[data-orientation=horizontal]>.absolute]:bg-green-500"

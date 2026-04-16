@@ -5,13 +5,12 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { ScrollText } from 'lucide-vue-next'
 
-const { tradersFile, questCompletion, toggleQuestCompletion, setAllQuestsForTrader } =
-  useSaveEditor()
+const { traders, toggleQuestCompletion, setAllQuestsForTrader } = useSaveEditor()
 
 const tradersWithQuests = TRADERS.filter((t) => (QUESTS_BY_TRADER.get(t.key)?.length ?? 0) > 0)
 
 function isCompleted(traderKey: TraderKey, questName: string): boolean {
-  return questCompletion.value[traderKey].includes(questName)
+  return traders.value?.[traderKey].includes(questName) ?? false
 }
 
 function completedCount(traderKey: TraderKey): number {
@@ -53,7 +52,7 @@ function difficultyVariant(difficulty: string) {
 </script>
 
 <template>
-  <div v-if="tradersFile" class="max-w-3xl space-y-6">
+  <div v-if="traders" class="max-w-3xl space-y-6">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <ScrollText class="h-5 w-5 text-muted-foreground" />

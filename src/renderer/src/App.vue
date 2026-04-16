@@ -18,7 +18,7 @@ import ToastContainer from './components/ToastContainer.vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
 import type { SlotItem } from './lib/types'
 
-const { tresFile, worldFile, tradersFile, isLoading, loadError, init } = useSaveEditor()
+const { character, world, traders, isLoading, loadError, init } = useSaveEditor()
 
 const addDialogOpen = ref(false)
 const addDialogTarget = ref<'inventory' | 'catalog'>('inventory')
@@ -62,7 +62,7 @@ onMounted(() => {
     </div>
 
     <Tabs
-      v-else-if="loadError || tresFile"
+      v-else-if="loadError || character"
       :default-value="defaultTab"
       class="flex-1 flex flex-col min-h-0"
     >
@@ -72,8 +72,8 @@ onMounted(() => {
           <TabsTrigger value="inventory" :disabled="!!loadError">Inventory</TabsTrigger>
           <TabsTrigger value="furniture" :disabled="!!loadError">Furniture</TabsTrigger>
           <TabsTrigger value="cat" :disabled="!!loadError">Cat</TabsTrigger>
-          <TabsTrigger value="world" :disabled="!!loadError || !worldFile">World</TabsTrigger>
-          <TabsTrigger value="quests" :disabled="!!loadError || !tradersFile">Quests</TabsTrigger>
+          <TabsTrigger value="world" :disabled="!!loadError || !world">World</TabsTrigger>
+          <TabsTrigger value="quests" :disabled="!!loadError || !traders">Quests</TabsTrigger>
           <div class="w-px self-stretch bg-border" />
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="backups">Backups</TabsTrigger>
@@ -100,16 +100,12 @@ onMounted(() => {
         <CatPanel />
       </TabsContent>
 
-      <TabsContent v-if="loadError || !worldFile" value="world" class="flex-1 min-h-0 p-4 mt-0" />
+      <TabsContent v-if="loadError || !world" value="world" class="flex-1 min-h-0 p-4 mt-0" />
       <TabsContent v-else value="world" class="flex-1 min-h-0 p-4 mt-0 overflow-auto">
         <WorldPanel />
       </TabsContent>
 
-      <TabsContent
-        v-if="loadError || !tradersFile"
-        value="quests"
-        class="flex-1 min-h-0 p-4 mt-0"
-      />
+      <TabsContent v-if="loadError || !traders" value="quests" class="flex-1 min-h-0 p-4 mt-0" />
       <TabsContent v-else value="quests" class="flex-1 min-h-0 p-4 mt-0 overflow-auto">
         <QuestsPanel />
       </TabsContent>

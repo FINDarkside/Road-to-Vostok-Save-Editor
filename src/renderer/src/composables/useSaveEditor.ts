@@ -1,13 +1,6 @@
 import { ref, computed } from 'vue'
 import type { TresFile } from '../lib/tres/types'
-import type {
-  SlotItem,
-  CharacterStats,
-  StatusEffects,
-  CatStatus,
-  WorldState,
-  SaveFileInfo
-} from '../lib/types'
+import type { SlotItem } from '../lib/types'
 import { parseTresFile } from '../lib/tres/parser'
 import { serializeTresFile } from '../lib/tres/serializer'
 import {
@@ -27,11 +20,10 @@ import { ITEMS_BY_PATH, ITEMS_META } from '../data/items'
 import { ATTACHMENT_SUBTYPE, getWeaponSlots } from '../data/attachment-subtypes'
 import type { TraderKey } from '../data/quests'
 
-const currentFile = ref<SaveFileInfo | null>(null)
+const currentFile = ref<string | null>(null)
 
-// Source TresFiles — kept for overlay-based serialization and for legacy
-// consumers that still null-check these refs. Not the source of truth for
-// edits; all mutations flow through the typed `character`/`world`/`traders`.
+// Source TresFiles — kept for overlay-based serialization. Not the source of
+// truth for edits; all mutations flow through the typed resources.
 const tresFile = ref<TresFile | null>(null)
 const worldFile = ref<TresFile | null>(null)
 const tradersFile = ref<TresFile | null>(null)
@@ -101,68 +93,6 @@ const catalogItems = computed<SlotItem[]>(() =>
   character.value ? character.value.catalog.map(slotItemDataToSlotItem) : []
 )
 
-const stats = computed<CharacterStats>(() => {
-  const c = character.value
-  if (!c) return { health: 0, energy: 0, hydration: 0, temperature: 0, mental: 0 }
-  return {
-    health: c.health,
-    energy: c.energy,
-    hydration: c.hydration,
-    temperature: c.temperature,
-    mental: c.mental
-  }
-})
-
-const statusEffects = computed<StatusEffects>(() => {
-  const c = character.value
-  if (!c)
-    return {
-      starvation: false,
-      dehydration: false,
-      bleeding: false,
-      fracture: false,
-      burn: false,
-      frostbite: false,
-      insanity: false,
-      rupture: false,
-      headshot: false
-    }
-  return {
-    starvation: c.starvation,
-    dehydration: c.dehydration,
-    bleeding: c.bleeding,
-    fracture: c.fracture,
-    burn: c.burn,
-    frostbite: c.frostbite,
-    insanity: c.insanity,
-    rupture: c.rupture,
-    headshot: c.headshot
-  }
-})
-
-const catStatus = computed<CatStatus>(() => {
-  const c = character.value
-  if (!c) return { cat: 0, catFound: false, catDead: false }
-  return { cat: c.cat, catFound: c.catFound, catDead: c.catDead }
-})
-
-const worldState = computed<WorldState>(() => {
-  const w = world.value
-  if (!w) return { difficulty: 1, season: 1, day: 1, weather: 'Neutral' }
-  return { difficulty: w.difficulty, season: w.season, day: w.day, weather: w.weather }
-})
-
-const questCompletion = computed<Record<TraderKey, string[]>>(() => {
-  const t = traders.value
-  if (!t) return { generalist: [], doctor: [], gunsmith: [], grandma: [] }
-  return {
-    generalist: t.generalist,
-    doctor: t.doctor,
-    gunsmith: t.gunsmith,
-    grandma: t.grandma
-  }
-})
-
 // ---------- Composable ----------
 
 export function useSaveEditor() {
@@ -177,7 +107,7 @@ export function useSaveEditor() {
       const tres = parseTresFile(content)
       tresFile.value = tres
       character.value = parseCharacter(tres)
-      currentFile.value = { fileName: 'Character.tres' }
+      currentFile.value = 'Character.tres'
       isDirty.value = false
     } catch (e) {
       loadError.value = e instanceof Error ? e.message : 'Failed to load Character.tres'
@@ -209,7 +139,7 @@ export function useSaveEditor() {
     await window.api.backupSave()
 
     const newCharTres = serializeCharacter(character.value, tresFile.value)
-    await window.api.saveSave(currentFile.value.fileName, serializeTresFile(newCharTres))
+    await window.api.saveSave(currentFile.value, serializeTresFile(newCharTres))
     tresFile.value = newCharTres
 
     if (world.value && worldFile.value) {
@@ -466,13 +396,28 @@ export function useSaveEditor() {
 
   // --- Stats / status / cat / world ---
 
-  function updateStat(key: keyof CharacterStats, value: number): void {
+  function updateStat(
+    key: 'health' | 'energy' | 'hydration' | 'temperature' | 'mental',
+    value: number
+  ): void {
     if (!character.value) return
     character.value[key] = value
     markDirty()
   }
 
-  function updateStatusEffect(key: keyof StatusEffects, value: boolean): void {
+  function updateStatusEffect(
+    key:
+      | 'starvation'
+      | 'dehydration'
+      | 'bleeding'
+      | 'fracture'
+      | 'burn'
+      | 'frostbite'
+      | 'insanity'
+      | 'rupture'
+      | 'headshot',
+    value: boolean
+  ): void {
     if (!character.value) return
     character.value[key] = value
     markDirty()
@@ -507,7 +452,10 @@ export function useSaveEditor() {
     markDirty()
   }
 
-  function updateWorldProp(key: keyof WorldState, value: number | string): void {
+  function updateWorldProp(
+    key: 'difficulty' | 'season' | 'day' | 'weather',
+    value: number | string
+  ): void {
     if (!world.value) return
     if (key === 'weather' && typeof value === 'string') {
       world.value.weather = value
@@ -617,24 +565,19 @@ export function useSaveEditor() {
 
   return {
     currentFile,
+    character,
+    world,
+    traders,
     items,
     equipment,
     catalogItems,
-    stats,
-    statusEffects,
-    catStatus,
-    worldState,
-    worldFile,
     worldLoadError,
-    tradersFile,
     tradersLoadError,
-    questCompletion,
     toggleQuestCompletion,
     setAllQuestsForTrader,
     isLoading,
     isDirty,
     loadError,
-    tresFile,
     init,
     saveFile,
     addItem,

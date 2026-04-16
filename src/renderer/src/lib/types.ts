@@ -1,7 +1,3 @@
-export interface SaveFileInfo {
-  fileName: string
-}
-
 export type ItemCategory =
   | 'Ammo'
   | 'Armor'
@@ -207,31 +203,3 @@ export interface DragDropState {
   offsetX: number
   offsetY: number
 }
-
-// Derived from the schema codec so these types can't drift from what's
-// actually parsed/serialized. SlotItem above stays hand-written because it's
-// a view model enriched with catalog-derived fields that aren't on disk.
-
-import type { CharacterResource, WorldResource } from './tres/codec'
-
-export type CharacterStats = Pick<
-  CharacterResource,
-  'health' | 'energy' | 'hydration' | 'temperature' | 'mental'
->
-
-export type StatusEffects = Pick<
-  CharacterResource,
-  | 'starvation'
-  | 'dehydration'
-  | 'bleeding'
-  | 'fracture'
-  | 'burn'
-  | 'frostbite'
-  | 'insanity'
-  | 'rupture'
-  | 'headshot'
->
-
-export type CatStatus = Pick<CharacterResource, 'cat' | 'catFound' | 'catDead'>
-
-export type WorldState = Pick<WorldResource, 'difficulty' | 'season' | 'day' | 'weather'>

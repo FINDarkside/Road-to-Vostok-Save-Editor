@@ -1,24 +1,13 @@
 <script setup lang="ts">
 import { useSaveEditor } from '../composables/useSaveEditor'
-import type { CharacterStats, StatusEffects } from '../lib/types'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Slider } from '../components/ui/slider'
 import { Heart, Zap, Droplets, Thermometer, Brain } from 'lucide-vue-next'
-import type { Component } from 'vue'
 
-const { stats, statusEffects, tresFile, updateStat, maxAllStats, updateStatusEffect } =
-  useSaveEditor()
+const { character, updateStat, maxAllStats, updateStatusEffect } = useSaveEditor()
 
-interface StatConfig {
-  key: keyof CharacterStats
-  label: string
-  color: string
-  trackColor: string
-  icon: Component
-}
-
-const statConfigs: StatConfig[] = [
+const statConfigs = [
   {
     key: 'health',
     label: 'Health',
@@ -54,14 +43,11 @@ const statConfigs: StatConfig[] = [
     trackColor: '[&_[data-orientation=horizontal]>.absolute]:bg-violet-500',
     icon: Brain
   }
-]
+] as const
 
-interface EffectConfig {
-  key: keyof StatusEffects
-  label: string
-}
+type StatKey = (typeof statConfigs)[number]['key']
 
-const effectConfigs: EffectConfig[] = [
+const effectConfigs = [
   { key: 'bleeding', label: 'Bleeding' },
   { key: 'fracture', label: 'Fracture' },
   { key: 'burn', label: 'Burn' },
@@ -71,13 +57,13 @@ const effectConfigs: EffectConfig[] = [
   { key: 'insanity', label: 'Insanity' },
   { key: 'rupture', label: 'Rupture' },
   { key: 'headshot', label: 'Headshot' }
-]
+] as const
 
-function onSliderChange(key: keyof CharacterStats, value: number[] | undefined): void {
+function onSliderChange(key: StatKey, value: number[] | undefined) {
   if (value) updateStat(key, value[0])
 }
 
-function onInputChange(key: keyof CharacterStats, event: Event): void {
+function onInputChange(key: StatKey, event: Event) {
   const value = parseFloat((event.target as HTMLInputElement).value)
   if (!isNaN(value)) {
     updateStat(key, Math.max(0, Math.min(100, value)))
@@ -86,7 +72,7 @@ function onInputChange(key: keyof CharacterStats, event: Event): void {
 </script>
 
 <template>
-  <div v-if="tresFile" class="max-w-xl space-y-6">
+  <div v-if="character" class="max-w-xl space-y-6">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-semibold">Character Stats</h2>
       <Button size="sm" variant="secondary" @click="maxAllStats">Max All</Button>
@@ -99,7 +85,7 @@ function onInputChange(key: keyof CharacterStats, event: Event): void {
           <label class="text-sm font-medium flex-1">{{ stat.label }}</label>
           <Input
             type="number"
-            :model-value="String(Math.round(stats[stat.key] * 10) / 10)"
+            :model-value="String(Math.round(character[stat.key] * 10) / 10)"
             class="h-7 w-20 text-xs text-right"
             min="0"
             max="100"
@@ -108,7 +94,7 @@ function onInputChange(key: keyof CharacterStats, event: Event): void {
           />
         </div>
         <Slider
-          :model-value="[stats[stat.key]]"
+          :model-value="[character[stat.key]]"
           :max="100"
           :step="1"
           :class="stat.trackColor"
@@ -124,11 +110,11 @@ function onInputChange(key: keyof CharacterStats, event: Event): void {
           v-for="effect in effectConfigs"
           :key="effect.key"
           class="flex items-center gap-2 text-sm cursor-pointer select-none rounded-md border border-border px-3 py-2 hover:bg-muted/50 transition-colors"
-          :class="statusEffects[effect.key] ? 'border-destructive bg-destructive/10' : ''"
+          :class="character[effect.key] ? 'border-destructive bg-destructive/10' : ''"
         >
           <input
             type="checkbox"
-            :checked="statusEffects[effect.key]"
+            :checked="character[effect.key]"
             class="accent-destructive"
             @change="updateStatusEffect(effect.key, ($event.target as HTMLInputElement).checked)"
           />

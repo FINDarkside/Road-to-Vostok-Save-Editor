@@ -10,7 +10,7 @@ import {
 } from '../components/ui/select'
 import { Shield, Skull, Sun, Snowflake, Calendar, Cloud } from 'lucide-vue-next'
 
-const { worldState, worldFile, updateWorldProp } = useSaveEditor()
+const { world, updateWorldProp } = useSaveEditor()
 
 const difficulties = [
   { value: 1, label: 'Standard', description: 'Normal starting conditions' },
@@ -34,7 +34,7 @@ function onDayInput(event: Event): void {
 </script>
 
 <template>
-  <div v-if="worldFile" class="max-w-xl space-y-6">
+  <div v-if="world" class="max-w-xl space-y-6">
     <h2 class="text-lg font-semibold">World</h2>
 
     <!-- Difficulty -->
@@ -48,13 +48,13 @@ function onDayInput(event: Event): void {
           v-for="d in difficulties"
           :key="d.value"
           class="flex flex-col items-center gap-1 text-sm cursor-pointer select-none rounded-md border border-border px-3 py-2 hover:bg-muted/50 transition-colors"
-          :class="worldState.difficulty === d.value ? 'border-primary bg-primary/10' : ''"
+          :class="world.difficulty === d.value ? 'border-primary bg-primary/10' : ''"
         >
           <input
             type="radio"
             name="difficulty"
             :value="d.value"
-            :checked="worldState.difficulty === d.value"
+            :checked="world.difficulty === d.value"
             class="sr-only"
             @change="updateWorldProp('difficulty', d.value)"
           />
@@ -75,13 +75,13 @@ function onDayInput(event: Event): void {
           v-for="s in seasons"
           :key="s.value"
           class="flex items-center justify-center gap-2 text-sm cursor-pointer select-none rounded-md border border-border px-3 py-2 hover:bg-muted/50 transition-colors"
-          :class="worldState.season === s.value ? 'border-primary bg-primary/10' : ''"
+          :class="world.season === s.value ? 'border-primary bg-primary/10' : ''"
         >
           <input
             type="radio"
             name="season"
             :value="s.value"
-            :checked="worldState.season === s.value"
+            :checked="world.season === s.value"
             class="sr-only"
             @change="updateWorldProp('season', s.value)"
           />
@@ -99,7 +99,7 @@ function onDayInput(event: Event): void {
       </div>
       <Input
         type="number"
-        :model-value="String(worldState.day)"
+        :model-value="String(world.day)"
         class="w-28"
         min="1"
         step="1"
@@ -114,7 +114,7 @@ function onDayInput(event: Event): void {
         <label class="text-sm font-medium">Weather</label>
       </div>
       <Select
-        :model-value="worldState.weather"
+        :model-value="world.weather"
         @update:model-value="
           (v) => {
             if (typeof v === 'string') updateWorldProp('weather', v)

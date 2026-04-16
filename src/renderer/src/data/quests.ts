@@ -1,4 +1,11 @@
-export type TraderKey = 'generalist' | 'doctor' | 'gunsmith' | 'grandma'
+export const TRADERS = [
+  { key: 'generalist', displayName: 'Generalist' },
+  { key: 'doctor', displayName: 'Doctor' },
+  { key: 'gunsmith', displayName: 'Gunsmith' },
+  { key: 'grandma', displayName: 'Grandma' }
+] as const
+
+export type TraderKey = (typeof TRADERS)[number]['key']
 
 export interface QuestItem {
   name: string
@@ -15,18 +22,6 @@ export interface QuestDef {
   receive: QuestItem[]
   rewardKeys: string[]
 }
-
-export interface TraderDef {
-  key: TraderKey
-  displayName: string
-}
-
-export const TRADERS: TraderDef[] = [
-  { key: 'generalist', displayName: 'Generalist' },
-  { key: 'doctor', displayName: 'Doctor' },
-  { key: 'gunsmith', displayName: 'Gunsmith' },
-  { key: 'grandma', displayName: 'Grandma' }
-]
 
 export const QUESTS: QuestDef[] = [
   // Doctor quests
