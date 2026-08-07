@@ -3,7 +3,6 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 const gh = process.platform === 'win32' ? 'gh.exe' : 'gh'
 
 function fail(message) {
@@ -19,6 +18,12 @@ function capture(command, args) {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   }).trim()
+}
+
+function runNpm(args) {
+  const npmExecPath = process.env.npm_execpath
+  if (!npmExecPath) fail('npm_execpath is unavailable; run this script through npm run release.')
+  run(process.execPath, [npmExecPath, ...args])
 }
 
 function optionValue(name) {
@@ -102,7 +107,7 @@ function main() {
   run('git', ['push', 'origin', 'main'])
   const target = capture('git', ['rev-parse', 'HEAD'])
 
-  run(npm, ['run', 'build:win'])
+  runNpm(['run', 'build:win'])
 
   const installerName = `${name}-${version}-setup.exe`
   const assetPaths = [
