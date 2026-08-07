@@ -6,18 +6,20 @@
  */
 
 import { readdir, readFile, writeFile } from 'fs/promises'
-import { join, basename } from 'path'
+import { join, basename, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
-const DECOMPILED = join(__dirname, '../../Vostok RE/decompiled')
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
+const DECOMPILED = join(SCRIPT_DIR, '../../Vostok RE/decompiled')
 const DECOMPILED_ITEMS = join(DECOMPILED, 'Items')
 const DECOMPILED_ASSETS = join(DECOMPILED, 'Assets')
 const DECOMPILED_SCRIPTS = join(DECOMPILED, 'Scripts')
-const OUT_ITEMS = join(__dirname, '../src/renderer/src/data/items.ts')
-const OUT_ATTACHMENTS = join(__dirname, '../src/renderer/src/data/weapon-attachments.ts')
+const OUT_ITEMS = join(SCRIPT_DIR, '../src/renderer/src/data/items.ts')
+const OUT_ATTACHMENTS = join(SCRIPT_DIR, '../src/renderer/src/data/weapon-attachments.ts')
 
 /** Map game `type` field → our ItemCategory name */
 const TYPE_TO_CATEGORY: Record<string, string> = {

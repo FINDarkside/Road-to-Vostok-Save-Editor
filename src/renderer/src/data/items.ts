@@ -2179,6 +2179,13 @@ export const ITEMS = [
   },
   {
     category: 'Medical',
+    id: 'Gum',
+    displayName: 'Gum',
+    resourcePath: 'res://Items/Medical/Gum/Gum.tres',
+    iconFile: 'Icon_Gum.png-c5a6c888f7f51bdf657701d44c183e9f.s3tc.ctex'
+  },
+  {
+    category: 'Medical',
     id: 'IFAK',
     displayName: 'IFAK',
     resourcePath: 'res://Items/Medical/IFAK/IFAK.tres',
