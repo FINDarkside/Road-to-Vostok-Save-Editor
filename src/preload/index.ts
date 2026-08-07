@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 const api = {
+  getAppVersion: (): Promise<string> => ipcRenderer.invoke('app:get-version'),
   listSaves: (): Promise<{ fileName: string }[]> => ipcRenderer.invoke('saves:list'),
   loadSave: (fileName: string): Promise<string> => ipcRenderer.invoke('saves:load', fileName),
   saveSave: (fileName: string, content: string): Promise<void> =>

@@ -14,6 +14,7 @@ type IconStatus =
   | { status: 'not-found' }
 
 interface SaveApi {
+  getAppVersion(): Promise<string>
   listSaves(): Promise<{ fileName: string }[]>
   loadSave(fileName: string): Promise<string>
   saveSave(fileName: string, content: string): Promise<void>

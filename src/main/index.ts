@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import { registerSaveHandlers } from './ipc/save-handlers'
 import { registerIconHandlers } from './ipc/icon-handlers'
 import { registerBackupHandlers } from './ipc/backup-handlers'
+import { registerAppHandlers } from './ipc/app-handlers'
 import { initAutoUpdater } from './updater'
 
 const ICON_CACHE_DIR = join(app.getPath('userData'), 'icon-cache')
@@ -69,6 +70,7 @@ app.whenReady().then(() => {
   registerSaveHandlers()
   registerIconHandlers()
   registerBackupHandlers()
+  registerAppHandlers()
 
   createWindow()
   initAutoUpdater()

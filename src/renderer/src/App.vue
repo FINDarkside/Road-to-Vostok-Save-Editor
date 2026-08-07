@@ -8,6 +8,7 @@ import InventoryPanel from './components/InventoryPanel.vue'
 import FurniturePanel from './components/FurniturePanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import BackupsPanel from './components/BackupsPanel.vue'
+import ChangelogPanel from './components/ChangelogPanel.vue'
 import CatPanel from './components/CatPanel.vue'
 import WorldPanel from './components/WorldPanel.vue'
 import QuestsPanel from './components/QuestsPanel.vue'
@@ -76,6 +77,7 @@ onMounted(() => {
           <div class="w-px self-stretch bg-border" />
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="backups">Backups</TabsTrigger>
+          <TabsTrigger value="changelog">Changelog</TabsTrigger>
         </TabsList>
       </div>
 
@@ -115,6 +117,10 @@ onMounted(() => {
 
       <TabsContent value="backups" class="flex-1 min-h-0 p-4 mt-0 overflow-auto">
         <BackupsPanel />
+      </TabsContent>
+
+      <TabsContent value="changelog" class="flex-1 min-h-0 p-4 mt-0 overflow-auto">
+        <ChangelogPanel />
       </TabsContent>
     </Tabs>
 

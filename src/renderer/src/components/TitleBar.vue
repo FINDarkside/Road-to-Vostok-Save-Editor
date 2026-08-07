@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { isDirty, isLoading } from '../composables/saveEditorState'
 import { saveFile, init } from '../composables/useTresFileLoader'
 import { useToast } from '../composables/useToast'
@@ -6,6 +7,11 @@ import { Button } from '../components/ui/button'
 import { Star } from 'lucide-vue-next'
 
 const toast = useToast()
+const appVersion = ref('')
+
+onMounted(async () => {
+  appVersion.value = await window.api.getAppVersion()
+})
 
 async function handleSave() {
   try {
@@ -19,6 +25,7 @@ async function handleSave() {
 <template>
   <div class="flex items-center gap-3 border-b border-border px-4 py-2">
     <h1 class="text-sm font-semibold whitespace-nowrap">Road to Vostok Save Editor</h1>
+    <span v-if="appVersion" class="text-xs text-muted-foreground">v{{ appVersion }}</span>
 
     <div v-if="isDirty" class="text-xs text-muted-foreground">Unsaved changes</div>
 

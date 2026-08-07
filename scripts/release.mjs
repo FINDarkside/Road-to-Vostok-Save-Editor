@@ -26,20 +26,28 @@ function runNpm(args) {
   run(process.execPath, [npmExecPath, ...args])
 }
 
-function optionValue(name) {
-  const index = process.argv.indexOf(name)
-  if (index === -1) return null
-  const value = process.argv[index + 1]
-  if (!value || value.startsWith('--')) fail(`${name} requires a value.`)
-  return value
+function showHelp() {
+  console.log(`Usage: npm run release
+
+Extracts the package version's notes from CHANGELOG.md, validates the release
+state, pushes main, builds the Windows installer, and publishes the installer
+plus updater metadata as a GitHub release.`)
 }
 
-function showHelp() {
-  console.log(`Usage: npm run release -- <notes-file>
-       node scripts/release.mjs --notes-file <path>
+function extractReleaseNotes(changelog, version) {
+  const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const heading = new RegExp(`^##\\s+${escapedVersion}\\s*$`, 'm')
+  const match = heading.exec(changelog)
+  if (!match) fail(`CHANGELOG.md has no section for version ${version}.`)
 
-Validates the release state, pushes main, builds the Windows installer, and
-publishes the installer plus updater metadata as a GitHub release.`)
+  const remainder = changelog.slice(match.index + match[0].length)
+  const nextVersion = remainder.search(/^##\s+/m)
+  const notes = (nextVersion === -1 ? remainder : remainder.slice(0, nextVersion)).trim()
+  if (!notes) fail(`CHANGELOG.md section ${version} is empty.`)
+
+  // The changelog nests release headings under its version heading. Promote
+  // them one level when publishing the version section on its own.
+  return notes.replace(/^###\s+/gm, '## ')
 }
 
 function assertReleaseDoesNotExist(tag) {
@@ -72,16 +80,6 @@ function main() {
     return
   }
 
-  const positionalArgument = process.argv.slice(2).find((argument) => !argument.startsWith('-'))
-  const notesArgument = optionValue('--notes-file') ?? positionalArgument
-  if (!notesArgument) fail('Missing release notes file path.')
-
-  const notesFile = resolve(notesArgument)
-  if (!existsSync(notesFile) || !statSync(notesFile).isFile()) {
-    fail(`Release notes file not found: ${notesFile}`)
-  }
-  if (!readFileSync(notesFile, 'utf8').trim()) fail('Release notes file is empty.')
-
   const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
   const packageLock = JSON.parse(readFileSync('package-lock.json', 'utf8'))
   const { name, version } = packageJson
@@ -91,6 +89,12 @@ function main() {
   if (packageLock.version !== version || packageLock.packages?.['']?.version !== version) {
     fail('package.json and package-lock.json versions do not match.')
   }
+
+  const changelogFile = resolve('CHANGELOG.md')
+  if (!existsSync(changelogFile) || !statSync(changelogFile).isFile()) {
+    fail(`Changelog file not found: ${changelogFile}`)
+  }
+  const releaseNotes = extractReleaseNotes(readFileSync(changelogFile, 'utf8'), version)
 
   const branch = capture('git', ['branch', '--show-current'])
   if (branch !== 'main')
@@ -136,8 +140,8 @@ function main() {
     target,
     '--title',
     version,
-    '--notes-file',
-    notesFile,
+    '--notes',
+    releaseNotes,
     '--fail-on-no-commits'
   ])
 
