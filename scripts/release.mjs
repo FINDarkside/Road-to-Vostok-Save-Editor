@@ -30,7 +30,8 @@ function optionValue(name) {
 }
 
 function showHelp() {
-  console.log(`Usage: npm run release -- --notes-file <path>
+  console.log(`Usage: npm run release -- <notes-file>
+       node scripts/release.mjs --notes-file <path>
 
 Validates the release state, pushes main, builds the Windows installer, and
 publishes the installer plus updater metadata as a GitHub release.`)
@@ -66,8 +67,9 @@ function main() {
     return
   }
 
-  const notesArgument = optionValue('--notes-file')
-  if (!notesArgument) fail('Missing required --notes-file <path>.')
+  const positionalArgument = process.argv.slice(2).find((argument) => !argument.startsWith('-'))
+  const notesArgument = optionValue('--notes-file') ?? positionalArgument
+  if (!notesArgument) fail('Missing release notes file path.')
 
   const notesFile = resolve(notesArgument)
   if (!existsSync(notesFile) || !statSync(notesFile).isFile()) {
