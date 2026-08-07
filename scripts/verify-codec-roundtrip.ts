@@ -130,4 +130,31 @@ if (existsSync(characterPath)) {
   const noChange = serializeTresFile(serializeCharacter(data, src))
   const matchOriginal = noChange === readFileSync(characterPath, 'utf8')
   console.log(`  untouched raw roundtrip: ${matchOriginal ? 'ok' : 'FAIL'}`)
+
+  // 5. Fresh slot items must carry the SlotData script. Godot rejects a
+  // generic Resource inside Array[SlotData], causing the whole array to load
+  // as empty.
+  const referenceItem = data.inventory[0] ?? data.equipment[0] ?? data.catalog[0]
+  if (referenceItem) {
+    let freshId = 'Resource_codec_test'
+    while (src.subResources.some((sub) => sub.id === freshId)) freshId += '_x'
+
+    const withFreshItem = {
+      ...data,
+      inventory: [...data.inventory, { ...referenceItem, id: freshId }]
+    }
+    const serialized = serializeCharacter(withFreshItem, src)
+    const freshSub = serialized.subResources.find((sub) => sub.id === freshId)
+    const scriptProp = freshSub?.properties.find((prop) => prop.key === 'script')
+    const slotDataExtId = serialized.extResources.find(
+      (ext) => ext.path === 'res://Scripts/SlotData.gd'
+    )?.id
+    const hasSlotDataScript =
+      freshSub?.properties[0] === scriptProp &&
+      scriptProp?.value.kind === 'ext_resource' &&
+      scriptProp.value.id === slotDataExtId
+
+    console.log(`  fresh item script first: ${hasSlotDataScript ? 'ok' : 'FAIL'}`)
+    if (!hasSlotDataScript) process.exitCode = 1
+  }
 }

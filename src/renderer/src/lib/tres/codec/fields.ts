@@ -113,7 +113,9 @@ export function vector2(opts: PrimitiveOpts<Vec2> = { default: DEFAULT_VEC2 }): 
  * A single ext_resource ref stored as its resolved path. `default` is the path
  * used on new resources; an empty string means "absent is OK".
  */
-export function extRef(opts: PrimitiveOpts<string> = { default: '' }): FieldCodec<string> {
+export function extRef(
+  opts: PrimitiveOpts<string> & { required?: boolean } = { default: '' }
+): FieldCodec<string> {
   return {
     default: opts.default,
     parse: (v, ctx) => (v && v.kind === 'ext_resource' ? resolveExtPath(ctx, v.id) : opts.default),
@@ -122,7 +124,7 @@ export function extRef(opts: PrimitiveOpts<string> = { default: '' }): FieldCode
         const sourcePath = resolveExtPath(ctx, source.id)
         if (sourcePath === current) return source
       }
-      if (!source && current === opts.default) return null
+      if (!source && current === opts.default && !opts.required) return null
       if (!current) return null
       const [id] = ensureExtIds(ctx, [current])
       return { kind: 'ext_resource', id }

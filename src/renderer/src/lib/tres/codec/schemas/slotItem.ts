@@ -13,7 +13,10 @@ export const ITEM_DATA_SCRIPT = 'res://Scripts/ItemData.gd'
  * trip correctly and fresh items only emit non-default values.
  */
 export const slotItemSchema = resource({
-  script: f.extRef({ default: SLOT_DATA_SCRIPT }),
+  // Slot items live in Array[SlotData]. Without the script property Godot
+  // treats a new sub-resource as a generic Resource and rejects the entire
+  // typed array when loading the save.
+  script: f.extRef({ default: SLOT_DATA_SCRIPT, required: true }),
   itemData: f.extRef({ default: '' }),
   nested: f.extRefArray({ default: [], elementTypePath: ITEM_DATA_SCRIPT }),
   storage: f.extRefArray({ default: [], elementTypePath: SLOT_DATA_SCRIPT }),

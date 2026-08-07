@@ -39,7 +39,20 @@ export function resource<S extends Record<string, FieldCodec<unknown>>>(
 
       if (source) {
         const emittedKeys = new Set<string>()
+
+        // Godot must see a resource's script before script-defined properties
+        // such as itemData. Preserve valid files as-is while also normalizing
+        // missing or misplaced script properties to the first position.
+        const scriptCodec = fields.script
+        if (scriptCodec) {
+          const sourceScript = source.find((prop) => prop.key === 'script')
+          const next = scriptCodec.serialize(typed.script, sourceScript?.value, ctx)
+          if (next !== null) out.push({ key: 'script', value: next })
+          emittedKeys.add('script')
+        }
+
         for (const prop of source) {
+          if (prop.key === 'script' && scriptCodec) continue
           const codec = fields[prop.key]
           if (codec) {
             const next = codec.serialize(typed[prop.key], prop.value, ctx)
