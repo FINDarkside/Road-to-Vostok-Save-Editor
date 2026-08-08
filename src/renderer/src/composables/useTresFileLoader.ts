@@ -22,7 +22,7 @@ import {
   worldLoadError,
   tradersLoadError
 } from './saveEditorState'
-import { loadSafehouses, saveSafehouseUnlocks } from './useSafehouses'
+import { loadSafehouses, saveSafehouseChanges } from './useSafehouses'
 
 export async function init(): Promise<void> {
   isLoading.value = true
@@ -84,7 +84,7 @@ export async function saveFile(): Promise<void> {
     tradersFile.value = newTradersTres
   }
 
-  await saveSafehouseUnlocks()
+  await saveSafehouseChanges()
 
   isDirty.value = false
 }

@@ -3,16 +3,18 @@ import { world } from '../composables/saveEditorState'
 import { updateWorldProp } from '../composables/useWorldProps'
 import {
   SAFEHOUSES,
+  currentSafehouse,
   hasLockedSafehouses,
   isSafehouseUnlocked,
   safehousesLoaded,
   safehousesLoadError,
+  teleportToSafehouse,
   unlockAllSafehouses,
-  unlockSafehouse
+  unlockSafehouse,
+  type SafehouseLocation
 } from '../composables/useSafehouses'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
-import { Badge } from '../components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -26,10 +28,12 @@ import {
   Sun,
   Snowflake,
   Calendar,
+  Check,
   Cloud,
   House,
-  MapPin,
-  LockOpen
+  Lock,
+  LockOpen,
+  Navigation
 } from 'lucide-vue-next'
 
 const difficulties = [
@@ -45,6 +49,19 @@ const seasons = [
 
 const weathers = ['Neutral', 'Overcast', 'Rain', 'Storm', 'Wind', 'Aurora', 'Fog'] as const
 
+const safehouseRegions = [...new Set(SAFEHOUSES.map((safehouse) => safehouse.location))].map(
+  (location) => ({
+    location,
+    safehouses: SAFEHOUSES.filter((safehouse) => safehouse.location === location)
+  })
+)
+
+function getUnlockedCount(location: SafehouseLocation) {
+  return SAFEHOUSES.filter(
+    (safehouse) => safehouse.location === location && isSafehouseUnlocked(safehouse.name)
+  ).length
+}
+
 function onDayInput(event: Event): void {
   const value = parseInt((event.target as HTMLInputElement).value, 10)
   if (!isNaN(value) && value >= 1) {
@@ -56,6 +73,105 @@ function onDayInput(event: Event): void {
 <template>
   <div v-if="world" class="max-w-xl space-y-6">
     <h2 class="text-lg font-semibold">World</h2>
+
+    <!-- Safehouses -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <House class="h-4 w-4 text-muted-foreground" />
+          <div>
+            <h3 class="text-sm font-medium">Safehouses</h3>
+            <p class="text-xs text-muted-foreground">
+              Unlock safehouses or teleport between regions
+            </p>
+          </div>
+        </div>
+        <Button
+          v-if="safehousesLoaded"
+          variant="outline"
+          size="sm"
+          :class="!hasLockedSafehouses() ? 'invisible' : ''"
+          :disabled="!hasLockedSafehouses()"
+          @click="unlockAllSafehouses"
+        >
+          <LockOpen class="h-3.5 w-3.5" />
+          Unlock all
+        </Button>
+      </div>
+
+      <p v-if="safehousesLoadError" class="text-sm text-destructive">
+        Could not load safehouse status: {{ safehousesLoadError }}
+      </p>
+
+      <div v-else class="overflow-hidden rounded-md border border-border">
+        <section
+          v-for="(region, regionIndex) in safehouseRegions"
+          :key="region.location"
+          :class="regionIndex > 0 ? 'border-t border-border' : ''"
+        >
+          <div class="flex min-h-9 items-center gap-2 bg-muted/50 px-3 py-1.5">
+            <h4 class="text-xs font-medium">{{ region.location }}</h4>
+            <span class="text-xs text-muted-foreground">
+              {{ getUnlockedCount(region.location) }} of {{ region.safehouses.length }} unlocked
+            </span>
+          </div>
+
+          <div
+            v-for="safehouse in region.safehouses"
+            :key="safehouse.name"
+            class="grid min-h-13 grid-cols-[minmax(0,1fr)_8.5rem_5.5rem] items-center gap-3 border-t border-border px-3 py-2"
+            :class="currentSafehouse === safehouse.name ? 'bg-primary/5' : ''"
+          >
+            <span
+              class="truncate text-sm font-medium"
+              :class="!isSafehouseUnlocked(safehouse.name) ? 'text-muted-foreground' : ''"
+            >
+              {{ safehouse.name }}
+            </span>
+
+            <span
+              v-if="currentSafehouse === safehouse.name"
+              class="flex items-center gap-1.5 text-xs font-medium"
+            >
+              <Navigation class="h-3.5 w-3.5" />
+              Current location
+            </span>
+            <span
+              v-else-if="!isSafehouseUnlocked(safehouse.name)"
+              class="flex items-center gap-1.5 text-xs text-muted-foreground"
+            >
+              <Lock class="h-3.5 w-3.5" />
+              Locked
+            </span>
+            <span v-else class="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Check class="h-3.5 w-3.5" />
+              Available
+            </span>
+
+            <div class="flex justify-end">
+              <Button
+                v-if="!isSafehouseUnlocked(safehouse.name)"
+                size="sm"
+                class="w-20"
+                :disabled="!safehousesLoaded"
+                @click="unlockSafehouse(safehouse.name)"
+              >
+                Unlock
+              </Button>
+              <Button
+                v-else-if="currentSafehouse !== safehouse.name"
+                variant="outline"
+                size="sm"
+                class="w-20"
+                @click="teleportToSafehouse(safehouse.name)"
+              >
+                Teleport
+              </Button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
 
     <!-- Difficulty -->
     <div class="space-y-2">
@@ -150,64 +266,6 @@ function onDayInput(event: Event): void {
           </SelectItem>
         </SelectContent>
       </Select>
-    </div>
-
-    <!-- Safehouses -->
-    <div class="space-y-3 border-t border-border pt-5">
-      <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2">
-          <House class="h-4 w-4 text-muted-foreground" />
-          <div>
-            <h3 class="text-sm font-medium">Safehouses</h3>
-            <p class="text-xs text-muted-foreground">Unlock safehouses without using their keys</p>
-          </div>
-        </div>
-        <Button
-          v-if="safehousesLoaded && hasLockedSafehouses()"
-          variant="outline"
-          size="sm"
-          @click="unlockAllSafehouses"
-        >
-          <LockOpen class="h-3.5 w-3.5" />
-          Unlock all
-        </Button>
-      </div>
-
-      <p v-if="safehousesLoadError" class="text-sm text-destructive">
-        Could not load safehouse status: {{ safehousesLoadError }}
-      </p>
-
-      <div v-else class="space-y-2">
-        <div
-          v-for="safehouse in SAFEHOUSES"
-          :key="safehouse.name"
-          class="flex items-center justify-between gap-4 rounded-md border border-border px-3 py-2.5"
-        >
-          <div>
-            <div class="text-sm font-medium">{{ safehouse.name }}</div>
-            <div class="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-              <MapPin class="h-3 w-3" />
-              {{ safehouse.location }}
-            </div>
-          </div>
-
-          <Badge
-            v-if="isSafehouseUnlocked(safehouse.name)"
-            variant="outline"
-            class="border-green-600/40 bg-green-500/10 text-green-600 dark:text-green-400"
-          >
-            Unlocked
-          </Badge>
-          <Button
-            v-else
-            size="sm"
-            :disabled="!safehousesLoaded"
-            @click="unlockSafehouse(safehouse.name)"
-          >
-            Unlock
-          </Button>
-        </div>
-      </div>
     </div>
   </div>
 </template>

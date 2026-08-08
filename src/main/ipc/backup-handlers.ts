@@ -5,7 +5,13 @@ import { getSaveDir } from './save-handlers'
 
 const BACKUP_DIR_NAME = 'save-editor-backups'
 const MAX_BACKUPS = 20
-const MANAGED_SAFEHOUSE_FILES = ['Attic.tres', 'Classroom.tres', 'Bunker.tres'] as const
+const MANAGED_SAFEHOUSE_FILES = [
+  'Cabin.tres',
+  'Attic.tres',
+  'Classroom.tres',
+  'Tent.tres',
+  'Bunker.tres'
+] as const
 
 function getBackupDir() {
   return join(getSaveDir(), BACKUP_DIR_NAME)
