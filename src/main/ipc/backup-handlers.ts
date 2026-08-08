@@ -5,6 +5,7 @@ import { getSaveDir } from './save-handlers'
 
 const BACKUP_DIR_NAME = 'save-editor-backups'
 const MAX_BACKUPS = 20
+const MANAGED_SAFEHOUSE_FILES = ['Attic.tres', 'Classroom.tres', 'Bunker.tres'] as const
 
 function getBackupDir() {
   return join(getSaveDir(), BACKUP_DIR_NAME)
@@ -114,6 +115,13 @@ export function registerBackupHandlers(): void {
 
     for (const file of files) {
       await copyFile(join(folderPath, file), join(saveDir, file))
+    }
+
+    // Safehouse unlocks are represented by file existence. Remove any managed
+    // safehouse that did not exist in the restored snapshot.
+    const backupFiles = new Set(files)
+    for (const file of MANAGED_SAFEHOUSE_FILES) {
+      if (!backupFiles.has(file)) await rm(join(saveDir, file), { force: true })
     }
   })
 

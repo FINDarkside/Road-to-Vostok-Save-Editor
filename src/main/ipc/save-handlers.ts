@@ -43,6 +43,18 @@ export function registerSaveHandlers(): void {
     await writeFile(filePath, content, 'utf-8')
   })
 
+  ipcMain.handle('saves:create', async (_event, fileName: string, content: string) => {
+    validateFileName(fileName)
+    const filePath = join(getSaveDir(), fileName)
+    try {
+      await writeFile(filePath, content, { encoding: 'utf-8', flag: 'wx' })
+      return true
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false
+      throw error
+    }
+  })
+
   ipcMain.handle('saves:backup', async () => {
     await createBackup()
   })

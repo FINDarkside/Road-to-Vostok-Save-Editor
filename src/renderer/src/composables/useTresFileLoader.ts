@@ -22,6 +22,7 @@ import {
   worldLoadError,
   tradersLoadError
 } from './saveEditorState'
+import { loadSafehouses, saveSafehouseUnlocks } from './useSafehouses'
 
 export async function init(): Promise<void> {
   isLoading.value = true
@@ -58,6 +59,8 @@ export async function init(): Promise<void> {
     tradersLoadError.value = e instanceof Error ? e.message : 'Failed to load Traders.tres'
   }
 
+  await loadSafehouses()
+
   isLoading.value = false
 }
 
@@ -80,6 +83,8 @@ export async function saveFile(): Promise<void> {
     await window.api.saveSave('Traders.tres', serializeTresFile(newTradersTres))
     tradersFile.value = newTradersTres
   }
+
+  await saveSafehouseUnlocks()
 
   isDirty.value = false
 }

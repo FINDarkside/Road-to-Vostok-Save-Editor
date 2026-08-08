@@ -1,7 +1,18 @@
 <script setup lang="ts">
 import { world } from '../composables/saveEditorState'
 import { updateWorldProp } from '../composables/useWorldProps'
+import {
+  SAFEHOUSES,
+  hasLockedSafehouses,
+  isSafehouseUnlocked,
+  safehousesLoaded,
+  safehousesLoadError,
+  unlockAllSafehouses,
+  unlockSafehouse
+} from '../composables/useSafehouses'
 import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Badge } from '../components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -9,7 +20,17 @@ import {
   SelectTrigger,
   SelectValue
 } from '../components/ui/select'
-import { Shield, Skull, Sun, Snowflake, Calendar, Cloud } from 'lucide-vue-next'
+import {
+  Shield,
+  Skull,
+  Sun,
+  Snowflake,
+  Calendar,
+  Cloud,
+  House,
+  MapPin,
+  LockOpen
+} from 'lucide-vue-next'
 
 const difficulties = [
   { value: 1, label: 'Standard', description: 'Normal starting conditions' },
@@ -129,6 +150,64 @@ function onDayInput(event: Event): void {
           </SelectItem>
         </SelectContent>
       </Select>
+    </div>
+
+    <!-- Safehouses -->
+    <div class="space-y-3 border-t border-border pt-5">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <House class="h-4 w-4 text-muted-foreground" />
+          <div>
+            <h3 class="text-sm font-medium">Safehouses</h3>
+            <p class="text-xs text-muted-foreground">Unlock safehouses without using their keys</p>
+          </div>
+        </div>
+        <Button
+          v-if="safehousesLoaded && hasLockedSafehouses()"
+          variant="outline"
+          size="sm"
+          @click="unlockAllSafehouses"
+        >
+          <LockOpen class="h-3.5 w-3.5" />
+          Unlock all
+        </Button>
+      </div>
+
+      <p v-if="safehousesLoadError" class="text-sm text-destructive">
+        Could not load safehouse status: {{ safehousesLoadError }}
+      </p>
+
+      <div v-else class="space-y-2">
+        <div
+          v-for="safehouse in SAFEHOUSES"
+          :key="safehouse.name"
+          class="flex items-center justify-between gap-4 rounded-md border border-border px-3 py-2.5"
+        >
+          <div>
+            <div class="text-sm font-medium">{{ safehouse.name }}</div>
+            <div class="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+              <MapPin class="h-3 w-3" />
+              {{ safehouse.location }}
+            </div>
+          </div>
+
+          <Badge
+            v-if="isSafehouseUnlocked(safehouse.name)"
+            variant="outline"
+            class="border-green-600/40 bg-green-500/10 text-green-600 dark:text-green-400"
+          >
+            Unlocked
+          </Badge>
+          <Button
+            v-else
+            size="sm"
+            :disabled="!safehousesLoaded"
+            @click="unlockSafehouse(safehouse.name)"
+          >
+            Unlock
+          </Button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

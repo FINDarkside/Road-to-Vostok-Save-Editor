@@ -7,6 +7,8 @@ const api = {
   loadSave: (fileName: string): Promise<string> => ipcRenderer.invoke('saves:load', fileName),
   saveSave: (fileName: string, content: string): Promise<void> =>
     ipcRenderer.invoke('saves:save', fileName, content),
+  createSave: (fileName: string, content: string): Promise<boolean> =>
+    ipcRenderer.invoke('saves:create', fileName, content),
   backupSave: (): Promise<void> => ipcRenderer.invoke('saves:backup'),
   getSaveDir: (): Promise<string> => ipcRenderer.invoke('saves:get-dir'),
   openSaveDir: (): Promise<void> => ipcRenderer.invoke('saves:open-dir'),
