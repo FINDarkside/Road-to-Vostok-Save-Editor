@@ -9,7 +9,7 @@ import { ScrollText } from 'lucide-vue-next'
 const tradersWithQuests = TRADERS.filter((t) => (QUESTS_BY_TRADER.get(t.key)?.length ?? 0) > 0)
 
 function isCompleted(traderKey: TraderKey, questName: string): boolean {
-  return traders.value?.[traderKey].includes(questName) ?? false
+  return traders.value?.[traderKey]?.includes(questName) ?? false
 }
 
 function completedCount(traderKey: TraderKey): number {

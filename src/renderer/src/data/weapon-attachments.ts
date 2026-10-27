@@ -23,6 +23,15 @@ export const WEAPON_ATTACHMENT_LAYOUTS = new Map<string, AttachmentOverlay[]>([
     { attachmentPath: 'res://Items/Attachments/RMR/RMR.tres', position: [-56, -86], scale: 0.6 },
     { attachmentPath: 'res://Items/Attachments/SRO/SRO.tres', position: [-54, -88], scale: 0.6 }
   ]],
+  ['res://Items/Weapons/HP-DA/HP-DA.tres', [
+    { attachmentPath: 'res://Items/Weapons/HP-DA/HP-DA_Magazine.tres', position: [-74.00001, 18], scale: 1.4, behind: true },
+    { attachmentPath: 'res://Items/Attachments/Rider/Rider.tres', position: [228, -56], scale: 1, behind: true },
+    { attachmentPath: 'res://Items/Attachments/RMR/RMR.tres', position: [-54, -88], scale: 0.6 },
+    { attachmentPath: 'res://Items/Attachments/SRO/SRO.tres', position: [-50, -90], scale: 0.6 }
+  ]],
+  ['res://Items/Weapons/Jatimatic/Jatimatic.tres', [
+    { attachmentPath: 'res://Items/Weapons/Jatimatic/Jatimatic_Magazine.tres', position: [-36, 46], scale: 0.8, behind: true }
+  ]],
   ['res://Items/Weapons/HK416/HK416.tres', [
     { attachmentPath: 'res://Items/Attachments/ACOG/ACOG.tres', position: [-42, -98], scale: 0.6 },
     { attachmentPath: 'res://Items/Attachments/EXPS/EXPS.tres', position: [-24, -96], scale: 0.6 },
@@ -144,6 +153,22 @@ export const WEAPON_ATTACHMENT_LAYOUTS = new Map<string, AttachmentOverlay[]>([
   ]],
   ['res://Items/Weapons/KP-31/KP-31.tres', [
     { attachmentPath: 'res://Items/Weapons/KP-31/KP-31_Drum.tres', position: [52, 10], scale: 0.5, behind: true }
+  ]],
+  ['res://Items/Weapons/M28/M28.tres', [
+    { attachmentPath: 'res://Items/Attachments/PU/PU.tres', position: [-126, -60], scale: 0.5, behind: true }
+  ]],
+  ['res://Items/Weapons/M28/M28_MOD.tres', [
+    { attachmentPath: 'res://Items/Attachments/PU/PU.tres', position: [-142, -60], scale: 0.5, behind: true },
+    { attachmentPath: 'res://Items/Attachments/ACOG/ACOG.tres', position: [-60, -78], scale: 0.5 },
+    { attachmentPath: 'res://Items/Attachments/EXPS/EXPS.tres', position: [-50, -74], scale: 0.5 },
+    { attachmentPath: 'res://Items/Attachments/HMR/HMR.tres', position: [-60, -82], scale: 0.5 },
+    { attachmentPath: 'res://Items/Attachments/Hybrid/Hybrid.tres', position: [424, -42], scale: 0.5 },
+    { attachmentPath: 'res://Items/Attachments/Kobra/Kobra.tres', position: [-42, -72], scale: 0.5, behind: true },
+    { attachmentPath: 'res://Items/Attachments/Leopard/Leopard.tres', position: [-38, -78], scale: 0.5 },
+    { attachmentPath: 'res://Items/Attachments/Micro/Micro.tres', position: [-54, -70], scale: 0.5 },
+    { attachmentPath: 'res://Items/Attachments/MRO/MRO.tres', position: [-54, -72], scale: 0.5 },
+    { attachmentPath: 'res://Items/Attachments/PRO/PRO.tres', position: [-46, -76], scale: 0.5, behind: true },
+    { attachmentPath: 'res://Items/Attachments/Vudu/Vudu.tres', position: [-42, -80], scale: 0.6 }
   ]],
   ['res://Items/Weapons/M4A1/M4A1.tres', [
     { attachmentPath: 'res://Items/Attachments/ACOG/ACOG.tres', position: [-94, -86], scale: 0.6 },

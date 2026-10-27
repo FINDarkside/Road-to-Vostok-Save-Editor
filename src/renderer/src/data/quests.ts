@@ -2,7 +2,9 @@ export const TRADERS = [
   { key: 'generalist', displayName: 'Generalist' },
   { key: 'doctor', displayName: 'Doctor' },
   { key: 'gunsmith', displayName: 'Gunsmith' },
-  { key: 'grandma', displayName: 'Grandma' }
+  { key: 'grandma', displayName: 'Grandma' },
+  { key: 'driver', displayName: 'Driver' },
+  { key: 'hunter', displayName: 'Hunter' }
 ] as const
 
 export type TraderKey = (typeof TRADERS)[number]['key']
@@ -475,6 +477,209 @@ export const QUESTS: QuestDef[] = [
     deliver: [{ name: 'Flame Beanie', count: 1 }],
     receive: [{ name: 'Bunker Key', count: 1 }],
     rewardKeys: ['Key_Bunker']
+  },
+  // Driver quests
+  // --- Driver Quests ---
+  {
+    trader: 'driver',
+    name: 'Cravings',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 1,
+    deliver: [{ name: 'Gum', count: 1 }],
+    receive: [{ name: 'Cigarettes', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Mandatory Sleep',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 2,
+    deliver: [{ name: 'Pillow', count: 1 }],
+    receive: [{ name: 'Beer', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Mental Health',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 3,
+    deliver: [{ name: 'Magazine_Crosswords', count: 1 }],
+    receive: [{ name: 'Coffee_Brewed', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Nordic Pine',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 4,
+    deliver: [{ name: 'Air_Freshener', count: 3 }],
+    receive: [{ name: 'Water_Bottle', count: 3 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Getting Hot',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 5,
+    deliver: [{ name: 'Radiator_Engine', count: 1 }],
+    receive: [{ name: 'Batteries', count: 3 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Bangers',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 6,
+    deliver: [{ name: 'Casette_Radio', count: 1 }],
+    receive: [{ name: 'Medkit', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Black Market',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 7,
+    deliver: [{ name: 'Jatimatic', count: 1 }, { name: 'Jatimatic_Magazine', count: 1 }],
+    receive: [{ name: 'RGD-5', count: 3 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Historic Vehicle',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 8,
+    deliver: [{ name: 'Museum_Plate', count: 1 }, { name: 'Screws', count: 1 }],
+    receive: [{ name: 'Radio_F', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'driver',
+    name: 'Missing Suitcase',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 9,
+    deliver: [{ name: 'Suitcase_Driver', count: 1 }],
+    receive: [{ name: 'Key_Tunnel', count: 1 }],
+    rewardKeys: ['Key_Key_Tunnel']
+  },
+  {
+    trader: 'driver',
+    name: 'Only Zeros',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 10,
+    deliver: [{ name: 'Alcometer', count: 1 }],
+    receive: [{ name: 'Key_Garage', count: 1 }],
+    rewardKeys: ['Key_Key_Garage']
+  },
+  // --- Hunter Quests ---
+  {
+    trader: 'hunter',
+    name: 'Cold Hands',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 1,
+    deliver: [{ name: 'Hand_Warmer', count: 1 }],
+    receive: [{ name: 'Bench_Campsite_F', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Wooden Figurines',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 2,
+    deliver: [{ name: 'Sticks', count: 1 }, { name: 'Glue', count: 1 }],
+    receive: [{ name: 'Matches', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Baked Potato',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 3,
+    deliver: [{ name: 'Potato', count: 1 }, { name: 'Aluminum_Foil', count: 1 }],
+    receive: [{ name: 'Antiseptic', count: 1 }, { name: 'Rags', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Moose Season',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 4,
+    deliver: [{ name: 'Ammo_308', count: 1 }],
+    receive: [{ name: 'Ammo_762x54R', count: 3 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Dream Bream',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 5,
+    deliver: [{ name: 'Bream', count: 1 }],
+    receive: [{ name: 'Bed_Nomad_F', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Leather Goods',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 6,
+    deliver: [{ name: 'Leather', count: 2 }],
+    receive: [{ name: 'Salvo', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Friendly Fire',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 7,
+    deliver: [{ name: 'SSh-39', count: 1 }, { name: 'Armor_Plate_III', count: 1 }],
+    receive: [{ name: 'Phoenix', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Crooked Barrel',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 8,
+    deliver: [{ name: 'Weapon_Repair_Kit', count: 1 }],
+    receive: [{ name: 'Backpack_Kantamus', count: 1 }, { name: 'Watch_Tactical', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Better Scope',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 9,
+    deliver: [{ name: 'Leopard', count: 1 }],
+    receive: [{ name: 'P320', count: 1 }, { name: 'P320_Magazine', count: 1 }, { name: 'SRO', count: 1 }, { name: 'Rider', count: 1 }, { name: 'Ammo_9x19', count: 1 }],
+    rewardKeys: []
+  },
+  {
+    trader: 'hunter',
+    name: 'Bald Spot',
+    difficulty: 'Easy',
+    isTutorial: false,
+    order: 10,
+    deliver: [{ name: 'Hat_Sauna', count: 1 }],
+    receive: [{ name: 'AFAK', count: 3 }],
+    rewardKeys: []
   }
 ]
 
